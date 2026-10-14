@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // O catálogo é público. Produtos oficiais só são escritos pelo Admin SDK.
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Inclui criação antecipada, alteração, exclusão e subcoleções.
+    // O Admin SDK das Functions não depende de permissões de cliente.
+    match /orderFinancials/{document=**} {
+      allow read, write: if false;
+    }
+
+    // Preserva a regra temporária publicada para os demais caminhos.
+    // O app ainda não possui Auth: não muda checkout, tracking ou operação.
+    // As exclusões são essenciais: um allow amplo anularia os bloqueios acima.
+    match /{collection}/{document=**} {
+      allow read, write: if collection != 'products'
+                        && collection != 'orderFinancials'
+                        && request.time < timestamp.date(2026, 11, 2);
+    }
+  }
+}

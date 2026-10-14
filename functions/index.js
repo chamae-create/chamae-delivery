@@ -80,6 +80,214 @@ function agruparItensEstoque(itemsList) {
   return Array.from(quantidades, ([id, quantity]) => ({id, quantity}));
 }
 
+const FRETE_PEDIDO_CENTAVOS = 1000;
+const PYG_POR_BRL = 1500;
+const BRL_POR_USD = 5;
+
+/**
+ * Identifica erros financeiros sem tratá-los como falhas de estoque.
+ * @param {string} codigo Código do erro.
+ * @return {Error} Erro identificado.
+ */
+function erroFinanceiro(codigo) {
+  const error = new Error(codigo);
+  error.financeiro = true;
+  return error;
+}
+
+/**
+ * Impede mudança dos produtos/quantidades após o financeiro ser congelado.
+ * @param {Object} pedido Pedido atual.
+ * @param {Object} dados Financeiro oficial.
+ */
+function conferirItensFinanceiros(pedido, dados) {
+  const itens = agruparItensEstoque(pedido.itemsList);
+  const quantidades = new Map((itens || []).map((item) =>
+    [item.id, item.quantity]));
+  if (
+    !itens || dados.items.length !== itens.length ||
+    dados.items.some((item) => quantidades.get(item.id) !== item.quantity)
+  ) {
+    throw erroFinanceiro("ITENS_PEDIDO_ALTERADOS");
+  }
+}
+
+/**
+ * Obtém preços oficiais e congela o financeiro em um documento do backend.
+ * Não escreve: todas as leituras da transação devem preceder as escritas.
+ * @param {Object} transaction Transação Firestore.
+ * @param {Object} orderRef Referência do pedido.
+ * @param {Object} pedido Pedido atual.
+ * @return {Promise<Object>} Financeiro e referência para persistência.
+ */
+async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
+  const itens = agruparItensEstoque(pedido.itemsList);
+  if (!itens || itens.length === 0) {
+    throw erroFinanceiro(itens ? "PEDIDO_SEM_ITENS" : "ITEM_PEDIDO_INVALIDO");
+  }
+
+  // Esta coleção deve permitir escrita somente pelo backend (Admin SDK).
+  const ref = db.collection("orderFinancials").doc(orderRef.id);
+  const snapshot = await transaction.get(ref);
+  if (snapshot.exists) {
+    const dados = snapshot.data();
+    conferirItensFinanceiros(pedido, dados);
+    return {ref, dados, novo: false};
+  }
+
+  let subtotalCentavos = 0;
+  const items = [];
+  for (const item of itens) {
+    const productSnapshot = await transaction.get(
+        db.collection("products").doc(item.id),
+    );
+    if (!productSnapshot.exists) {
+      throw erroFinanceiro("PRODUTO_NAO_ENCONTRADO");
+    }
+    const product = productSnapshot.data() || {};
+    const preco = product.priceBRL == null ? product.price : product.priceBRL;
+    const precoCentavos = Math.round((preco + Number.EPSILON) * 100);
+    if (
+      typeof preco !== "number" || !Number.isFinite(preco) || preco < 0 ||
+      !Number.isSafeInteger(precoCentavos) ||
+      Math.abs(preco * 100 - precoCentavos) > 0.000001
+    ) {
+      throw erroFinanceiro("PRECO_PRODUTO_INVALIDO");
+    }
+    if (product.isActive === false) {
+      throw erroFinanceiro("PRODUTO_INATIVO");
+    }
+    subtotalCentavos += precoCentavos * item.quantity;
+    if (!Number.isSafeInteger(subtotalCentavos)) {
+      throw erroFinanceiro("VALOR_PEDIDO_INVALIDO");
+    }
+    items.push({
+      id: item.id, quantity: item.quantity, price: precoCentavos / 100,
+    });
+  }
+
+  if (subtotalCentavos > Math.floor((Number.MAX_SAFE_INTEGER - 50) / 3)) {
+    throw erroFinanceiro("VALOR_PEDIDO_INVALIDO");
+  }
+  const customerFeeCentavos = Math.floor((subtotalCentavos + 50) / 100);
+  const merchantFeeCentavos = Math.floor((subtotalCentavos * 3 + 50) / 100);
+  const totalCentavos =
+      subtotalCentavos + FRETE_PEDIDO_CENTAVOS + customerFeeCentavos;
+  if (!Number.isSafeInteger(totalCentavos) || totalCentavos <= 0) {
+    throw erroFinanceiro("VALOR_PEDIDO_INVALIDO");
+  }
+
+  // Uma tentativa antiga sem registro financeiro só pode reutilizar sua chave
+  // se o valor previamente congelado coincide com o cálculo oficial atual.
+  const chaveLegada = typeof pedido.mercadoPagoIdempotencyKey === "string" ?
+    pedido.mercadoPagoIdempotencyKey : "";
+  if (chaveLegada && Math.round(Number(pedido.mercadoPagoAmountBRL) * 100) !==
+      totalCentavos) {
+    throw erroFinanceiro("PIX_LEGADO_VALOR_DIVERGENTE");
+  }
+
+  const dados = {
+    items,
+    itemsTotal: subtotalCentavos / 100,
+    deliveryFee: FRETE_PEDIDO_CENTAVOS / 100,
+    customerFee: customerFeeCentavos / 100,
+    merchantFee: merchantFeeCentavos / 100,
+    merchantNet: (subtotalCentavos - merchantFeeCentavos) / 100,
+    platformFee: (customerFeeCentavos + merchantFeeCentavos) / 100,
+    totalBRL: totalCentavos / 100,
+    totalCentavos,
+    pixIdempotencyKey: chaveLegada || randomUUID(),
+    version: 1,
+    createdAt: FieldValue.serverTimestamp(),
+  };
+  return {ref, dados, novo: true};
+}
+
+/**
+ * Replica os campos oficiais no pedido sem usar preços enviados pelo cliente.
+ * @param {Object} pedido Pedido atual.
+ * @param {Object} dados Registro financeiro do backend.
+ * @return {Object} Campos financeiros oficiais para atualização.
+ */
+function camposFinanceirosPedido(pedido, dados) {
+  const precos = new Map(dados.items.map((item) => [item.id, item.price]));
+  return {
+    itemsList: pedido.itemsList.map((item) => ({
+      ...item,
+      price: precos.get(item.id.trim()),
+      ...(Object.prototype.hasOwnProperty.call(item, "unitPrice") ?
+        {unitPrice: precos.get(item.id.trim())} : {}),
+    })),
+    itemsTotal: dados.itemsTotal,
+    deliveryFee: dados.deliveryFee,
+    customerFee: dados.customerFee,
+    merchantFee: dados.merchantFee,
+    merchantNet: dados.merchantNet,
+    platformFee: dados.platformFee,
+    totalBRL: dados.totalBRL,
+    financialValidationStatus: "validated",
+    financialValidationVersion: dados.version,
+    financialValidationError: null,
+  };
+}
+
+/**
+ * Valida valores declarados para entrega contra o total oficial.
+ * Mantém moedas e cotações; valores convertidos do cliente não são usados.
+ * @param {Object} pedido Pedido atual.
+ * @param {Object} dados Financeiro oficial.
+ */
+function validarPagamentoEntrega(pedido, dados) {
+  if (pedido.splitPayment === true) {
+    const partes = pedido.paymentParts;
+    if (!Array.isArray(partes) || partes.length < 2 || partes.length > 3) {
+      throw erroFinanceiro("SPLIT_PAYMENT_INVALIDO");
+    }
+    let totalBRL = 0;
+    for (const parte of partes) {
+      if (!parte || parte.method !== "Dinheiro") {
+        throw erroFinanceiro("SPLIT_PAYMENT_INVALIDO");
+      }
+      const amount = parte.amountCurrency;
+      if (
+        typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0
+      ) {
+        throw erroFinanceiro("VALOR_PAGAMENTO_INVALIDO");
+      }
+      switch (parte.currency) {
+        case "BRL": totalBRL += amount; break;
+        case "USD": totalBRL += amount * BRL_POR_USD; break;
+        case "PYG": totalBRL += amount / PYG_POR_BRL; break;
+        default: throw erroFinanceiro("MOEDA_PAGAMENTO_INVALIDA");
+      }
+    }
+    if (!Number.isSafeInteger(Math.round(totalBRL * 100))) {
+      throw erroFinanceiro("VALOR_PAGAMENTO_INVALIDO");
+    }
+    if (Math.round(totalBRL * 100) < dados.totalCentavos) {
+      throw erroFinanceiro("PAGAMENTO_INSUFICIENTE");
+    }
+  } else if (pedido.paymentMethod === "Dinheiro") {
+    // Pedidos antigos podem não ter declaração de cédulas para troco.
+    if (pedido.cashTendered == null) return;
+    const amount = pedido.cashTendered;
+    if (typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0) {
+      throw erroFinanceiro("VALOR_PAGAMENTO_INVALIDO");
+    }
+    let totalMoeda;
+    switch (pedido.cashCurrency || "BRL") {
+      case "BRL": totalMoeda = dados.totalBRL; break;
+      case "USD": totalMoeda = Math.round(dados.totalBRL / BRL_POR_USD * 100) /
+          100; break;
+      case "PYG": totalMoeda = Math.round(dados.totalBRL * PYG_POR_BRL); break;
+      default: throw erroFinanceiro("MOEDA_PAGAMENTO_INVALIDA");
+    }
+    if (amount < totalMoeda) {
+      throw erroFinanceiro("PAGAMENTO_INSUFICIENTE");
+    }
+  }
+}
+
 
 const mercadoPagoToken =
 
@@ -1476,6 +1684,15 @@ exports.chamaeMercadoPagoWebhook = onRequest(
                     // ======================================
 
 
+                    const financeiroSnapshot = await transaction.get(
+                        db.collection("orderFinancials").doc(externalReference),
+                    );
+                    const financeiroSalvo = financeiroSnapshot.exists ?
+                      financeiroSnapshot.data() : null;
+                    if (financeiroSalvo) {
+                      conferirItensFinanceiros(pedido, financeiroSalvo);
+                    }
+
                     const valorCongelado =
 
                         Number(
@@ -1487,28 +1704,10 @@ exports.chamaeMercadoPagoWebhook = onRequest(
                         );
 
 
-                    const valorPedido =
-
-                        Number(
-
-                            pedido.totalBRL,
-
-                        );
-
-
-                    const valorEsperado =
-
-                        Number.isFinite(
-
-                            valorCongelado,
-
-                        ) &&
-
-                        valorCongelado > 0 ?
-
-                          valorCongelado :
-
-                          valorPedido;
+                    // Cobranças antigas sem registro oficial mantêm o valor
+                    // congelado para não reprecificar PIX já emitidos.
+                    const valorEsperado = financeiroSalvo ?
+                      financeiroSalvo.totalBRL : valorCongelado;
 
 
                     if (
@@ -1714,6 +1913,8 @@ exports.chamaeMercadoPagoWebhook = onRequest(
                     // ======================================
 
                     const atualizacao = {
+                      ...(financeiroSalvo ?
+                        camposFinanceirosPedido(pedido, financeiroSalvo) : {}),
                       paymentStatus: "Pago",
 
                       mercadoPagoOrderId: orderId,
@@ -2267,116 +2468,31 @@ exports.chamaeCriarPix = onRequest(
               }
 
 
-              const total =
+              const financeiro = await prepararFinanceiroPedido(
+                  transaction, orderRef, pedido,
+              );
+              idempotencyKey = financeiro.dados.pixIdempotencyKey;
+              valorBRL = financeiro.dados.totalBRL;
 
-                  Number(
-
-                      pedido.totalBRL,
-
-                  );
-
-
-              if (
-
-                !Number.isFinite(total) ||
-
-                total <= 0
-
-              ) {
-                throw new Error(
-
-                    "VALOR_PEDIDO_INVALIDO",
-
-                );
+              if (financeiro.novo) {
+                transaction.set(financeiro.ref, financeiro.dados);
               }
 
-
-              const chaveExistente =
-
-                  typeof pedido
-
-                      .mercadoPagoIdempotencyKey ===
-
-                      "string" ?
-
-                    pedido
-
-                        .mercadoPagoIdempotencyKey :
-
-                    "";
-
-
-              const valorCongelado =
-
-                  Number(
-
-                      pedido
-
-                          .mercadoPagoAmountBRL,
-
-                  );
-
-
-              idempotencyKey =
-
-                  chaveExistente ||
-
-                  randomUUID();
-
-
-              valorBRL =
-
-                  chaveExistente &&
-
-                  Number.isFinite(
-
-                      valorCongelado,
-
-                  ) &&
-
-                  valorCongelado > 0 ?
-
-                    valorCongelado :
-
-                    total;
-
-
-              if (!chaveExistente) {
-                transaction.update(
-
-                    orderRef,
-
-                    {
-
-                      mercadoPagoIdempotencyKey:
-
-                          idempotencyKey,
-
-
-                      mercadoPagoAmountBRL:
-
-                          valorBRL,
-
-
-                      mercadoPagoCreateStatus:
-
-                          "creating",
-
-
-                      mercadoPagoCreateStartedAt:
-
-                          FieldValue
-
-                              .serverTimestamp(),
-
-                    },
-
-                );
-              }
+              transaction.update(orderRef, {
+                ...camposFinanceirosPedido(pedido, financeiro.dados),
+                mercadoPagoIdempotencyKey: idempotencyKey,
+                mercadoPagoAmountBRL: valorBRL,
+                mercadoPagoCreateStatus: "creating",
+                mercadoPagoCreateStartedAt: FieldValue.serverTimestamp(),
+              });
             },
 
         );
       } catch (error) {
+        if (error.financeiro) {
+          response.status(400).json({erro: error.message});
+          return;
+        }
         if (
 
           error.message ===
@@ -2867,33 +2983,20 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
                 return;
               }
 
-              const total = Number(pedido.totalBRL);
+              const financeiro = await prepararFinanceiroPedido(
+                  transaction, orderRef, pedido,
+              );
+              idempotencyKey = financeiro.dados.pixIdempotencyKey;
+              valorBRL = financeiro.dados.totalBRL;
 
-              if (!Number.isFinite(total) || total <= 0) {
-                throw new Error("VALOR_PEDIDO_INVALIDO");
+              if (financeiro.novo) {
+                transaction.set(financeiro.ref, financeiro.dados);
               }
-
-              const chaveExistente =
-                  typeof pedido.mercadoPagoIdempotencyKey === "string" ?
-                    pedido.mercadoPagoIdempotencyKey :
-                    "";
-
-              const valorCongelado =
-                  Number(pedido.mercadoPagoAmountBRL);
-
-              idempotencyKey =
-                  chaveExistente || randomUUID();
-
-              valorBRL =
-                  chaveExistente &&
-                  Number.isFinite(valorCongelado) &&
-                  valorCongelado > 0 ?
-                    valorCongelado :
-                    total;
 
               transaction.update(
                   orderRef,
                   {
+                    ...camposFinanceirosPedido(pedido, financeiro.dados),
                     mercadoPagoIdempotencyKey:
                         idempotencyKey,
                     mercadoPagoAmountBRL:
@@ -2921,9 +3024,11 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
           await orderRef.update({
             mercadoPagoCreateStatus: "error",
             mercadoPagoLastErrorCode:
-                error.message === "VALOR_PEDIDO_INVALIDO" ?
-                  "VALOR_PEDIDO_INVALIDO" :
-                  "PREPARATION_ERROR",
+                error.financeiro ? error.message : "PREPARATION_ERROR",
+            ...(error.financeiro ? {
+              financialValidationStatus: "rejected",
+              financialValidationError: error.message,
+            } : {}),
             mercadoPagoLastErrorAt:
                 FieldValue.serverTimestamp(),
           });
@@ -3246,6 +3351,11 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
                 return;
               }
 
+              const financeiro = await prepararFinanceiroPedido(
+                  transaction, orderRef, pedido,
+              );
+              validarPagamentoEntrega(pedido, financeiro.dados);
+
               const itensValidados = [];
               let erro = null;
 
@@ -3297,6 +3407,10 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
                 return;
               }
 
+              if (financeiro.novo) {
+                transaction.set(financeiro.ref, financeiro.dados);
+              }
+
               for (const item of itensValidados) {
                 transaction.update(
                     item.ref,
@@ -3309,6 +3423,7 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
               }
 
               transaction.update(orderRef, {
+                ...camposFinanceirosPedido(pedido, financeiro.dados),
                 stockReservationRequired: true,
                 stockReservationStatus: "reserved",
                 stockReservationError: null,
@@ -3337,8 +3452,14 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
 
         try {
           await orderRef.update({
-            stockReservationStatus: "error",
-            stockReservationError: "RESERVATION_TRANSACTION_ERROR",
+            ...(error.financeiro ? {
+              financialValidationStatus: "rejected",
+              financialValidationError: error.message,
+              status: "Revisão financeira",
+            } : {
+              stockReservationStatus: "error",
+              stockReservationError: "RESERVATION_TRANSACTION_ERROR",
+            }),
             stockReservationLastErrorAt:
                 FieldValue.serverTimestamp(),
             updatedAt: FieldValue.serverTimestamp(),
@@ -3416,6 +3537,15 @@ exports.chamaeResolverReservaEstoque = onDocumentUpdated(
 
               if (!deveLiberar && !deveFinalizar) {
                 return;
+              }
+
+              const financeiroSnapshot = await transaction.get(
+                  db.collection("orderFinancials").doc(orderId),
+              );
+              const financeiroSalvo = financeiroSnapshot.exists ?
+                financeiroSnapshot.data() : null;
+              if (financeiroSalvo && deveFinalizar) {
+                conferirItensFinanceiros(pedido, financeiroSalvo);
               }
 
               const itens =
@@ -3540,6 +3670,8 @@ exports.chamaeResolverReservaEstoque = onDocumentUpdated(
               }
 
               const atualizacao = {
+                ...(financeiroSalvo ?
+                  camposFinanceirosPedido(pedido, financeiroSalvo) : {}),
                 stockReservationStatus: "finalized",
                 stockReservationError: null,
                 stockFinalized: true,
