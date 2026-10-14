@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../core/models.dart';
 
@@ -861,6 +862,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   Map<String, dynamic> _montarDadosPedido({
     required String orderId,
+    required String customerUid,
     required bool aguardandoPix,
   }) {
     final double merchantFee = _subtotal * 0.03;
@@ -878,6 +880,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     return {
       'id': orderId,
+      'customerUid': customerUid,
       'customerName': _nameCtrl.text.trim(),
       'customerPhone': _phoneCtrl.text.trim(),
       'address': _deliveryAddress.addressText,
@@ -938,6 +941,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<_CreatedOrder> _criarPedidoDocumento({
     required bool aguardandoPix,
   }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.uid.isEmpty) {
+      throw StateError(
+        'Não foi possível autenticar. Reinicie o app e tente novamente.',
+      );
+    }
+    final customerUid = user.uid;
+
     final now = DateTime.now();
     final String orderId =
         '#CH-${now.millisecondsSinceEpoch.toString().substring(8)}';
@@ -948,6 +959,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     await reference.set(
       _montarDadosPedido(
         orderId: orderId,
+        customerUid: customerUid,
         aguardandoPix: aguardandoPix,
       ),
     );

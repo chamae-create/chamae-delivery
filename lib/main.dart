@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'core/theme.dart';
 import 'screens/splash_screen.dart';
@@ -11,6 +12,15 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    try {
+      final auth = FirebaseAuth.instance;
+      final user = await auth.authStateChanges().first;
+      if (user == null) {
+        await auth.signInAnonymously();
+      }
+    } catch (e) {
+      debugPrint('Erro ao autenticar cliente: $e');
+    }
   } catch (e) {
     debugPrint('Erro ao inicializar Firebase: $e');
   }
