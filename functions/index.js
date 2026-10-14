@@ -52,6 +52,34 @@ if (getApps().length === 0) {
 
 const db = getFirestore();
 
+/**
+ * Agrupa quantidades por produto sem permitir que itens inválidos se compensem.
+ * @param {*} itemsList Itens originais do pedido.
+ * @return {?Array} Itens agrupados, ou null quando algum item é inválido.
+ */
+function agruparItensEstoque(itemsList) {
+  const itens = Array.isArray(itemsList) ? itemsList : [];
+  const quantidades = new Map();
+
+  for (const item of itens) {
+    const productId = item && typeof item.id === "string" ?
+      item.id.trim() : "";
+    const quantity = Number(item && item.quantity);
+
+    if (!productId || !Number.isSafeInteger(quantity) || quantity <= 0) {
+      return null;
+    }
+
+    const total = (quantidades.get(productId) || 0) + quantity;
+    if (!Number.isSafeInteger(total)) {
+      return null;
+    }
+    quantidades.set(productId, total);
+  }
+
+  return Array.from(quantidades, ([id, quantity]) => ({id, quantity}));
+}
+
 
 const mercadoPagoToken =
 
@@ -1622,37 +1650,21 @@ exports.chamaeMercadoPagoWebhook = onRequest(
                     // ======================================
 
                     const itens =
-                        Array.isArray(pedido.itemsList) ?
-                          pedido.itemsList :
-                          [];
+                        agruparItensEstoque(pedido.itemsList);
 
                     const itensValidados = [];
                     let estoquePodeSerProcessado = true;
                     let motivoRevisaoEstoque = null;
 
-                    if (itens.length === 0) {
+                    if (!itens || itens.length === 0) {
                       estoquePodeSerProcessado = false;
-                      motivoRevisaoEstoque = "PEDIDO_SEM_ITENS";
+                      motivoRevisaoEstoque = itens ?
+                        "PEDIDO_SEM_ITENS" : "ITEM_PEDIDO_INVALIDO";
                     }
 
-                    for (const item of itens) {
-                      const productId =
-                          typeof item.id === "string" ?
-                            item.id.trim() :
-                            "";
-
-                      const quantity = Number(item.quantity);
-
-                      if (
-                        !productId ||
-                        !Number.isInteger(quantity) ||
-                        quantity <= 0
-                      ) {
-                        estoquePodeSerProcessado = false;
-                        motivoRevisaoEstoque =
-                            "ITEM_PEDIDO_INVALIDO";
-                        break;
-                      }
+                    for (const item of itens || []) {
+                      const productId = item.id;
+                      const quantity = item.quantity;
 
                       const productRef =
                           db.collection("products").doc(productId);
@@ -3221,14 +3233,13 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
               }
 
               const itens =
-                  Array.isArray(pedido.itemsList) ?
-                    pedido.itemsList :
-                    [];
+                  agruparItensEstoque(pedido.itemsList);
 
-              if (itens.length === 0) {
+              if (!itens || itens.length === 0) {
                 transaction.update(orderRef, {
                   stockReservationStatus: "requires_review",
-                  stockReservationError: "PEDIDO_SEM_ITENS",
+                  stockReservationError: itens ?
+                    "PEDIDO_SEM_ITENS" : "ITEM_PEDIDO_INVALIDO",
                   status: "Revisão de estoque",
                   updatedAt: FieldValue.serverTimestamp(),
                 });
@@ -3239,20 +3250,8 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
               let erro = null;
 
               for (const item of itens) {
-                const productId =
-                    typeof item.id === "string" ?
-                      item.id.trim() :
-                      "";
-                const quantity = Number(item.quantity);
-
-                if (
-                  !productId ||
-                  !Number.isInteger(quantity) ||
-                  quantity <= 0
-                ) {
-                  erro = "ITEM_PEDIDO_INVALIDO";
-                  break;
-                }
+                const productId = item.id;
+                const quantity = item.quantity;
 
                 const productRef =
                     db.collection("products").doc(productId);
@@ -3420,14 +3419,13 @@ exports.chamaeResolverReservaEstoque = onDocumentUpdated(
               }
 
               const itens =
-                  Array.isArray(pedido.itemsList) ?
-                    pedido.itemsList :
-                    [];
+                  agruparItensEstoque(pedido.itemsList);
 
-              if (itens.length === 0) {
+              if (!itens || itens.length === 0) {
                 transaction.update(orderRef, {
                   stockReservationStatus: "requires_review",
-                  stockReservationError: "PEDIDO_SEM_ITENS",
+                  stockReservationError: itens ?
+                    "PEDIDO_SEM_ITENS" : "ITEM_PEDIDO_INVALIDO",
                   updatedAt: FieldValue.serverTimestamp(),
                 });
                 return;
@@ -3437,20 +3435,8 @@ exports.chamaeResolverReservaEstoque = onDocumentUpdated(
               let erro = null;
 
               for (const item of itens) {
-                const productId =
-                    typeof item.id === "string" ?
-                      item.id.trim() :
-                      "";
-                const quantity = Number(item.quantity);
-
-                if (
-                  !productId ||
-                  !Number.isInteger(quantity) ||
-                  quantity <= 0
-                ) {
-                  erro = "ITEM_PEDIDO_INVALIDO";
-                  break;
-                }
+                const productId = item.id;
+                const quantity = item.quantity;
 
                 const productRef =
                     db.collection("products").doc(productId);
