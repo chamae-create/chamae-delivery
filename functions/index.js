@@ -3168,6 +3168,8 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
       const metodosComReserva = new Set([
         "Dinheiro",
         "Maquininha",
+        "Maquininha - Débito à vista",
+        "Maquininha - Crédito à vista",
         "Pagamento dividido",
       ]);
 
