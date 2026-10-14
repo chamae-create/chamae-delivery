@@ -3369,58 +3369,18 @@ exports.chamaeResolverReservaEstoque = onDocumentUpdated(
       maxInstances: 10,
     },
     async (event) => {
-      const beforeSnapshot = event.data && event.data.before;
       const afterSnapshot = event.data && event.data.after;
 
       if (
-        !beforeSnapshot ||
         !afterSnapshot ||
         !afterSnapshot.exists
       ) {
         return;
       }
 
-      const antes = beforeSnapshot.data() || {};
       const depois = afterSnapshot.data() || {};
 
       if (depois.stockReservationStatus !== "reserved") {
-        return;
-      }
-
-      const status =
-          typeof depois.status === "string" ?
-            depois.status.trim() :
-            "";
-      const statusLower = status.toLowerCase();
-
-      const deveLiberar =
-          statusLower.includes("cancel");
-
-      // Para simplificar a operação no lançamento,
-      // "Concluído" significa entrega realizada e pagamento recebido.
-      const deveFinalizar =
-          status === "Concluído" ||
-          depois.paymentStatus === "Pago";
-
-      if (!deveLiberar && !deveFinalizar) {
-        return;
-      }
-
-      // Evita disparos desnecessários quando a condição já existia.
-      const statusAntes =
-          typeof antes.status === "string" ?
-            antes.status.trim() :
-            "";
-      const pagamentoAntes =
-          typeof antes.paymentStatus === "string" ?
-            antes.paymentStatus :
-            "";
-
-      if (
-        !deveLiberar &&
-        statusAntes === status &&
-        pagamentoAntes === depois.paymentStatus
-      ) {
         return;
       }
 
@@ -3439,6 +3399,23 @@ exports.chamaeResolverReservaEstoque = onDocumentUpdated(
               const pedido = atual.data() || {};
 
               if (pedido.stockReservationStatus !== "reserved") {
+                return;
+              }
+
+              // Decide pelo estado atual, inclusive em retries da transação.
+              const status =
+                  typeof pedido.status === "string" ?
+                    pedido.status.trim() :
+                    "";
+              const deveLiberar =
+                  status.toLowerCase().includes("cancel");
+
+              // "Concluído" continua significando entrega e pagamento recebido.
+              const deveFinalizar = !deveLiberar && (
+                status === "Concluído" || pedido.paymentStatus === "Pago"
+              );
+
+              if (!deveLiberar && !deveFinalizar) {
                 return;
               }
 
