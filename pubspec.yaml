@@ -11,6 +11,15 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.6
+  firebase_core: ^4.15.0
+  cloud_firestore: ^6.10.0
+  google_fonts: ^6.2.1
+  video_player: ^2.9.2
+  geolocator: ^14.1.1
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
+  google_maps_flutter: ^2.18.2
+  geocoding: ^5.0.0
 
 dev_dependencies:
   flutter_test:
@@ -19,7 +28,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-  # Declaração da logo oficial
   assets:
-    - assets/images/logo.png
+    - assets/images/

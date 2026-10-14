@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "302882774102",
+    "project_id": "chamae-delivery",
+    "storage_bucket": "chamae-delivery.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302882774102:android:c15c7c4802822bd3b92ff7",
+        "android_client_info": {
+          "package_name": "com.chamae.delivery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHN5Ubq-CYLcZfVgnPyJ794RDUraGDvfo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302882774102:android:621044625161ed6cb92ff7",
+        "android_client_info": {
+          "package_name": "com.example.chamae_delivery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHN5Ubq-CYLcZfVgnPyJ794RDUraGDvfo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
