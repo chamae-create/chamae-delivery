@@ -9,7 +9,7 @@ const {
 } = require("node:crypto");
 
 
-const {onRequest} = require("firebase-functions/v2/https");
+const {onRequest, HttpsError} = require("firebase-functions/v2/https");
 const {
   onDocumentCreated,
   onDocumentUpdated,
@@ -2333,9 +2333,8 @@ exports.chamaeCriarPix = onRequest(
       cors: false,
 
 
-      // TEMPORARIAMENTE PUBLIC PARA TESTE CONTROLADO
-
-      invoker: "public",
+      // Manual legacy endpoint: service-account IAM only.
+      invoker: "private",
 
 
       secrets: [
@@ -3482,6 +3481,224 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
 // FUNÇÃO 8 — FINALIZAR OU LIBERAR RESERVA DE ESTOQUE
 // ======================================================
 
+/**
+ * Existing stock algorithm shared by trigger and completion.
+ * @param {Object} transaction Admin transaction.
+ * @param {Object} orderRef Order reference.
+ * @param {string} orderId Order ID.
+ * @param {boolean} complete Fail closed and finalize for completion.
+ * @return {Promise<void>} Effects inside caller transaction.
+ */
+async function resolverReservaNaTransacao(
+    transaction, orderRef, orderId, complete = false) {
+  const atual = await transaction.get(orderRef);
+
+  if (!atual.exists) {
+    return;
+  }
+
+  const pedido = atual.data() || {};
+  if (complete) pedido.status = "Concluído";
+
+  if (pedido.stockReservationStatus !== "reserved") {
+    return;
+  }
+
+  // Decide pelo estado atual, inclusive em retries da transação.
+  const status =
+      typeof pedido.status === "string" ?
+        pedido.status.trim() :
+        "";
+  const deveLiberar =
+      status.toLowerCase().includes("cancel");
+
+  // "Concluído" continua significando entrega e pagamento recebido.
+  const deveFinalizar = !deveLiberar && (
+    status === "Concluído" || pedido.paymentStatus === "Pago"
+  );
+
+  if (!deveLiberar && !deveFinalizar) {
+    return;
+  }
+
+  const financeiroSnapshot = await transaction.get(
+      db.collection("orderFinancials").doc(orderId),
+  );
+  const financeiroSalvo = financeiroSnapshot.exists ?
+    financeiroSnapshot.data() : null;
+  if (financeiroSalvo && deveFinalizar) {
+    conferirItensFinanceiros(pedido, financeiroSalvo);
+  }
+
+  const itens =
+      agruparItensEstoque(pedido.itemsList);
+
+  if (!itens || itens.length === 0) {
+    if (complete) {
+      throw new HttpsError("failed-precondition",
+          "Itens inválidos. Revise a reserva antes de concluir.");
+    }
+    transaction.update(orderRef, {
+      stockReservationStatus: "requires_review",
+      stockReservationError: itens ?
+        "PEDIDO_SEM_ITENS" : "ITEM_PEDIDO_INVALIDO",
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+    return;
+  }
+
+  const itensValidados = [];
+  let erro = null;
+
+  for (const item of itens) {
+    const productId = item.id;
+    const quantity = item.quantity;
+
+    const productRef =
+        db.collection("products").doc(productId);
+    const productSnapshot =
+        await transaction.get(productRef);
+
+    if (!productSnapshot.exists) {
+      erro = "PRODUTO_NAO_ENCONTRADO";
+      break;
+    }
+
+    const product = productSnapshot.data() || {};
+    const stockAtual = Number(product.stock);
+    const reservadoAtual = Number(
+        product.reservedStock || 0,
+    );
+
+    if (
+      !Number.isFinite(stockAtual) ||
+      !Number.isFinite(reservadoAtual) ||
+      reservadoAtual < quantity
+    ) {
+      erro = "RESERVA_INCONSISTENTE";
+      break;
+    }
+
+    if (
+      deveFinalizar &&
+      stockAtual < quantity
+    ) {
+      erro = "ESTOQUE_INSUFICIENTE_NA_FINALIZACAO";
+      break;
+    }
+
+    itensValidados.push({
+      ref: productRef,
+      quantity: quantity,
+      stockAtual: stockAtual,
+      reservadoAtual: reservadoAtual,
+    });
+  }
+
+  if (erro) {
+    if (complete) {
+      throw new HttpsError("failed-precondition",
+          "Reserva inconsistente. Revise o estoque antes de concluir.");
+    }
+    transaction.update(orderRef, {
+      stockReservationStatus: "requires_review",
+      stockReservationError: erro,
+      status: "Revisão de estoque",
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+    return;
+  }
+
+  for (const item of itensValidados) {
+    if (deveLiberar) {
+      transaction.update(
+          item.ref,
+          {
+            reservedStock:
+                item.reservadoAtual -
+                item.quantity,
+          },
+      );
+    } else {
+      transaction.update(
+          item.ref,
+          {
+            stock:
+                item.stockAtual -
+                item.quantity,
+            reservedStock:
+                item.reservadoAtual -
+                item.quantity,
+            salesCount:
+                FieldValue.increment(
+                    item.quantity,
+                ),
+          },
+      );
+    }
+  }
+
+  if (deveLiberar) {
+    transaction.update(orderRef, {
+      stockReservationStatus: "released",
+      stockReservationError: null,
+      stockReleasedAt:
+          FieldValue.serverTimestamp(),
+      stockReleasedBy:
+          "order_status_cancelled",
+      updatedAt:
+          FieldValue.serverTimestamp(),
+    });
+
+    console.log(
+        "Reserva de estoque liberada.",
+        {
+          orderId: orderId,
+        },
+    );
+    return;
+  }
+
+  const atualizacao = {
+    ...(financeiroSalvo ?
+      camposFinanceirosPedido(pedido, financeiroSalvo) : {}),
+    stockReservationStatus: "finalized",
+    stockReservationError: null,
+    stockFinalized: true,
+    stockFinalizedAt:
+        FieldValue.serverTimestamp(),
+    stockFinalizedBy:
+        "order_delivery_completed",
+    stockProcessed: true,
+    stockProcessedAt:
+        FieldValue.serverTimestamp(),
+    stockProcessedBy:
+        "stock_reservation_finalizer",
+    updatedAt:
+        FieldValue.serverTimestamp(),
+  };
+
+  if (pedido.paymentStatus !== "Pago") {
+    atualizacao.paymentStatus = "Pago";
+    atualizacao.paidAt =
+        FieldValue.serverTimestamp();
+    atualizacao.paymentConfirmedBy =
+        "delivery_completion";
+  }
+
+  transaction.update(
+      orderRef,
+      atualizacao,
+  );
+
+  console.log(
+      "Reserva de estoque finalizada.",
+      {
+        orderId: orderId,
+      },
+  );
+}
+
 exports.chamaeResolverReservaEstoque = onDocumentUpdated(
     {
       document: "orders/{orderId}",
@@ -3509,205 +3726,8 @@ exports.chamaeResolverReservaEstoque = onDocumentUpdated(
 
       try {
         await db.runTransaction(
-            async (transaction) => {
-              const atual = await transaction.get(orderRef);
-
-              if (!atual.exists) {
-                return;
-              }
-
-              const pedido = atual.data() || {};
-
-              if (pedido.stockReservationStatus !== "reserved") {
-                return;
-              }
-
-              // Decide pelo estado atual, inclusive em retries da transação.
-              const status =
-                  typeof pedido.status === "string" ?
-                    pedido.status.trim() :
-                    "";
-              const deveLiberar =
-                  status.toLowerCase().includes("cancel");
-
-              // "Concluído" continua significando entrega e pagamento recebido.
-              const deveFinalizar = !deveLiberar && (
-                status === "Concluído" || pedido.paymentStatus === "Pago"
-              );
-
-              if (!deveLiberar && !deveFinalizar) {
-                return;
-              }
-
-              const financeiroSnapshot = await transaction.get(
-                  db.collection("orderFinancials").doc(orderId),
-              );
-              const financeiroSalvo = financeiroSnapshot.exists ?
-                financeiroSnapshot.data() : null;
-              if (financeiroSalvo && deveFinalizar) {
-                conferirItensFinanceiros(pedido, financeiroSalvo);
-              }
-
-              const itens =
-                  agruparItensEstoque(pedido.itemsList);
-
-              if (!itens || itens.length === 0) {
-                transaction.update(orderRef, {
-                  stockReservationStatus: "requires_review",
-                  stockReservationError: itens ?
-                    "PEDIDO_SEM_ITENS" : "ITEM_PEDIDO_INVALIDO",
-                  updatedAt: FieldValue.serverTimestamp(),
-                });
-                return;
-              }
-
-              const itensValidados = [];
-              let erro = null;
-
-              for (const item of itens) {
-                const productId = item.id;
-                const quantity = item.quantity;
-
-                const productRef =
-                    db.collection("products").doc(productId);
-                const productSnapshot =
-                    await transaction.get(productRef);
-
-                if (!productSnapshot.exists) {
-                  erro = "PRODUTO_NAO_ENCONTRADO";
-                  break;
-                }
-
-                const product = productSnapshot.data() || {};
-                const stockAtual = Number(product.stock);
-                const reservadoAtual = Number(
-                    product.reservedStock || 0,
-                );
-
-                if (
-                  !Number.isFinite(stockAtual) ||
-                  !Number.isFinite(reservadoAtual) ||
-                  reservadoAtual < quantity
-                ) {
-                  erro = "RESERVA_INCONSISTENTE";
-                  break;
-                }
-
-                if (
-                  deveFinalizar &&
-                  stockAtual < quantity
-                ) {
-                  erro = "ESTOQUE_INSUFICIENTE_NA_FINALIZACAO";
-                  break;
-                }
-
-                itensValidados.push({
-                  ref: productRef,
-                  quantity: quantity,
-                  stockAtual: stockAtual,
-                  reservadoAtual: reservadoAtual,
-                });
-              }
-
-              if (erro) {
-                transaction.update(orderRef, {
-                  stockReservationStatus: "requires_review",
-                  stockReservationError: erro,
-                  status: "Revisão de estoque",
-                  updatedAt: FieldValue.serverTimestamp(),
-                });
-                return;
-              }
-
-              for (const item of itensValidados) {
-                if (deveLiberar) {
-                  transaction.update(
-                      item.ref,
-                      {
-                        reservedStock:
-                            item.reservadoAtual -
-                            item.quantity,
-                      },
-                  );
-                } else {
-                  transaction.update(
-                      item.ref,
-                      {
-                        stock:
-                            item.stockAtual -
-                            item.quantity,
-                        reservedStock:
-                            item.reservadoAtual -
-                            item.quantity,
-                        salesCount:
-                            FieldValue.increment(
-                                item.quantity,
-                            ),
-                      },
-                  );
-                }
-              }
-
-              if (deveLiberar) {
-                transaction.update(orderRef, {
-                  stockReservationStatus: "released",
-                  stockReservationError: null,
-                  stockReleasedAt:
-                      FieldValue.serverTimestamp(),
-                  stockReleasedBy:
-                      "order_status_cancelled",
-                  updatedAt:
-                      FieldValue.serverTimestamp(),
-                });
-
-                console.log(
-                    "Reserva de estoque liberada.",
-                    {
-                      orderId: orderId,
-                    },
-                );
-                return;
-              }
-
-              const atualizacao = {
-                ...(financeiroSalvo ?
-                  camposFinanceirosPedido(pedido, financeiroSalvo) : {}),
-                stockReservationStatus: "finalized",
-                stockReservationError: null,
-                stockFinalized: true,
-                stockFinalizedAt:
-                    FieldValue.serverTimestamp(),
-                stockFinalizedBy:
-                    "order_delivery_completed",
-                stockProcessed: true,
-                stockProcessedAt:
-                    FieldValue.serverTimestamp(),
-                stockProcessedBy:
-                    "stock_reservation_finalizer",
-                updatedAt:
-                    FieldValue.serverTimestamp(),
-              };
-
-              if (pedido.paymentStatus !== "Pago") {
-                atualizacao.paymentStatus = "Pago";
-                atualizacao.paidAt =
-                    FieldValue.serverTimestamp();
-                atualizacao.paymentConfirmedBy =
-                    "delivery_completion";
-              }
-
-              transaction.update(
-                  orderRef,
-                  atualizacao,
-              );
-
-              console.log(
-                  "Reserva de estoque finalizada.",
-                  {
-                    orderId: orderId,
-                  },
-              );
-            },
+            async (transaction) => resolverReservaNaTransacao(
+                transaction, orderRef, orderId),
         );
       } catch (error) {
         console.error(
@@ -3720,3 +3740,29 @@ exports.chamaeResolverReservaEstoque = onDocumentUpdated(
       }
     },
 );
+
+
+// FUNÇÃO 9 — PROJEÇÃO SANITIZADA PARA O FUTURO APP DE ENTREGADORES.
+// Não altera pagamentos, estoque ou o contrato de criação/atribuição de orders.
+exports.chamaeSincronizarCourierDelivery =
+    require("./courier-deliveries").createCourierDeliveryTrigger(db);
+
+// Atribuição e despacho autenticados; vínculo e projeção no mesmo commit.
+const courierAssignmentFunctions =
+    require("./courier-assignment").createCourierAssignmentFunctions(db);
+exports.chamaeAtribuirMotoboy =
+    courierAssignmentFunctions.chamaeAtribuirMotoboy;
+exports.chamaeDespacharPedido =
+    courierAssignmentFunctions.chamaeDespacharPedido;
+exports.chamaeListarMotoboysAtribuiveis =
+    courierAssignmentFunctions.chamaeListarMotoboysAtribuiveis;
+
+Object.assign(exports, require("./order-operations")
+    .createOrderOperations(db, {
+      resolveReservation: resolverReservaNaTransacao,
+      checkFinancial: conferirItensFinanceiros,
+    }));
+
+Object.assign(exports, require("./order-chat").createOrderChat(db));
+
+Object.assign(exports, require("./order-printing").createOrderPrinting(db));

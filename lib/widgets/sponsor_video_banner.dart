@@ -65,7 +65,7 @@ class _SponsorVideoBannerState extends State<SponsorVideoBanner> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.10),
+            color: Colors.black.withValues(alpha: 0.10),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),

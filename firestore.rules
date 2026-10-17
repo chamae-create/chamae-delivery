@@ -2,25 +2,157 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // O catálogo é público. Produtos oficiais só são escritos pelo Admin SDK.
-    match /products/{productId} {
-      allow read: if true;
-      allow write: if false;
+    function signedIn() {
+      return request.auth != null;
     }
 
-    // Inclui criação antecipada, alteração, exclusão e subcoleções.
-    // O Admin SDK das Functions não depende de permissões de cliente.
+    // O cliente atual usa Auth anônimo; roles administrativas nunca o aceitam.
+    function namedAccount() {
+      return signedIn()
+        && request.auth.token.get('firebase', {}).get('sign_in_provider', '') != 'anonymous';
+    }
+
+    // Provisionamento futuro: cadastro do motoboy pelo backend em couriers/{uid}.
+    // Não há role nova e o próprio usuário não pode criar/alterar esse cadastro.
+    function isCourierAccount() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/couriers/$(request.auth.uid));
+    }
+
+    function activeCourier() {
+      let profile = get(/databases/$(database)/documents/couriers/$(request.auth.uid)).data;
+      return profile.get('administrativeState', '') == 'active'
+        && profile.get('enabled', true) != false
+        && profile.get('isActive', true) != false
+        && profile.get('active', true) != false;
+    }
+
+    function hasRole(role) {
+      return namedAccount()
+        && request.auth.token.get('roles', []) is list
+        && role in request.auth.token.get('roles', []);
+    }
+
+    function isSuperadmin() { return hasRole('superadmin'); }
+    function isOperations() { return hasRole('operations_admin') || isSuperadmin(); }
+    function isCatalogAdmin() { return hasRole('catalog_admin') || isSuperadmin(); }
+    function isFinance() { return hasRole('finance') || isSuperadmin(); }
+
+    function ownsOrder(data) {
+      return signedIn() && data.get('customerUid', '') == request.auth.uid;
+    }
+
+    function validOrderCreate(data) {
+      // Contrato real de _montarDadosPedido. Valores aqui são propostas do cliente;
+      // validação financeira/estoque e confirmação de pagamento são do backend.
+      return ownsOrder(data)
+        && data.keys().hasAll(['id', 'customerUid', 'customerName', 'itemsList',
+          'totalBRL', 'paymentMethod', 'paymentStatus', 'status', 'courierPaid', 'createdAt'])
+        && data.keys().hasOnly([
+          'id', 'customerUid', 'customerName', 'customerPhone', 'address',
+          'deliveryAddress', 'deliveryLocation', 'itemsList', 'itemsTotal',
+          'deliveryFee', 'customerFee', 'merchantFee', 'merchantNet', 'platformFee',
+          'totalBRL', 'displayCurrency', 'displayTotal', 'exchangeRatePYGPerBRL',
+          'exchangeRateBRLPerUSD', 'exchangeRateSource', 'exchangeRateCapturedAt',
+          'paymentMethod', 'paymentStatus', 'cardType', 'cashCurrency',
+          'cashTendered', 'cashTenderedBRL', 'changeBRL', 'cashChangeRateUSDToBRL',
+          'cashChangeRatePYGPerBRL', 'splitPayment', 'paymentParts', 'splitPaidBRL',
+          'splitRemainingBRL', 'splitChangeBRL', 'status', 'pixRequested',
+          'pixRequestVersion', 'courierName', 'courierPaid', 'createdAt'
+        ])
+        && data.id is string && data.id.size() > 0
+        && data.customerName is string
+        && data.itemsList is list && data.itemsList.size() > 0
+        && data.totalBRL is number && data.totalBRL > 0
+        && data.paymentMethod is string
+        && data.paymentStatus in ['Aguardando confirmação', 'Pendente na entrega', 'Pendente']
+        && data.status in ['Novo', 'Aguardando pagamento']
+        && data.courierPaid == false
+        && data.createdAt == request.time
+        && (!('exchangeRateCapturedAt' in data) || data.exchangeRateCapturedAt == request.time)
+        && (!('paymentParts' in data) || data.paymentParts == null
+          || (data.paymentParts is list && data.paymentParts.size() <= 3))
+        && (data.get('pixRequested', false) != true
+          || (data.status == 'Aguardando pagamento'
+            && data.paymentStatus == 'Aguardando confirmação'));
+    }
+
+    match /orders/{orderId} {
+      allow create: if signedIn() && !isCourierAccount() && validOrderCreate(request.resource.data);
+      allow read: if signedIn() && !isCourierAccount()
+        && (ownsOrder(resource.data) || isOperations() || isFinance());
+      // Every operational/financial mutation uses authenticated backend.
+      allow update, delete: if false;
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isCatalogAdmin();
+    }
+
     match /orderFinancials/{document=**} {
       allow read, write: if false;
     }
 
-    // Preserva a regra temporária publicada para os demais caminhos.
-    // O app ainda não possui Auth: não muda checkout, tracking ou operação.
-    // As exclusões são essenciais: um allow amplo anularia os bloqueios acima.
-    match /{collection}/{document=**} {
-      allow read, write: if collection != 'products'
-                        && collection != 'orderFinancials'
-                        && request.time < timestamp.date(2026, 11, 2);
+    match /courierSettlements/{receiptId} {
+      allow read: if !isCourierAccount() && (isOperations() || isFinance());
+      allow create, update, delete: if false;
+    }
+
+    match /couriers/{courierId} {
+      allow read: if isOperations() && !isCourierAccount();
+      allow write: if false;
+    }
+
+    function canReadOrderChat(orderId) {
+      let order = get(/databases/$(database)/documents/orders/$(orderId)).data;
+      let roles = request.auth.token.get('roles', []);
+      return signedIn() && !isCourierAccount()
+        && order.get('financialValidationStatus', '') == 'validated'
+        && (isOperations() || (ownsOrder(order)
+          && !(roles is list && roles.hasAny(['finance', 'catalog_admin']))));
+    }
+
+    match /orderChats/{orderId} {
+      allow get: if canReadOrderChat(orderId);
+      allow list: if isOperations() && !isCourierAccount();
+      allow write: if false;
+      match /messages/{messageId} {
+        allow read: if canReadOrderChat(orderId);
+        allow write: if false;
+      }
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if isOperations() && !isCourierAccount();
+      allow write: if false;
+    }
+
+    match /courierDeliveries/{deliveryId} {
+      // Somente projeção sanitizada pelo backend. Nenhuma escrita de cliente.
+      allow get: if namedAccount() && isCourierAccount()
+        && resource.data.courierUid == request.auth.uid
+        && activeCourier()
+        && resource.data.keys().hasAll(['orderId', 'courierUid', 'customerName', 'status'])
+        && resource.data.keys().hasOnly(['orderId', 'courierUid', 'customerName',
+          'deliveryLocation', 'address', 'complement', 'reference', 'status',
+          'createdAt', 'assignedAt', 'pickedUpAt', 'completedAt', 'updatedAt'])
+        && resource.data.orderId is string
+        && resource.data.customerName is string && resource.data.status is string
+        && resource.data.get('createdAt', request.time) is timestamp
+        && resource.data.get('assignedAt', request.time) is timestamp
+        && resource.data.get('pickedUpAt', request.time) is timestamp
+        && resource.data.get('completedAt', request.time) is timestamp
+        && resource.data.get('updatedAt', request.time) is timestamp
+        && (!('address' in resource.data) || resource.data.address is string)
+        && (!('complement' in resource.data) || resource.data.complement is string)
+        && (!('reference' in resource.data) || resource.data.reference is string)
+        && (!('deliveryLocation' in resource.data) || resource.data.deliveryLocation is latlng);
+      allow list, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

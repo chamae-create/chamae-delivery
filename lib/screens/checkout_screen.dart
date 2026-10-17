@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../core/models.dart';
+import '../data/customer_orders.dart';
 
 import '../core/theme.dart';
 
@@ -69,6 +70,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   late DeliveryAddress _deliveryAddress;
 
   String _paymentMethod = 'PIX';
+  String? _deliveryCountry;
 
   String _selectedCurrency = 'BRL';
 
@@ -148,6 +150,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     setState(() {
 
+      _deliveryCountry = null;
       _deliveryAddress = DeliveryAddress(
 
         latitude: result.latitude,
@@ -157,7 +160,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         addressText: result.addressText,
 
         complement: result.complement,
-
       );
 
     });
@@ -811,6 +813,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
 
   bool _validarDadosCliente() {
+    if (_deliveryCountry == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Selecione Brasil ou Paraguai para a entrega.'),
+      ));
+      return false;
+    }
+
 
     final name = _nameCtrl.text.trim();
 
@@ -884,7 +893,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       'customerName': _nameCtrl.text.trim(),
       'customerPhone': _phoneCtrl.text.trim(),
       'address': _deliveryAddress.addressText,
-      'deliveryAddress': _deliveryAddress.toMap(),
+      'deliveryAddress': {..._deliveryAddress.toMap(), 'country': _deliveryCountry},
       'deliveryLocation': _deliveryAddress.geoPoint,
       'itemsList': itemsList,
       'itemsTotal': _subtotal,
@@ -932,7 +941,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       'status': aguardandoPix ? 'Aguardando pagamento' : 'Novo',
       'pixRequested': aguardandoPix,
       'pixRequestVersion': aguardandoPix ? 1 : null,
-      'courierName': 'Marcos Silva (Moto 01)',
       'courierPaid': false,
       'createdAt': FieldValue.serverTimestamp(),
     };
@@ -1001,6 +1009,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               MaterialPageRoute(
                 builder: (context) => TrackingScreen(
                   orderId: created.orderId,
+                  documentId: created.reference.id,
                 ),
               ),
             );
@@ -1044,6 +1053,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         MaterialPageRoute(
           builder: (context) => TrackingScreen(
             orderId: created.orderId,
+            documentId: created.reference.id,
           ),
         ),
       );
@@ -1233,6 +1243,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                             children: [
 
+                              DropdownButtonFormField<String>(
+                                key: ValueKey(_deliveryAddress),
+                                initialValue: _deliveryCountry,
+                                decoration: const InputDecoration(labelText: 'País da entrega'),
+                                items: const [
+                                  DropdownMenuItem(value: 'BR', child: Text('BRASIL')),
+                                  DropdownMenuItem(value: 'PY', child: Text('PARAGUAI')),
+                                ],
+                                onChanged: (value) => setState(() => _deliveryCountry = value),
+                              ),
                               const Text(
 
                                 'Entregar em',
@@ -2298,7 +2318,7 @@ class _PixPaymentDialog extends StatefulWidget {
 }
 
 class _PixPaymentDialogState extends State<_PixPaymentDialog> {
-  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _subscription;
+  StreamSubscription<Map<String, dynamic>?>? _subscription;
 
   String? _qrCode;
   String? _qrCodeBase64;
@@ -2306,13 +2326,17 @@ class _PixPaymentDialogState extends State<_PixPaymentDialog> {
   String _paymentStatus = 'Aguardando confirmação';
   bool _paymentApproved = false;
   bool _finishing = false;
+  String? _authorizedCustomerUid;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
 
-    _subscription = widget.orderReference.snapshots().listen(
+    _subscription = CustomerOrders(
+      auth: FirebaseAuth.instance,
+      firestore: FirebaseFirestore.instance,
+    ).watchDocumentId(widget.orderReference.id).listen(
       _handleSnapshot,
       onError: (Object error) {
         if (!mounted) return;
@@ -2326,12 +2350,24 @@ class _PixPaymentDialogState extends State<_PixPaymentDialog> {
   }
 
   void _handleSnapshot(
-    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    Map<String, dynamic>? data,
   ) {
-    if (!mounted || !snapshot.exists) return;
+    if (!mounted) return;
+    if (data == null) {
+      setState(() {
+        _authorizedCustomerUid = null;
+        _qrCode = null;
+        _qrCodeBase64 = null;
+        _createStatus = 'creating';
+        _paymentStatus = 'Aguardando confirmação';
+        _paymentApproved = false;
+      });
+      return;
+    }
 
-    final data = snapshot.data() ?? <String, dynamic>{};
 
+
+    _authorizedCustomerUid = data['customerUid'] as String;
     final nextQrCode = data['mercadoPagoQrCode']?.toString();
     final nextQrCodeBase64 =
         data['mercadoPagoQrCodeBase64']?.toString();
@@ -2359,6 +2395,8 @@ class _PixPaymentDialogState extends State<_PixPaymentDialog> {
 
   Future<void> _finalizarPagamento() async {
     if (_finishing) return;
+    final customerUid = _authorizedCustomerUid;
+    if (customerUid == null) return;
 
     _finishing = true;
 
@@ -2374,6 +2412,11 @@ class _PixPaymentDialogState extends State<_PixPaymentDialog> {
     );
 
     if (!mounted) return;
+
+    if (_authorizedCustomerUid != customerUid ||
+        FirebaseAuth.instance.currentUser?.uid != customerUid) {
+      return;
+    }
 
     Navigator.of(context).pop();
 

@@ -456,11 +456,11 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                     height: 36,
                     margin: const EdgeInsets.only(right: 2),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Color(0xFF4B4B4B)),
+                      border: Border.all(color: const Color(0xFF4B4B4B)),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     alignment: Alignment.center,
-                    child: Text(
+                    child: const Text(
                       r'$',
                       style: TextStyle(
                         color: AppTheme.primaryYellow,
@@ -546,7 +546,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                               ],
                             ),
                           ),
-                          Icon(
+                          const Icon(
                             Icons.keyboard_arrow_down_rounded,
                             color: Colors.white,
                           ),
@@ -571,18 +571,18 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                       mainAxisAlignment:
                           MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.schedule_rounded,
                           size: 19,
                           color: Colors.black,
                         ),
-                        SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Text(
                           _deliveryAddress == null
                               ? 'Calcular entrega'
                               : 'Local definido',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 10,
                             height: 1.05,
@@ -698,7 +698,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -784,7 +784,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black
-                                .withOpacity(0.04),
+                                .withValues(alpha: 0.04),
                             blurRadius: 8,
                           ),
                         ],
@@ -835,7 +835,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.055),
+            color: Colors.black.withValues(alpha: 0.055),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -1024,12 +1024,12 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         color: const Color(0xFF0D0D0D),
         border: Border(
           top: BorderSide(
-            color: Colors.white.withOpacity(0.10),
+            color: Colors.white.withValues(alpha: 0.10),
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.22),
+            color: Colors.black.withValues(alpha: 0.22),
             blurRadius: 15,
             offset: const Offset(0, -3),
           ),

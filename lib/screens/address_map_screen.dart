@@ -391,7 +391,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black
-                                    .withOpacity(0.30),
+                                    .withValues(alpha: 0.30),
                                 blurRadius: 10,
                                 offset: const Offset(
                                   0,
@@ -428,7 +428,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                           width: 12,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.30),
+                            color: Colors.black.withValues(alpha: 0.30),
                             borderRadius:
                                 BorderRadius.circular(
                               20,
@@ -442,7 +442,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                 if (_loadingLocation)
                   Container(
                     color: Colors.black
-                        .withOpacity(0.22),
+                        .withValues(alpha: 0.22),
                     child: const Center(
                       child: Card(
                         child: Padding(
@@ -492,13 +492,13 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white
-                            .withOpacity(0.94),
+                            .withValues(alpha: 0.94),
                         borderRadius:
                             BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black
-                                .withOpacity(0.12),
+                                .withValues(alpha: 0.12),
                             blurRadius: 8,
                           ),
                         ],

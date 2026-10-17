@@ -3,12 +3,15 @@
   "description": "Cloud Functions for Firebase",
   "scripts": {
     "lint": "eslint .",
+    "test": "node --test test/financial.spec.js test/courier-deliveries.spec.js test/courier-assignment.spec.js test/order-operations.spec.js",
+    "test:couriers:emulator": "node --test --test-concurrency=1 test/courier-deliveries.emulator.spec.js test/courier-assignment.emulator.spec.js test/pilot.emulator.spec.js",
     "test:rules": "node --test test/firestore.rules.spec.js",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "test:chat:emulator": "node --test test/order-chat.emulator.spec.js"
   },
   "engines": {
     "node": "24"

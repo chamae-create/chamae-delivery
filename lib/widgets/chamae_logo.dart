@@ -16,7 +16,7 @@ class ChamaeOfficialLogo extends StatelessWidget {
         border: Border.all(color: AppColors.primaryGold, width: size * 0.04),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryGold.withOpacity(0.25),
+            color: AppColors.primaryGold.withValues(alpha: 0.25),
             blurRadius: size * 0.2,
             spreadRadius: 2,
           ),

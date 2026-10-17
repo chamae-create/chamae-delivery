@@ -96,6 +96,11 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
     require: (name) => {
       switch (name) {
         case "node:crypto": return require(name);
+        case "./courier-deliveries": return require("../courier-deliveries");
+        case "./courier-assignment": return require("../courier-assignment");
+        case "./order-operations": return require("../order-operations");
+        case "./order-chat": return require("../order-chat");
+        case "./order-printing": return require("../order-printing");
         case "firebase-functions/v2/https":
           return {onRequest: (_, handler) => handler};
         case "firebase-functions/v2/firestore":
