@@ -3,6 +3,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const {test} = require("node:test");
+const {customerPolicyFixture, customerProfileFixture} =
+    require("./customer-policy-fixture");
 
 const source = fs.readFileSync(path.join(__dirname, "../index.js"), "utf8");
 const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -96,6 +98,11 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
     require: (name) => {
       switch (name) {
         case "node:crypto": return require(name);
+        case "./delivery-service": return require("../delivery-service");
+        case "./customer-security": return require("../customer-security");
+        case "./customer-onboarding": return require("../customer-onboarding");
+        case "./catalog-commercial-policy":
+          return require("../catalog-commercial-policy");
         case "./courier-deliveries": return require("../courier-deliveries");
         case "./courier-assignment": return require("../courier-assignment");
         case "./order-operations": return require("../order-operations");
@@ -171,6 +178,89 @@ const assertFinancial = (data) => {
     merchantNet: 58.20, platformFee: 2.40, totalBRL: 70.60,
   })) assert.equal(data[key], expected, key);
 };
+
+test("new flow checks consent before finance/PIX", async () => {
+  const policy = customerPolicyFixture();
+  const f = fixture({customerFlowVersion: 2, customerUid: "buyer",
+    deliveryAddress: {countryCode: "BR"}});
+  f.docs.set("customerPolicies/current", policy);
+  f.docs.set("customerProfiles/buyer",
+      customerProfileFixture(policy, "TEST-TIMESTAMP"));
+  f.docs.set("deliveryConfiguration/current", {mode: "legacy"});
+  await f.invoke("auto");
+  assert.equal(f.requests.length, 1);
+  assertFinancial(f.docs.get("orders/o1"));
+  assert.equal(f.docs.get("orderFinancials/o1")
+      .ageEligibilitySnapshot.dateOfBirthVerified, false);
+});
+
+test("new flow rejects stale consent or missing alcohol policy", async () => {
+  for (const invalid of ["consent", "alcohol"]) {
+    const policy = customerPolicyFixture();
+    const f = fixture({customerFlowVersion: 2, customerUid: "buyer",
+      deliveryAddress: {countryCode: "BR"}}, {category: "Cervejas"});
+    f.docs.set("customerPolicies/current", policy);
+    const profile = customerProfileFixture(policy, "TEST-TIMESTAMP");
+    if (invalid === "consent") profile.termsVersion = "TEST-OLDER";
+    f.docs.set("customerProfiles/buyer", profile);
+    await f.invoke("auto");
+    assert.equal(f.requests.length, 0);
+    assert.equal(f.docs.has("orderFinancials/o1"), false);
+  }
+});
+
+for (const flow of ["auto", "manual", "reserve"]) {
+  test(`${flow}: route quote freezes fee/version and ignores forged freight`,
+      async () => {
+        const destination = {latitude: -20.01, longitude: -50.01,
+          countryCode: "BR", confirmed: true};
+        const quoteId = "a".repeat(64);
+        const f = fixture({customerUid: "buyer", deliveryAddress: destination,
+          deliveryQuoteId: quoteId, deliveryFee: 99999,
+          ...(flow === "reserve" ? {paymentMethod: "Maquininha",
+            pixRequested: false, status: "Novo"} : {})});
+        f.docs.set("deliveryConfiguration/current", {mode: "routeBands",
+          activeVersion: "v1"});
+        f.docs.set(`deliveryQuotes/${quoteId}`, {uid: "buyer", version: "v1",
+          origin: {latitude: -20, longitude: -50}, destination,
+          distanceMeters: 2300, feeCents: 725, createdAtMs: Date.now(),
+          expiresAtMs: Date.now() + 300000});
+        f.docs.set("deliveryPricingVersions/v1", {published: true, table: {
+          schemaVersion: 2, minimumPolicy: "replace",
+          origin: {latitude: -20, longitude: -50},
+          maxDistanceMeters: 3000,
+          bands: [{minExclusiveMeters: 0, maxInclusiveMeters: 3000,
+            priceCents: 725, enabled: true, order: 0}],
+        }});
+        await f.invoke(flow);
+        const frozen = f.docs.get("orderFinancials/o1");
+        assert.equal(frozen.deliveryFee, 7.25);
+        assert.equal(frozen.totalBRL, 67.85);
+        assert.equal(frozen.deliverySnapshot.configurationVersion, "v1");
+        assert.equal(frozen.deliverySnapshot.distanceMeters, 2300);
+        assert.equal(frozen.deliveryDistanceMeters, 2300);
+        assert.equal(frozen.deliveryPricingVersion, "v1");
+        assert.equal(f.docs.get("orders/o1").deliveryPricingVersion, "v1");
+        assert.equal(f.docs.get(`deliveryQuotes/${quoteId}`).orderId, "o1");
+        f.docs.set("deliveryConfiguration/current", {mode: "routeBands",
+          activeVersion: "v2"});
+        // Reducing the active radius must never recalculate confirmed orders.
+        f.docs.set("deliveryPricingVersions/v2", {published: true, table: {
+          schemaVersion: 2, minimumPolicy: "replace",
+          origin: {latitude: -20, longitude: -50},
+          maxDistanceMeters: 1000,
+          bands: [{minExclusiveMeters: 0, maxInclusiveMeters: 1000,
+            priceCents: 600, enabled: true, order: 0}],
+        }});
+        f.docs.get(`deliveryQuotes/${quoteId}`).feeCents = 50000;
+        await f.invoke(flow);
+        assert.equal(f.docs.get("orderFinancials/o1").deliveryFee, 7.25);
+        assert.equal(
+            f.docs.get("orderFinancials/o1").deliveryDistanceMeters, 2300);
+        assert.equal(
+            f.docs.get("orderFinancials/o1").deliveryPricingVersion, "v1");
+      });
+}
 
 for (const flow of ["auto", "manual"]) {
   test(`${flow}: ignores client prices, totals and flags`, async () => {
@@ -464,3 +554,26 @@ test("financial totals exceeding safe cent arithmetic cannot be charged",
       await f.invoke("auto");
       assert.equal(f.requests.length, 0);
     });
+
+for (const flow of ["auto", "reserve"]) {
+  for (const product of [
+    {name: "POD"}, {name: "Vape"}, {name: "CIGARRO"}, {name: "CIGARROS"},
+    {name: "CIGARRILHO"}, {name: "TABACO"}, {category: "Tabacaria"},
+    {name: "MARLBORO BLUE ICE"}, {name: "IGNITE V80"},
+    {commercialBlocked: true},
+  ]) {
+    test(flow+": restricted official product cannot be purchased "+
+        JSON.stringify(product), async () => {
+      const f=fixture(flow==="reserve"?
+        {paymentMethod: "Dinheiro", pixRequested: false}:{},
+      {...product, isActive: true});
+      const original=clone(f.docs.get("products/p1"));
+      await f.invoke(flow);
+      assert.equal(f.requests.length, 0);
+      assert.equal(f.docs.get("orders/o1").financialValidationStatus,
+          "rejected");
+      assert.deepEqual(f.docs.get("products/p1"), original);
+      assert.equal(f.docs.has("orderFinancials/o1"), false);
+    });
+  }
+}

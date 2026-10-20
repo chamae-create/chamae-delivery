@@ -15,7 +15,7 @@ let app;
 let db;
 let environment;
 let sequence = 0;
-const auth = (role = "operations_admin") => ({
+const auth = (role = "superadmin") => ({
   uid: "operator", token: {roles: [role]},
 });
 before(async () => {
@@ -71,10 +71,14 @@ const seed = async (overrides = {}) => {
   const delivery = db.doc(`courierDeliveries/${id}`);
   const call = (uid, extra = {}, role) => changeCourier(db, {
     auth: auth(role), data: {orderId: id, courierUid: uid,
-      requestId: randomUUID(), ...extra},
+      requestId: randomUUID(),
+      contingencyReason: "Falha do aparelho do motoboy",
+      confirmation: `CONFIRMAR ${id}`, ...extra},
   });
   const dispatch = (extra = {}) => changeCourier(db, {
-    auth: auth(), data: {orderId: id, requestId: randomUUID(), ...extra},
+    auth: auth(), data: {orderId: id, requestId: randomUUID(),
+      contingencyReason: "Falha do aparelho do motoboy",
+      confirmation: `CONFIRMAR ${id}`, ...extra},
   }, "dispatch");
   return {id, ref, delivery, call, dispatch,
     read: async () => (await ref.get()).data(),
@@ -85,7 +89,7 @@ const owns = (uid, id) => getDoc(doc(rider(uid), "courierDeliveries", id));
 const forbidden = ["customerPhone", "WhatsApp", "email", "customerUid",
   "history", "totalBRL", "customerFee", "deliveryFee", "mercadoPagoOrderId"];
 
-for (const role of ["operations_admin", "superadmin"]) {
+for (const role of ["superadmin"]) {
   test(`${role}: official name and sanitized projection`,
       async () => {
         const f = await seed();

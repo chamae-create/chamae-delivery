@@ -42,16 +42,59 @@ service cloud.firestore {
       return signedIn() && data.get('customerUid', '') == request.auth.uid;
     }
 
-    function validOrderCreate(data) {
+    function verifiedCustomerIdentity() {
+      let provider = request.auth.token.get('firebase', {}).get('sign_in_provider', '');
+      return provider != '' && provider != 'anonymous'
+        && (request.auth.token.get('customerVerified', false) == true
+          || provider in ['google.com', 'apple.com']);
+    }
+
+    function currentCustomerConsent() {
+      let policy = get(/databases/$(database)/documents/customerPolicies/current).data;
+      let profile = get(/databases/$(database)/documents/customerProfiles/$(request.auth.uid)).data;
+      return policy.get('published', false) == true && policy.get('draft', true) == false
+        && !policy.termsVersion.lower().matches('.*draft.*')
+        && !policy.privacyVersion.lower().matches('.*draft.*')
+        && !policy.alcoholVersion.lower().matches('.*draft.*')
+        && profile.get('acceptedAt', null) is timestamp
+        && profile.get('birthDate', '') is string && profile.birthDate.size() == 10
+        && profile.get('termsVersion', '') == policy.termsVersion
+        && profile.get('privacyVersion', '') == policy.privacyVersion
+        && profile.get('alcoholVersion', '') == policy.alcoholVersion
+        && profile.get('policyRevision', '') == policy.revision
+        && profile.get('policyHash', '') == policy.contentHash;
+    }
+
+    function confirmedDestination(data) {
+      let address = data.get('deliveryAddress', {});
+      return address is map
+        && address.get('confirmed', false) == true
+        && address.get('latitude', null) is number
+        && address.get('longitude', null) is number
+        && address.latitude >= -90 && address.latitude <= 90
+        && address.longitude >= -180 && address.longitude <= 180
+        && address.get('countryCode', '') in ['BR', 'PY']
+        && address.get('street', '') is string && address.street.size() > 0
+        && address.get('city', '') is string && address.city.size() > 0
+        && (address.get('noNumber', false) == true
+          || (address.get('number', '') is string && address.number.size() > 0));
+    }
+
+    function validOrderCreate(data, documentId) {
       // Contrato real de _montarDadosPedido. Valores aqui são propostas do cliente;
       // validação financeira/estoque e confirmação de pagamento são do backend.
       return ownsOrder(data)
+        && !exists(/databases/$(database)/documents/customerOrderCancellations/$(request.auth.uid)/orders/$(documentId))
+        && confirmedDestination(data)
+        && verifiedCustomerIdentity()
+        && data.get('customerFlowVersion', 0) == 2
+        && currentCustomerConsent()
         && data.keys().hasAll(['id', 'customerUid', 'customerName', 'itemsList',
           'totalBRL', 'paymentMethod', 'paymentStatus', 'status', 'courierPaid', 'createdAt'])
         && data.keys().hasOnly([
-          'id', 'customerUid', 'customerName', 'customerPhone', 'address',
+          'id', 'customerUid', 'customerName', 'customerPhone', 'address', 'customerFlowVersion',
           'deliveryAddress', 'deliveryLocation', 'itemsList', 'itemsTotal',
-          'deliveryFee', 'customerFee', 'merchantFee', 'merchantNet', 'platformFee',
+          'deliveryQuoteId', 'deliveryFee', 'customerFee', 'merchantFee', 'merchantNet', 'platformFee',
           'totalBRL', 'displayCurrency', 'displayTotal', 'exchangeRatePYGPerBRL',
           'exchangeRateBRLPerUSD', 'exchangeRateSource', 'exchangeRateCapturedAt',
           'paymentMethod', 'paymentStatus', 'cardType', 'cashCurrency',
@@ -78,12 +121,84 @@ service cloud.firestore {
     }
 
     match /orders/{orderId} {
-      allow create: if signedIn() && !isCourierAccount() && validOrderCreate(request.resource.data);
+      allow create: if signedIn() && !isCourierAccount() && validOrderCreate(request.resource.data, orderId);
       allow read: if signedIn() && !isCourierAccount()
         && (ownsOrder(resource.data) || isOperations() || isFinance());
       // Every operational/financial mutation uses authenticated backend.
       allow update, delete: if false;
     }
+
+    // Integrate inside /databases/{database}/documents in the authoritative rules.
+    // Uses the existing isCatalogAdmin() helper (named superadmin/catalog_admin).
+    // Do not deploy this fragment as a replacement ruleset.
+    match /categories/{categoryId} {
+      function validCategory() {
+        let data = request.resource.data;
+        return data.keys().hasOnly(['name', 'normalizedName', 'createdAt', 'updatedAt'])
+          && data.keys().hasAll(['name', 'normalizedName', 'createdAt'])
+          && data.name is string
+          && data.name.size() > 0 && data.name.size() <= 100
+          && !data.name.matches('.*[\\s]{2,}.*')
+          && !data.name.matches('^[\\s].*|.*[\\s]$')
+          && data.normalizedName == data.name.lower()
+          && data.normalizedName != 'todos'
+          && (!('updatedAt' in data) || data.updatedAt == request.time);
+      }
+      allow read: if isCatalogAdmin();
+      allow create: if isCatalogAdmin()
+        && validCategory()
+        && request.resource.data.createdAt == request.time;
+      // Keep the normalized identity stable: products store the category as text.
+      allow update: if isCatalogAdmin() && validCategory()
+        && request.resource.data.normalizedName == resource.data.normalizedName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    match /deliveryConfiguration/{id} {
+      allow read: if isSuperadmin() && !isCourierAccount();
+      allow write: if false;
+    }
+    match /deliveryPricingVersions/{version} {
+      allow read: if isSuperadmin() && !isCourierAccount();
+      allow write: if false;
+    }
+    match /customerPolicies/{id} {
+      // Only the onboarding configuration, including an absent current document.
+      allow get: if signedIn() && id == 'current';
+      allow list, write: if false;
+    }
+    match /customerProfiles/{uid} {
+      allow get: if namedAccount() && request.auth.uid == uid && !isCourierAccount();
+      // Consent, birth date and verification are exclusively backend-owned.
+      allow create: if namedAccount() && request.auth.uid == uid && !isCourierAccount()
+        && request.resource.data.keys().hasOnly(['createdAt'])
+        && request.resource.data.keys().hasAll(['createdAt'])
+        && request.resource.data.createdAt == request.time;
+      allow list, update, delete: if false;
+    }
+    match /customerConsentEvents/{uid}/events/{id} { allow read, write: if false; }
+    match /deliveryConfiguration/{id} {
+      allow read: if isSuperadmin() && !isCourierAccount();
+      allow write: if false;
+    }
+    match /customerWorkspaces/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid && !isCourierAccount();
+      allow list: if false;
+      allow create, update: if signedIn() && request.auth.uid == uid && !isCourierAccount()
+        && request.resource.data.keys().hasOnly(['addresses', 'lastAddress', 'defaultAddress', 'cart', 'pending', 'contact'])
+        && request.resource.data.get('addresses', []) is list
+        && request.resource.data.get('addresses', []).size() <= 20
+        && request.resource.data.get('cart', []) is list
+        && request.resource.data.get('cart', []).size() <= 100;
+      allow delete: if false;
+    }
+    match /deliveryQuotes/{id} { allow read, write: if false; }
+    match /customerDeliverySecrets/{uid} { allow read, write: if false; }
+    match /deliveryPinVerifiers/{id} { allow read, write: if false; }
+    match /deliveryPinAudit/{id} { allow read, write: if false; }
+    match /customerOrderCancellations/{uid}/orders/{id} { allow read, write: if false; }
 
     match /products/{productId} {
       allow read: if true;

@@ -1,3 +1,8 @@
+const {prepareDelivery} = require("./delivery-service");
+const {prepareCustomerEligibility, checkProductEligibility} =
+    require("./customer-onboarding");
+const {isCommerciallyBlocked} = require("./catalog-commercial-policy");
+
 const {
 
   randomUUID,
@@ -135,6 +140,14 @@ async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
     return {ref, dados, novo: false};
   }
 
+  let delivery;
+  const eligibility = await prepareCustomerEligibility(transaction, db, pedido);
+  try {
+    delivery = await prepareDelivery(transaction, db, orderRef, pedido,
+        FRETE_PEDIDO_CENTAVOS);
+  } catch (error) {
+    throw erroFinanceiro(error.code || error.message || "DELIVERY_UNAVAILABLE");
+  }
   let subtotalCentavos = 0;
   const items = [];
   for (const item of itens) {
@@ -145,6 +158,10 @@ async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
       throw erroFinanceiro("PRODUTO_NAO_ENCONTRADO");
     }
     const product = productSnapshot.data() || {};
+    checkProductEligibility(eligibility, product);
+    if (isCommerciallyBlocked(product)) {
+      throw erroFinanceiro("PRODUTO_BLOQUEADO_COMERCIALMENTE");
+    }
     const preco = product.priceBRL == null ? product.price : product.priceBRL;
     const precoCentavos = Math.round((preco + Number.EPSILON) * 100);
     if (
@@ -172,7 +189,7 @@ async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
   const customerFeeCentavos = Math.floor((subtotalCentavos + 50) / 100);
   const merchantFeeCentavos = Math.floor((subtotalCentavos * 3 + 50) / 100);
   const totalCentavos =
-      subtotalCentavos + FRETE_PEDIDO_CENTAVOS + customerFeeCentavos;
+      subtotalCentavos + delivery.feeCents + customerFeeCentavos;
   if (!Number.isSafeInteger(totalCentavos) || totalCentavos <= 0) {
     throw erroFinanceiro("VALOR_PEDIDO_INVALIDO");
   }
@@ -189,7 +206,18 @@ async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
   const dados = {
     items,
     itemsTotal: subtotalCentavos / 100,
-    deliveryFee: FRETE_PEDIDO_CENTAVOS / 100,
+    deliveryFee: delivery.feeCents / 100,
+    ...(delivery.snapshot ? {deliverySnapshot: delivery.snapshot,
+      deliveryDistanceMeters: delivery.snapshot.distanceMeters,
+      deliveryPricingVersion: delivery.snapshot.configurationVersion,
+      routingProvider: delivery.snapshot.routingProvider,
+      deliveryQuotedAtMs: delivery.snapshot.quotedAtMs} : {}),
+    ...(eligibility ? {ageEligibilitySnapshot: {
+      policyRevision: eligibility.policy.revision,
+      destinationCountry: eligibility.country,
+      dateOfBirthVerified: false,
+      documentRequiredAtDelivery: eligibility.documentRequiredAtDelivery,
+    }} : {}),
     customerFee: customerFeeCentavos / 100,
     merchantFee: merchantFeeCentavos / 100,
     merchantNet: (subtotalCentavos - merchantFeeCentavos) / 100,
@@ -200,7 +228,7 @@ async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
     version: 1,
     createdAt: FieldValue.serverTimestamp(),
   };
-  return {ref, dados, novo: true};
+  return {ref, dados, novo: true, quoteRef: delivery.quoteRef};
 }
 
 /**
@@ -220,6 +248,14 @@ function camposFinanceirosPedido(pedido, dados) {
     })),
     itemsTotal: dados.itemsTotal,
     deliveryFee: dados.deliveryFee,
+    ...(dados.deliverySnapshot ?
+      {deliverySnapshot: dados.deliverySnapshot,
+        deliveryDistanceMeters: dados.deliverySnapshot.distanceMeters,
+        deliveryPricingVersion: dados.deliverySnapshot.configurationVersion,
+        routingProvider: dados.deliverySnapshot.routingProvider,
+        deliveryQuotedAtMs: dados.deliverySnapshot.quotedAtMs} : {}),
+    ...(dados.ageEligibilitySnapshot ?
+      {ageEligibilitySnapshot: dados.ageEligibilitySnapshot} : {}),
     customerFee: dados.customerFee,
     merchantFee: dados.merchantFee,
     merchantNet: dados.merchantNet,
@@ -2475,6 +2511,10 @@ exports.chamaeCriarPix = onRequest(
 
               if (financeiro.novo) {
                 transaction.set(financeiro.ref, financeiro.dados);
+                if (financeiro.quoteRef) {
+                  transaction.update(financeiro.quoteRef,
+                      {orderId: financeiro.ref.id});
+                }
               }
 
               transaction.update(orderRef, {
@@ -2990,6 +3030,10 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
 
               if (financeiro.novo) {
                 transaction.set(financeiro.ref, financeiro.dados);
+                if (financeiro.quoteRef) {
+                  transaction.update(financeiro.quoteRef,
+                      {orderId: financeiro.ref.id});
+                }
               }
 
               transaction.update(
@@ -3408,6 +3452,10 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
 
               if (financeiro.novo) {
                 transaction.set(financeiro.ref, financeiro.dados);
+                if (financeiro.quoteRef) {
+                  transaction.update(financeiro.quoteRef,
+                      {orderId: financeiro.ref.id});
+                }
               }
 
               for (const item of itensValidados) {
@@ -3766,3 +3814,10 @@ Object.assign(exports, require("./order-operations")
 Object.assign(exports, require("./order-chat").createOrderChat(db));
 
 Object.assign(exports, require("./order-printing").createOrderPrinting(db));
+
+Object.assign(exports, require("./delivery-service")
+    .createDeliveryFunctions(db));
+Object.assign(exports, require("./customer-security")
+    .createCustomerSecurity(db));
+Object.assign(exports, require("./customer-onboarding")
+    .createCustomerOnboarding(db));

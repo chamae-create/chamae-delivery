@@ -1,3 +1,5 @@
+const {requireContingency, auditContingency} =
+    require("./operational-contingency");
 const {createHash, randomUUID} = require("node:crypto");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {Timestamp, FieldValue, FieldPath} = require("firebase-admin/firestore");
@@ -75,10 +77,13 @@ function readyForDispatch(order) {
  */
 async function changeCourier(db, request, operation = "assign") {
   const actorUid = authorize(request);
+  const reason = requireContingency(request);
   const data = request.data;
   const allowed = operation === "assign" ?
-    ["orderId", "courierUid", "expectedCourierUid", "requestId"] :
-    ["orderId", "expectedCourierUid", "requestId"];
+    ["orderId", "courierUid", "expectedCourierUid", "requestId",
+      "contingencyReason", "confirmation"] :
+    ["orderId", "expectedCourierUid", "requestId",
+      "contingencyReason", "confirmation"];
   if (!data || typeof data !== "object" || Array.isArray(data) ||
       Object.keys(data).some((key) => !allowed.includes(key))) {
     throw new HttpsError("invalid-argument", "Solicitação inválida.");
@@ -100,7 +105,7 @@ async function changeCourier(db, request, operation = "assign") {
     throw new HttpsError("invalid-argument", "Identificador inválido.");
   }
   const fingerprint = createHash("sha256").update(JSON.stringify({
-    operation, orderId: id, courierUid: target,
+    operation, reason, orderId: id, courierUid: target,
     expectedCourierUid: expected === undefined ? null : expected,
   })).digest("hex");
   const ledgerId = createHash("sha256")
@@ -109,6 +114,7 @@ async function changeCourier(db, request, operation = "assign") {
   const orderRef = db.collection("orders").doc(id);
   const deliveryRef = db.collection("courierDeliveries").doc(id);
   const auditRef = db.collection("courierDeliveryAudit").doc();
+  const contingencyRef = db.collection("operationalContingencyAudit").doc();
   return db.runTransaction(async (transaction) => {
     const receipt = await transaction.get(ledgerRef);
     if (receipt.exists) {
@@ -210,6 +216,10 @@ async function changeCourier(db, request, operation = "assign") {
     writeCourierDelivery(transaction, {
       plan, deliveryRef, auditRef, orderId: id, previous, actorUid,
     });
+    if (changed) {
+      auditContingency(transaction, contingencyRef, request,
+          operation, source, patch);
+    }
     transaction.create(ledgerRef, {
       actorUid, orderId: id, courierUid: uid, operation, fingerprint,
       createdAt: FieldValue.serverTimestamp(),

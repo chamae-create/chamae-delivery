@@ -13,6 +13,8 @@ const {doc, getDoc, getDocs, collection, query, where,
     require("firebase/firestore");
 const {loadBackend} = require("./backend-fixture");
 const {changeCourier} = require("../courier-assignment");
+const {customerPolicyFixture, customerProfileFixture} =
+    require("./customer-policy-fixture");
 
 let app;
 let db;
@@ -24,16 +26,24 @@ const auth = (role = "operations_admin") => ({uid: `actor-${role}`,
 const request = (data, role) => ({auth: auth(role),
   data: {requestId: randomUUID(), ...data}});
 const client = (uid, role) => env.authenticatedContext(uid,
-    role ? {roles: [role]} : {}).firestore();
+    role ? {roles: [role]} : {customerVerified: true,
+      firebase: {sign_in_provider: "password"}}).firestore();
 const act = (id, operation, extra = {}) => backend.functions[
   operation === "separate" ? "chamaeIniciarSeparacao" : "chamaeConcluirEntrega"
-](request({orderId: id, ...extra}));
+](request({orderId: id, ...(operation === "complete" ? {
+  contingencyReason: "Falha do aparelho do motoboy",
+  confirmation: `CONFIRMAR ${id}`} : {}),
+...extra}, operation === "complete" ? "superadmin" : "operations_admin"));
 const settle = (ids, extra = {}, role = "finance") =>
   backend.functions.chamaeRegistrarAcertoMotoboy(
       request({orderDocumentIds: ids, ...extra}, role));
 const assign = (id, uid = "pilot-rider") => changeCourier(db,
-    request({orderId: id, courierUid: uid}));
-const dispatch = (id) => changeCourier(db, request({orderId: id}), "dispatch");
+    request({orderId: id, courierUid: uid,
+      contingencyReason: "Falha do aparelho do motoboy",
+      confirmation: `CONFIRMAR ${id}`}, "superadmin"));
+const dispatch = (id) => changeCourier(db, request({orderId: id,
+  contingencyReason: "Falha do aparelho do motoboy",
+  confirmation: `CONFIRMAR ${id}`}, "superadmin"), "dispatch");
 before(async () => {
   const host = process.env.FIRESTORE_EMULATOR_HOST;
   assert.ok(host, "Local emulator mandatory; no production fallback");
@@ -46,6 +56,10 @@ before(async () => {
   await env.clearFirestore();
   app = initializeApp({projectId: "demo-chamae-rules"});
   db = getFirestore(app);
+  const policy = customerPolicyFixture();
+  await db.doc("customerPolicies/current").set(policy);
+  await db.doc("customerProfiles/buyer").set(
+      customerProfileFixture(policy, Timestamp.fromMillis(1000)));
   backend = loadBackend(db);
   for (const uid of ["pilot-rider", "other-rider"]) {
     await db.doc(`couriers/${uid}`).set({name: `Oficial ${uid}`,
@@ -68,7 +82,11 @@ async function createOrder() {
     stock: 20, reservedStock: 0, salesCount: 0});
   await assertSucceeds(setDoc(doc(client("buyer"), "orders", id), {
     id: "#PILOT", customerUid: "buyer", customerName: "Ana",
+    customerFlowVersion: 2,
     customerPhone: "PRIVATE_PHONE", address: "Rua das Flores, 123",
+    deliveryAddress: {latitude: -22.5, longitude: -55.7,
+      street: "Rua das Flores",
+      city: "Cidade", number: "123", countryCode: "BR", confirmed: true},
     deliveryLocation: new ClientGeoPoint(-22.5, -55.7),
     itemsList: [{id: productId, quantity: 3, price: 0.01}],
     totalBRL: 1, itemsTotal: 1, deliveryFee: 1,

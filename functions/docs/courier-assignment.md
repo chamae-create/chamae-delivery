@@ -1,3 +1,5 @@
+POLITICA ATUAL (17/10/2026): consulte [operational-flow.md](operational-flow.md). Atribuir, despachar e concluir agora exigem contingencia superadmin com motivo, confirmacao e auditoria. O texto abaixo e historico e nao concede permissoes atuais.
+
 ATUALIZAÇÃO DO PILOTO (15/10/2026): este documento inclui histórico anterior. A política atual está em pilot_readiness.md/pilot_validation.md no chamae_admin e functions/docs/pilot.md no chamae_delivery. Todas as mutações SDK de orders/acertos foram fechadas; conclusão e acertos agora usam callables; o caixa agrupa por UID; cadastro inativo revoga leitura. Nada foi deployado.
 
 # Atribuição autenticada de motoboys

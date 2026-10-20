@@ -3,7 +3,7 @@
   "description": "Cloud Functions for Firebase",
   "scripts": {
     "lint": "eslint .",
-    "test": "node --test test/financial.spec.js test/courier-deliveries.spec.js test/courier-assignment.spec.js test/order-operations.spec.js",
+    "test": "node --test test/financial.spec.js test/courier-deliveries.spec.js test/courier-assignment.spec.js test/order-operations.spec.js test/delivery-contracts.spec.js test/customer-onboarding.spec.js test/delivery-official.spec.js",
     "test:couriers:emulator": "node --test --test-concurrency=1 test/courier-deliveries.emulator.spec.js test/courier-assignment.emulator.spec.js test/pilot.emulator.spec.js",
     "test:rules": "node --test test/firestore.rules.spec.js",
     "serve": "firebase emulators:start --only functions",

@@ -1,3 +1,6 @@
+const {requireContingency, auditContingency} =
+    require("./operational-contingency");
+const {prepareCourierDispatch} = require("./courier-dispatch-contract");
 const {createHash} = require("node:crypto");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {Timestamp, FieldValue} = require("firebase-admin/firestore");
@@ -49,7 +52,10 @@ function authorizeSettlement(request) {
 async function moveOrder(db, request, operation, resolveReservation,
     checkFinancial) {
   const actorUid = authorize(request);
-  const data = payload(request, ["orderId", "requestId"]);
+  const reason = operation === "complete" ? requireContingency(request) : null;
+  const data = payload(request, operation === "complete" ?
+    ["orderId", "requestId", "contingencyReason", "confirmation"] :
+    ["orderId", "requestId"]);
   if (!validId(data.orderId)) {
     throw new HttpsError("invalid-argument", "Pedido inválido.");
   }
@@ -59,7 +65,9 @@ async function moveOrder(db, request, operation, resolveReservation,
   const auditRef = db.collection("courierDeliveryAudit").doc();
   const ledgerRef = db.doc(`orderOperationRequests/${digest(
       `${actorUid}:${data.requestId}`)}`);
-  const fingerprint = digest(`${operation}:${id}`);
+  const fingerprint = digest(reason ? `${operation}:${id}:${reason}` :
+    `${operation}:${id}`);
+  const contingencyRef = db.collection("operationalContingencyAudit").doc();
   const next = operation === "separate" ? "Em Separação" : "Concluído";
   const before = operation === "separate" ? "Novo" : "Saiu para Entrega";
   return db.runTransaction(async (tx) => {
@@ -122,11 +130,19 @@ async function moveOrder(db, request, operation, resolveReservation,
         order.stockReservationStatus === "reserved") {
       await resolveReservation(tx, ref, id, true);
     }
+    if (operation === "complete") {
+      auditContingency(tx, contingencyRef, request, "complete", order,
+          {status: next});
+    }
     if (order.status !== next) {
+      if (operation === "separate") {
+        prepareCourierDispatch(tx, db.doc(`courierDispatchRequests/${id}`), id);
+      }
       tx.update(ref, {status: next, updatedAt: FieldValue.serverTimestamp(),
         ...(operation === "complete" ? {
           completedAt: FieldValue.serverTimestamp(), completedBy: actorUid,
-        } : {separationStartedAt: FieldValue.serverTimestamp()})});
+        } : {separationStartedAt: FieldValue.serverTimestamp(),
+          courierDispatchState: "awaiting_integration"})});
     }
     writeCourierDelivery(tx, {plan, deliveryRef, auditRef, orderId: id,
       previous: previous.exists ? previous.data() : {}, actorUid});

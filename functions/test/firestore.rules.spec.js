@@ -2,6 +2,8 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const {before, after, test} = require("node:test");
+const {customerPolicyFixture, customerProfileFixture} =
+    require("./customer-policy-fixture");
 const {
   initializeTestEnvironment, assertFails, assertSucceeds,
 } = require("@firebase/rules-unit-testing");
@@ -40,6 +42,10 @@ before(async () => {
   await environment.clearFirestore();
   await environment.withSecurityRulesDisabled(async (context) => {
     const db = context.firestore();
+    const policy = customerPolicyFixture();
+    await setDoc(doc(db, "customerPolicies/current"), policy);
+    await setDoc(doc(db, "customerProfiles/customer"),
+        customerProfileFixture(policy, Timestamp.fromMillis(1000)));
     await setDoc(doc(db, "products/p1"), product);
     await setDoc(doc(db, "orderFinancials/existing"), financial);
     await setDoc(doc(db, "orders/existing"), {
@@ -54,7 +60,9 @@ after(async () => {
 
 const clients = {
   unauthenticated: () => environment.unauthenticatedContext().firestore(),
-  authenticated: () => environment.authenticatedContext("customer").firestore(),
+  authenticated: () => environment.authenticatedContext("customer", {
+    customerVerified: true, firebase: {sign_in_provider: "password"},
+  }).firestore(),
   claimedAdmin: () => environment.authenticatedContext("customer", {
     admin: true,
   }).firestore(),
@@ -170,8 +178,11 @@ test("temporary public access to orders has been removed",
 const checkoutOrder = (overrides = {}) => {
   return {
     id: "#CH-CHECKOUT", customerUid: "customer", customerName: "Cliente",
+    customerFlowVersion: 2,
     customerPhone: "telefone-do-cliente", address: "Rua da Loja, 1",
-    deliveryAddress: {addressText: "Rua da Loja, 1"},
+    deliveryAddress: {addressText: "Rua da Loja, 1", latitude: -22.5,
+      longitude: -55.7, street: "Rua da Loja", city: "Cidade",
+      number: "1", confirmed: true, countryCode: "BR"},
     deliveryLocation: new GeoPoint(-22.5, -55.7),
     itemsList: [{id: "p1", name: "Produto", quantity: 1, price: 20}],
     itemsTotal: 20, deliveryFee: 5, customerFee: 1, merchantFee: 0.6,
@@ -198,6 +209,250 @@ const validatedOrder = (overrides = {}) => {
     stockReservationStatus: "reserved", ...overrides,
   });
 };
+
+test("unverified customer browses but cannot place an order", async () => {
+  const db = environment.authenticatedContext("customer", {
+    firebase: {sign_in_provider: "password"},
+  }).firestore();
+  await assertSucceeds(getDoc(doc(db, "products/p1")));
+  await assertFails(setDoc(doc(db, "orders/unverified"), checkoutOrder()));
+});
+
+test("anonymous cannot buy even with a verification claim", async () => {
+  const db = environment.authenticatedContext("customer", {
+    customerVerified: true, firebase: {sign_in_provider: "anonymous"},
+  }).firestore();
+  await assertFails(setDoc(doc(db, "orders/anon-claim"), checkoutOrder()));
+});
+
+for (const provider of ["google.com", "apple.com"]) {
+  test(`${provider}: trusted Firebase identity buys with current consent`,
+      async () => {
+        const db = environment.authenticatedContext("customer", {
+          firebase: {sign_in_provider: provider},
+        }).firestore();
+        await assertSucceeds(setDoc(doc(db, "orders", provider),
+            checkoutOrder()));
+      });
+}
+
+test("consent is server-only; stale/missing consent blocks new customer flow",
+    async () => {
+      const db = clients.authenticated();
+      await assertFails(updateDoc(doc(db, "customerProfiles/customer"),
+          {birthDate: "1990-01-01"}));
+      await assertFails(setDoc(doc(db, "customerPolicies/current"),
+          {published: true}));
+      const stale = environment.authenticatedContext("stale", {
+        firebase: {sign_in_provider: "google.com"},
+      }).firestore();
+      const p = customerPolicyFixture();
+      await seed("stale", {...customerProfileFixture(p,
+          Timestamp.fromMillis(1000)), termsVersion: "TEST-OLD"},
+      "customerProfiles");
+      await assertFails(setDoc(doc(stale, "orders/no-current-consent"),
+          checkoutOrder({customerUid: "stale"})));
+      await assertFails(getDoc(doc(stale, "customerProfiles/customer")));
+      await assertFails(setDoc(doc(db,
+          "customerConsentEvents/customer/events/forged"), {acceptedAt: true}));
+    });
+
+test("discarded proposal cannot arrive late; lock is private and server only",
+    async () => {
+      const id = "cancelled-order";
+      const lock = `customerOrderCancellations/customer/orders/${id}`;
+      await environment.withSecurityRulesDisabled(async (context) => {
+        await setDoc(doc(context.firestore(), lock), {uid: "customer"});
+      });
+      const db = clients.authenticated();
+      await assertFails(setDoc(doc(db, "orders", id), checkoutOrder()));
+      await assertFails(getDoc(doc(db, lock)));
+      await assertFails(setDoc(doc(db, lock), {uid: "customer"}));
+    });
+
+for (const address of [{confirmed: false}, {countryCode: "US"},
+  {latitude: 91}, {longitude: -181}, {street: ""}, {city: ""},
+  {number: "", noNumber: false}]) {
+  test(`checkout refuses invalid destination ${JSON.stringify(address)}`,
+      async () => {
+        const valid = checkoutOrder();
+        await assertFails(setDoc(doc(clients.authenticated(),
+            "orders/bad-destination"), {...valid,
+          deliveryAddress: {...valid.deliveryAddress, ...address}}));
+      });
+}
+
+test("verified owner can use confirmed PY destination without a number",
+    async () => {
+      const order = checkoutOrder();
+      await assertSucceeds(setDoc(doc(clients.authenticated(),
+          "orders/confirmed-py"), {...order, deliveryAddress: {
+        ...order.deliveryAddress, countryCode: "PY", noNumber: true, number: "",
+      }}));
+    });
+
+test(
+    "bootstrap: own missing profile is readable " +
+    "and only minimal create is allowed",
+    async () => {
+      const db = environment.authenticatedContext("new-google", {
+        firebase: {sign_in_provider: "google.com"},
+      }).firestore();
+      const ref = doc(db, "customerProfiles/new-google");
+      assert.equal((await assertSucceeds(getDoc(ref))).exists(), false);
+      await assertFails(setDoc(ref, {createdAt: serverTimestamp(),
+        acceptedAt: serverTimestamp()}));
+      await assertFails(setDoc(ref, {createdAt: serverTimestamp(),
+        birthDate: "2000-01-01"}));
+      await assertFails(setDoc(ref, {createdAt: Timestamp.fromMillis(0)}));
+      await assertSucceeds(setDoc(ref, {createdAt: serverTimestamp()}));
+      await assertSucceeds(getDoc(ref));
+      await assertSucceeds(getDoc(doc(clients.authenticated(),
+          "customerProfiles/customer")));
+      await assertFails(updateDoc(ref, {customerVerified: true}));
+      await assertFails(setDoc(ref, {createdAt: serverTimestamp()}));
+      await assertFails(deleteDoc(ref));
+      await assertFails(getDoc(doc(db, "customerProfiles/customer")));
+      await assertFails(setDoc(doc(db, "customerProfiles/foreign"),
+          {createdAt: serverTimestamp()}));
+      await assertFails(getDocs(collection(db, "customerProfiles")));
+    });
+
+test("policy: authenticated get current only, never list or client writes",
+    async () => {
+      const db = clients.authenticated();
+      await assertSucceeds(getDoc(doc(db, "customerPolicies/current")));
+      await assertFails(getDoc(doc(db, "customerPolicies/draft-private")));
+      await assertFails(getDocs(collection(db, "customerPolicies")));
+      await assertFails(getDoc(doc(clients.unauthenticated(),
+          "customerPolicies/current")));
+      await assertFails(setDoc(doc(db, "customerPolicies/new"),
+          {published: true}));
+      await assertFails(updateDoc(doc(db, "customerPolicies/current"),
+          {published: false}));
+      await assertFails(deleteDoc(doc(db, "customerPolicies/current")));
+    });
+
+test(
+    "linking: same UID keeps workspace, refreshed Google token unlocks profile",
+    async () => {
+      const uid = "linked-anonymous";
+      const anonymous = environment.authenticatedContext(uid, {
+        firebase: {sign_in_provider: "anonymous"},
+      }).firestore();
+      const google = environment.authenticatedContext(uid, {
+        firebase: {sign_in_provider: "google.com"},
+      }).firestore();
+      const path = `customerWorkspaces/${uid}`;
+      assert.equal(
+          (await assertSucceeds(getDoc(doc(anonymous, path)))).exists(), false);
+      await assertSucceeds(setDoc(doc(anonymous, path), {addresses: [],
+        cart: [{id: "p1", quantity: 1}]}));
+      const saved = await assertSucceeds(getDoc(doc(google, path)));
+      assert.equal(saved.data().cart[0].id, "p1");
+      await assertFails(getDoc(doc(anonymous, `customerProfiles/${uid}`)));
+      await assertFails(setDoc(doc(anonymous, `customerProfiles/${uid}`),
+          {createdAt: serverTimestamp()}));
+      await assertSucceeds(setDoc(doc(google, `customerProfiles/${uid}`),
+          {createdAt: serverTimestamp()}));
+      await assertSucceeds(getDoc(doc(google, `customerProfiles/${uid}`)));
+      const other = environment.authenticatedContext("switched-uid", {
+        firebase: {sign_in_provider: "google.com"},
+      }).firestore();
+      await assertFails(getDoc(doc(other, path)));
+      await assertFails(getDoc(doc(other, `customerProfiles/${uid}`)));
+      await assertFails(getDocs(collection(google, "customerWorkspaces")));
+      for (const db of [anonymous, google, other, clients.unauthenticated()]) {
+        await assertFails(getDoc(doc(db, "orderFinancials/existing")));
+        await assertFails(getDoc(doc(db, `customerDeliverySecrets/${uid}`)));
+        await assertFails(getDoc(doc(db,
+            `customerConsentEvents/${uid}/events/private`)));
+      }
+    });
+
+test("courier cannot bootstrap a customer profile or workspace", async () => {
+  await seed("bootstrap-courier", {administrativeState: "active"}, "couriers");
+  const db = environment.authenticatedContext("bootstrap-courier", {
+    firebase: {sign_in_provider: "google.com"},
+  }).firestore();
+  for (const name of ["customerProfiles", "customerWorkspaces"]) {
+    const ref = doc(db, name, "bootstrap-courier");
+    await assertFails(getDoc(ref));
+    await assertFails(setDoc(ref, name === "customerProfiles" ?
+      {createdAt: serverTimestamp()} : {addresses: [], cart: []}));
+  }
+});
+
+test("workspace belongs only to owner and has no privileged fields",
+    async () => {
+      const owner = clients.authenticated();
+      const foreign = environment.authenticatedContext("foreign").firestore();
+      await assertSucceeds(setDoc(doc(owner, "customerWorkspaces/customer"), {
+        addresses: [], cart: [], pending: null,
+      }));
+      await assertSucceeds(getDoc(doc(owner, "customerWorkspaces/customer")));
+      await assertFails(getDoc(doc(foreign, "customerWorkspaces/customer")));
+      await assertFails(updateDoc(doc(foreign, "customerWorkspaces/customer"),
+          {cart: []}));
+      await assertFails(updateDoc(doc(owner, "customerWorkspaces/customer"),
+          {customerVerified: true}));
+      await assertFails(updateDoc(doc(owner, "customerWorkspaces/customer"),
+          {cart: Array(101).fill({id: "p1"})}));
+    });
+
+test("pricing versions: superadmin reads, no direct writes or other roles",
+    async () => {
+      await seed("test-version", {published: false},
+          "deliveryPricingVersions");
+      await assertSucceeds(getDoc(doc(roleDb("superadmin"),
+          "deliveryPricingVersions/test-version")));
+      for (const role of ["operations_admin", "catalog_admin", "finance"]) {
+        await assertFails(getDoc(doc(roleDb(role),
+            "deliveryPricingVersions/test-version")));
+      }
+      await assertFails(getDoc(doc(clients.authenticated(),
+          "deliveryPricingVersions/test-version")));
+      await assertFails(setDoc(doc(roleDb("superadmin"),
+          "deliveryPricingVersions/direct"), {published: true}));
+      await assertFails(setDoc(doc(roleDb("superadmin"),
+          "deliveryConfiguration/current"), {mode: "routeBands"}));
+    });
+
+test("delivery configuration: superadmin reads; SDK writes denied",
+    async () => {
+      for (const id of ["current", "draft"]) {
+        await seed(id, {activeVersion: "test-version"},
+            "deliveryConfiguration");
+        await assertSucceeds(getDoc(doc(roleDb("superadmin"),
+            `deliveryConfiguration/${id}`)));
+        for (const db of [clients.authenticated(), clients.unauthenticated(),
+          roleDb("finance"), roleDb("operations_admin"),
+          roleDb("catalog_admin")]) {
+          await assertFails(getDoc(doc(db, `deliveryConfiguration/${id}`)));
+          await assertFails(setDoc(doc(db, `deliveryConfiguration/${id}`),
+              {mode: "routeBands"}));
+        }
+        await assertFails(updateDoc(doc(roleDb("superadmin"),
+            `deliveryConfiguration/${id}`), {activeVersion: "forged"}));
+      }
+    });
+
+for (const name of ["deliveryQuotes", "customerDeliverySecrets",
+  "deliveryPinVerifiers", "deliveryPinAudit"]) {
+  test(`${name}: customer, courier, admin cannot read/write private data`,
+      async () => {
+        await seed("private-rider", {administrativeState: "active"},
+            "couriers");
+        await seed("private", {secret: "not-for-clients"}, name);
+        const rider = environment.authenticatedContext("private-rider")
+            .firestore();
+        for (const db of [clients.authenticated(), rider,
+          roleDb("superadmin")]) {
+          await assertFails(getDoc(doc(db, name, "private")));
+          await assertFails(setDoc(doc(db, name, "forged"), {value: 1}));
+        }
+      });
+}
 
 const roleDb = (role, uid = role) => {
   return environment.authenticatedContext(uid, {roles: [role]}).firestore();
@@ -227,12 +482,15 @@ for (const [name, overrides] of Object.entries({
   });
 }
 
-test("anonymous customer: own order, no admin access", async () => {
+test("anonymous: cannot buy; keeps historical order access", async () => {
   const db = environment.authenticatedContext("anonymous-customer", {
     firebase: {sign_in_provider: "anonymous"}, roles: ["superadmin"],
   }).firestore();
-  await assertSucceeds(setDoc(doc(db, "orders/anonymous-own"),
+  await assertFails(setDoc(doc(db, "orders/anonymous-own"),
       checkoutOrder({customerUid: "anonymous-customer"})));
+  await seed("anonymous-own", checkoutOrder({customerUid: "anonymous-customer",
+    createdAt: Timestamp.fromMillis(1000),
+    exchangeRateCapturedAt: Timestamp.fromMillis(1000)}));
   await assertSucceeds(getDoc(doc(db, "orders/anonymous-own")));
   await assertFails(getDoc(doc(db, "orders/existing")));
   await assertFails(setDoc(doc(db, "products/anonymous-fake"), product));
