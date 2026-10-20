@@ -108,3 +108,35 @@ yarn-error.log*
 secrets/
 .secret/
 credentials/
+# Checkpoint hygiene: local files only; official references remain versionable
+node_modules/
+*.jks
+*.keystore
+key.properties
+*service_account*.json
+*firebase-adminsdk*.json
+*.hprof
+*.dmp
+*.tmp
+*.swp
+*.swo
+*.bak
+*~
+
+# Local capture backups and machine-specific evidence (keep files on disk)
+/tool/visual_freeze/before/
+/tool/visual_freeze/*.diff
+/tool/visual_freeze/screenshots/
+/tool/visual_homologation/before/
+/tool/visual_homologation/*.diff
+/tool/visual_homologation/android/
+# Retain representative narrow/wide screenshots; other sizes stay local
+/tool/visual_homologation/after/*.png
+!/tool/visual_homologation/after/*_320.0.png
+!/tool/visual_homologation/after/*_1440.0.png
+/docs/visual_homologation_real_device_2026-10-20/before/
+/docs/visual_homologation_real_device_2026-10-20/source_changes.diff
+/docs/visual_homologation_real_device_2026-10-20/device_and_artifacts.json
+/docs/visual_homologation_real_device_2026-10-20/device_final_state.json
+/docs/visual_homologation_real_device_2026-10-20/gfxinfo_debug.txt
+/docs/config/firebase_legacy/android/google-services.json
