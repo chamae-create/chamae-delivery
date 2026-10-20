@@ -7,6 +7,7 @@ class Product {
   final double price;
   final int stock;
   final bool isActive;
+  final bool commercialBlocked;
   final String imageUrl;
   final String description;
   final bool isOffer;
@@ -20,6 +21,7 @@ class Product {
     required this.price,
     required this.stock,
     required this.isActive,
+    this.commercialBlocked = false,
     required this.imageUrl,
     required this.description,
     required this.isOffer,
@@ -34,10 +36,12 @@ class Product {
       id: doc.id,
       name: (data['name'] ?? 'Produto').toString(),
       category: (data['category'] ?? 'Geral').toString(),
-      price:
-          ((data['priceBRL'] ?? data['price'] ?? 0) as num).toDouble(),
-      stock: ((data['stock'] ?? 0) as num).toInt(),
+      price: ((data['priceBRL'] ?? data['price'] ?? 0) as num).toDouble(),
+      stock: (((data['stock'] ?? 0) as num).toInt() -
+              ((data['reservedStock'] ?? 0) as num).toInt())
+          .clamp(0, 1 << 30),
       isActive: (data['isActive'] ?? true) as bool,
+      commercialBlocked: data['commercialBlocked'] == true,
       imageUrl: (data['imageUrl'] ?? '').toString(),
       description: (data['description'] ?? '').toString(),
       isOffer: (data['isOffer'] ?? false) as bool,
@@ -48,6 +52,8 @@ class Product {
 }
 
 class CartItem {
+  final String category;
+  final bool commercialBlocked;
   final String id;
   final String name;
   final double price;
@@ -60,6 +66,8 @@ class CartItem {
     required this.price,
     required this.imageUrl,
     this.quantity = 1,
+    this.category = '',
+    this.commercialBlocked = false,
   });
 
   double get totalPrice => price * quantity;
@@ -79,6 +87,10 @@ class DeliveryAddress {
   final String addressText;
   final String complement;
   final String reference;
+  final String? countryCode;
+  final String street, number, district, city, label;
+  final bool noNumber, confirmed;
+  final int? createdAtMs, updatedAtMs;
 
   const DeliveryAddress({
     required this.latitude,
@@ -86,6 +98,16 @@ class DeliveryAddress {
     this.addressText = '',
     this.complement = '',
     this.reference = '',
+    this.countryCode,
+    this.street = '',
+    this.number = '',
+    this.district = '',
+    this.city = '',
+    this.label = 'Outro',
+    this.noNumber = false,
+    this.confirmed = false,
+    this.createdAtMs,
+    this.updatedAtMs,
   });
 
   DeliveryAddress copyWith({
@@ -94,6 +116,9 @@ class DeliveryAddress {
     String? addressText,
     String? complement,
     String? reference,
+    String? countryCode,
+    int? createdAtMs,
+    int? updatedAtMs,
   }) {
     return DeliveryAddress(
       latitude: latitude ?? this.latitude,
@@ -101,6 +126,16 @@ class DeliveryAddress {
       addressText: addressText ?? this.addressText,
       complement: complement ?? this.complement,
       reference: reference ?? this.reference,
+      countryCode: countryCode ?? this.countryCode,
+      street: street,
+      number: number,
+      district: district,
+      city: city,
+      label: label,
+      noNumber: noNumber,
+      confirmed: confirmed,
+      createdAtMs: createdAtMs ?? this.createdAtMs,
+      updatedAtMs: updatedAtMs ?? this.updatedAtMs,
     );
   }
 
@@ -111,6 +146,16 @@ class DeliveryAddress {
       'addressText': addressText,
       'complement': complement,
       'reference': reference,
+      'countryCode': countryCode,
+      'street': street,
+      'number': number,
+      'district': district,
+      'city': city,
+      'label': label,
+      'noNumber': noNumber,
+      'confirmed': confirmed,
+      'createdAtMs': createdAtMs,
+      'updatedAtMs': updatedAtMs,
     };
   }
 
@@ -123,6 +168,16 @@ class DeliveryAddress {
       addressText: (data['addressText'] ?? '').toString(),
       complement: (data['complement'] ?? '').toString(),
       reference: (data['reference'] ?? '').toString(),
+      countryCode: data['countryCode'] as String?,
+      street: (data['street'] ?? '').toString(),
+      number: (data['number'] ?? '').toString(),
+      district: (data['district'] ?? '').toString(),
+      city: (data['city'] ?? '').toString(),
+      label: (data['label'] ?? 'Outro').toString(),
+      noNumber: data['noNumber'] == true,
+      confirmed: data['confirmed'] == true,
+      createdAtMs: (data['createdAtMs'] as num?)?.toInt(),
+      updatedAtMs: (data['updatedAtMs'] as num?)?.toInt(),
     );
   }
 
@@ -132,10 +187,13 @@ class DeliveryAddress {
       );
 
   bool get hasCoordinates =>
-      latitude != 0 && longitude != 0;
+      latitude.isFinite &&
+      longitude.isFinite &&
+      latitude.abs() <= 90 &&
+      longitude.abs() <= 180 &&
+      (latitude != 0 || longitude != 0);
 
-  String get coordinatesText =>
-      '${latitude.toStringAsFixed(6)}, '
+  String get coordinatesText => '${latitude.toStringAsFixed(6)}, '
       '${longitude.toStringAsFixed(6)}';
 }
 
@@ -173,22 +231,15 @@ class OrderModel {
     return OrderModel(
       documentId: doc.id,
       id: (data['id'] ?? doc.id).toString(),
-      customerName:
-          (data['customerName'] ?? '').toString(),
-      customerPhone:
-          (data['customerPhone'] ?? '').toString(),
+      customerName: (data['customerName'] ?? '').toString(),
+      customerPhone: (data['customerPhone'] ?? '').toString(),
       address: (data['address'] ?? '').toString(),
-      totalBRL:
-          ((data['totalBRL'] ?? 0) as num).toDouble(),
-      paymentMethod:
-          (data['paymentMethod'] ?? '').toString(),
+      totalBRL: ((data['totalBRL'] ?? 0) as num).toDouble(),
+      paymentMethod: (data['paymentMethod'] ?? '').toString(),
       status: (data['status'] ?? 'Novo').toString(),
-      courierName:
-          (data['courierName'] ?? '').toString(),
-      courierPaid:
-          (data['courierPaid'] ?? false) as bool,
-      createdAt:
-          timestamp is Timestamp ? timestamp.toDate() : null,
+      courierName: (data['courierName'] ?? '').toString(),
+      courierPaid: (data['courierPaid'] ?? false) as bool,
+      createdAt: timestamp is Timestamp ? timestamp.toDate() : null,
     );
   }
 }
