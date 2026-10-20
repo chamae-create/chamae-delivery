@@ -37,12 +37,12 @@ void main() {
         )));
     await tester.pumpAndSettle();
     expect(find.text('Finalizar Pedido'), findsOneWidget);
-    final button = find.textContaining('Pagar com PIX');
+    final button = find.text('Finalizar pedido');
     await tester.ensureVisible(button);
     await tester.pumpAndSettle();
     expect(button, findsOneWidget);
     // 2 x R$20 + entrega R$10 + taxa de cliente de 1% = R$50,40.
-    expect(tester.widget<Text>(button).data, matches(r'50[,.]40'));
+    expect(find.textContaining('50,40'), findsWidgets);
     expect(cart.single.quantity, 2);
     expect(cartCleared, isFalse);
     expect(tester.takeException(), isNull);

@@ -11,6 +11,7 @@ class SponsorVideoBanner extends StatefulWidget {
 class _SponsorVideoBannerState extends State<SponsorVideoBanner> {
   late final VideoPlayerController _controller;
   bool _videoReady = false;
+  bool _failed = false;
 
   @override
   void initState() {
@@ -25,7 +26,8 @@ class _SponsorVideoBannerState extends State<SponsorVideoBanner> {
 
   Future<void> _initializeVideo() async {
     try {
-      await _controller.initialize();
+      await _controller.initialize().timeout(const Duration(seconds: 12));
+      if (!mounted) return;
 
       await _controller.setLooping(true);
       await _controller.setVolume(0);
@@ -38,6 +40,7 @@ class _SponsorVideoBannerState extends State<SponsorVideoBanner> {
       });
     } catch (e) {
       debugPrint('Erro ao carregar vídeo patrocinado: $e');
+      if (mounted) setState(() => _failed = true);
     }
   }
 
@@ -50,7 +53,7 @@ class _SponsorVideoBannerState extends State<SponsorVideoBanner> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 125,
+      height: (MediaQuery.sizeOf(context).width * .48).clamp(190.0, 360.0),
       width: double.infinity,
       margin: const EdgeInsets.symmetric(
         horizontal: 16,
@@ -58,7 +61,7 @@ class _SponsorVideoBannerState extends State<SponsorVideoBanner> {
       ),
       decoration: BoxDecoration(
         color: Colors.black,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: const Color(0xFFFFCC00),
           width: 1.5,
@@ -88,12 +91,36 @@ class _SponsorVideoBannerState extends State<SponsorVideoBanner> {
                 );
               },
             )
-          : const Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFFFFCC00),
-                strokeWidth: 2,
-              ),
-            ),
+          : Stack(fit: StackFit.expand, children: [
+              Image.asset('assets/images/splash_bg.png',
+                  fit: BoxFit.cover,
+                  alignment: const Alignment(0, -.65),
+                  errorBuilder: (_, __, ___) =>
+                      const ColoredBox(color: Colors.black)),
+              const DecoratedBox(
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.transparent, Color(0xCC141414)]))),
+              const Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 16,
+                  child: Text('Pit Stop V8 • Bebidas e conveniência',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.w800))),
+              if (!_failed)
+                const Positioned(
+                    top: 16,
+                    right: 16,
+                    child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Color(0xFFFFCC00)))),
+            ]),
     );
   }
 }

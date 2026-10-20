@@ -1,17 +1,26 @@
+import '../core/theme.dart';
+import '../widgets/customer_visual.dart';
+import '../widgets/order_notification_card.dart';
+import '../widgets/delivery_pin_card.dart';
 import 'package:flutter/material.dart';
 
-import '../order_chat.dart';
+import '../widgets/customer_chat_entry.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../widgets/pix_payment_dialog.dart';
+import 'customer_profile_screen.dart';
 
 class TrackingView extends StatelessWidget {
   final String orderId;
 
   final Stream<Map<String, dynamic>?> orderStream;
   final VoidCallback onBack;
+  final VoidCallback? onRetry;
   const TrackingView({
     super.key,
     required this.orderId,
     required this.orderStream,
     required this.onBack,
+    this.onRetry,
   });
 
   @override
@@ -31,11 +40,13 @@ class TrackingView extends StatelessWidget {
         stream: orderStream,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return const Center(
-              child: Text(
-                'Não foi possível acompanhar o pedido. Tente novamente.',
-              ),
-            );
+            return Center(
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+              const Text('Não foi possível acompanhar o pedido.'),
+              if (onRetry != null)
+                TextButton(
+                    onPressed: onRetry, child: const Text('Tentar novamente')),
+            ]));
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -51,33 +62,89 @@ class TrackingView extends StatelessWidget {
 
           final status = (data['status'] ?? 'Novo').toString();
           final courier = data['courierUid'] is String &&
-              (data['courierUid'] as String).trim().isNotEmpty &&
-              data['courierName'] is String && (data['courierName'] as String).trim().isNotEmpty
-            ? (data['courierName'] as String).trim() : 'Aguardando atribuição';
+                  (data['courierUid'] as String).trim().isNotEmpty &&
+                  data['courierName'] is String &&
+                  (data['courierName'] as String).trim().isNotEmpty
+              ? (data['courierName'] as String).trim()
+              : status == 'Concluído' || status == 'Cancelado'
+                  ? 'Entregador não informado'
+                  : 'Aguardando atribuição';
           final address = (data['address'] ?? 'Centro - Ponta Porã').toString();
           final double total = ((data['totalBRL'] ?? 0.0) as num).toDouble();
 
           int currentStep = 0;
           if (status == 'Em Separação') currentStep = 1;
-          if (status == 'Saiu para Entrega') currentStep = 2;
-          if (status == 'Concluído') currentStep = 3;
+          if (status == 'Aguardando Retirada') currentStep = 2;
+          if (status == 'Saiu para Entrega') currentStep = 3;
+          if (status == 'Concluído') currentStep = 4;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: CustomerVisual.pagePadding(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                CustomerHero(
+                    title: customerStatus(status),
+                    subtitle: 'Pedido $orderId',
+                    icon: status == 'Concluído'
+                        ? Icons.check_circle_outline
+                        : status == 'Cancelado'
+                            ? Icons.cancel_outlined
+                            : Icons.two_wheeler_rounded),
+                const SizedBox(height: 12),
+                Card(
+                    child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Resumo do pedido',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w800)),
+                              const SizedBox(height: 8),
+                              if (data['itemsList'] is List)
+                                for (final item in (data['itemsList'] as List)
+                                    .whereType<Map>())
+                                  Text(
+                                      '${item['quantity'] ?? 1} × ${item['name'] ?? 'Produto'}'),
+                              const Divider(),
+                              Text((data['paymentMethod'] ?? '')
+                                      .toString()
+                                      .startsWith('Maquininha')
+                                  ? 'Cartão na entrega'
+                                  : (data['paymentMethod'] ?? 'Pagamento')
+                                      .toString()),
+                              Text(data['paymentStatus'] == 'Pago'
+                                  ? 'Pagamento confirmado'
+                                  : data['pixRequested'] == true
+                                      ? 'Aguardando pagamento'
+                                      : 'Pagamento na entrega'),
+                            ]))),
+                if (data['pixRequested'] == true &&
+                    data['paymentStatus'] != 'Pago' &&
+                    status != 'Cancelado' &&
+                    data['_documentId'] is String)
+                  ElevatedButton.icon(
+                      icon: const Icon(Icons.pix),
+                      label: const Text('Ver pagamento PIX'),
+                      onPressed: () => showDialog<void>(
+                          context: context,
+                          builder: (_) => PixPaymentDialog(
+                              orderReference: FirebaseFirestore.instance
+                                  .collection('orders')
+                                  .doc(data['_documentId']),
+                              orderId: orderId,
+                              totalBRL: total,
+                              onPaid: () async {}))),
                 // Mapa em Proporções Mobile
-                if (data['financialValidationStatus'] == 'validated' && data['_documentId'] is String)
-                  OutlinedButton.icon(icon: const Icon(Icons.chat_outlined),
-                    label: const Text('Falar com a loja'),
-                    onPressed: () => showDialog<void>(context: context,
-                      builder: (_) => AlertDialog(title: const Text('Falar com a loja'),
-                        content: SizedBox(width: 520, child: SingleChildScrollView(
-                          child: OrderChat(key: ValueKey(data['_documentId']),
-                            orderId: data['_documentId'], order: data))),
-                        actions: [TextButton(onPressed: () => Navigator.pop(context),
-                          child: const Text('Fechar'))]))),
+                if (data['financialValidationStatus'] == 'validated' &&
+                    data['_documentId'] is String)
+                  CustomerChatEntry(order: data),
+                if (!['Cancelado', 'Concluído'].contains(status)) ...[
+                  const DeliveryPinCard(),
+                  OrderNotificationCard(
+                      orderId: data['_documentId']?.toString() ?? orderId),
+                ],
                 const SizedBox(height: 16),
 
                 // Card de Linha do Tempo
@@ -86,7 +153,7 @@ class TrackingView extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey.shade200),
+                    border: Border.all(color: AppColors.borderLight),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.03),
@@ -97,8 +164,10 @@ class TrackingView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        spacing: 12,
+                        runSpacing: 8,
                         children: [
                           const Text(
                             'STATUS DO PEDIDO',
@@ -112,23 +181,42 @@ class TrackingView extends StatelessWidget {
                             'Total: R\$ ${total.toStringAsFixed(2)}',
                             style: const TextStyle(
                               fontWeight: FontWeight.w900,
-                              fontSize: 14,
+                              fontSize: 16,
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          _buildStepIndicator(0, 'Recebido', currentStep >= 0),
-                          _buildStepLine(currentStep >= 1),
-                          _buildStepIndicator(1, 'Separando', currentStep >= 1),
-                          _buildStepLine(currentStep >= 2),
-                          _buildStepIndicator(2, 'Na Rota', currentStep >= 2),
-                          _buildStepLine(currentStep >= 3),
-                          _buildStepIndicator(3, 'Entregue', currentStep >= 3),
-                        ],
-                      ),
+                      if (status != 'Cancelado' &&
+                          status != 'Aguardando pagamento')
+                        Column(children: [
+                          for (final (index, label) in const [
+                            'Pedido recebido',
+                            'Em separação',
+                            'Aguardando retirada',
+                            'Saiu para entrega',
+                            'Entregue'
+                          ].indexed)
+                            Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                child: Row(children: [
+                                  Icon(
+                                      index <= currentStep
+                                          ? Icons.check_circle
+                                          : Icons.radio_button_unchecked,
+                                      color: index <= currentStep
+                                          ? AppColors.darkGold
+                                          : Colors.grey),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                      child: Text(label,
+                                          style: TextStyle(
+                                              fontWeight: index == currentStep
+                                                  ? FontWeight.w800
+                                                  : FontWeight.w400))),
+                                ])),
+                        ]),
                     ],
                   ),
                 ),
@@ -140,7 +228,7 @@ class TrackingView extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.grey.shade200),
+                    border: Border.all(color: AppColors.borderLight),
                   ),
                   child: Row(
                     children: [
@@ -177,13 +265,6 @@ class TrackingView extends StatelessWidget {
                           ],
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.phone_rounded,
-                          color: Colors.green,
-                        ),
-                        onPressed: () {},
-                      ),
                     ],
                   ),
                 ),
@@ -191,43 +272,6 @@ class TrackingView extends StatelessWidget {
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildStepIndicator(int step, String label, bool active) {
-    return Column(
-      children: [
-        Container(
-          width: 20,
-          height: 20,
-          decoration: BoxDecoration(
-            color: active ? const Color(0xFFFFCC00) : Colors.grey.shade300,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            active ? Icons.check : Icons.circle,
-            size: 12,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 9,
-            fontWeight: active ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStepLine(bool active) {
-    return Expanded(
-      child: Container(
-        height: 2,
-        color: active ? const Color(0xFFFFCC00) : Colors.grey.shade300,
       ),
     );
   }

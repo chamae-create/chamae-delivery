@@ -49,6 +49,13 @@
 
   <!-- Converte latitude/longitude em endereço -->
   <script>
+    window.chamaeSearchAddress = async function(query) {
+      if (!window.google || !google.maps) throw new Error('Mapa indisponível');
+      const response = await new google.maps.Geocoder().geocode({address: query});
+      if (!response.results?.length) throw new Error('Endereço não encontrado');
+      const point = response.results[0].geometry.location;
+      return JSON.stringify({latitude: point.lat(), longitude: point.lng()});
+    };
     window.chamaeReverseGeocode = async function(latitude, longitude) {
       if (!window.google || !google.maps) {
         throw new Error('Google Maps ainda não carregou.');
@@ -64,10 +71,15 @@
       });
 
       if (response.results && response.results.length > 0) {
-        return response.results[0].formatted_address;
+        const result = response.results[0];
+        const country = result.address_components.find(c => c.types.includes('country'));
+        const component = type => result.address_components.find(c => c.types.includes(type))?.long_name ?? '';
+        return JSON.stringify({address: result.formatted_address, countryCode: country?.short_name ?? null,
+          street: component('route'), number: component('street_number'),
+          district: component('sublocality'), city: component('locality') || component('administrative_area_level_2')});
       }
 
-      return 'Endereço não identificado';
+      return JSON.stringify({address: '', countryCode: null});
     };
   </script>
 </head>

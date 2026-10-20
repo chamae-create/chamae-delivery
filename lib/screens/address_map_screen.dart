@@ -1,33 +1,51 @@
 import 'dart:async';
-import 'dart:js_interop';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import '../data/customer_location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-@JS('chamaeReverseGeocode')
-external JSPromise<JSString> _chamaeReverseGeocode(
-  double latitude,
-  double longitude,
-);
+import '../data/reverse_geocode.dart';
+
 class AddressMapResult {
   final double latitude;
   final double longitude;
   final String addressText;
   final String complement;
+  final String? countryCode;
+  final String reference;
+  final String street, number, district, city;
   const AddressMapResult({
     required this.latitude,
     required this.longitude,
     required this.addressText,
     this.complement = '',
+    this.countryCode,
+    this.reference = '',
+    this.street = '',
+    this.number = '',
+    this.district = '',
+    this.city = '',
   });
 }
+
 class AddressMapScreen extends StatefulWidget {
-  const AddressMapScreen({super.key});
+  final bool useCurrentLocation;
+  final String initialQuery;
+  final double? initialLatitude, initialLongitude;
+  const AddressMapScreen(
+      {super.key,
+      this.useCurrentLocation = false,
+      this.initialQuery = '',
+      this.initialLatitude,
+      this.initialLongitude});
   @override
   State<AddressMapScreen> createState() => _AddressMapScreenState();
 }
+
 class _AddressMapScreenState extends State<AddressMapScreen> {
   GoogleMapController? _mapController;
   final TextEditingController _complementController = TextEditingController();
+  final TextEditingController _referenceController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+  bool _searching = false;
   LatLng _selectedLocation = _fallbackLocation;
   bool _loadingLocation = true;
   bool _mapReady = false;
@@ -37,25 +55,41 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
   Timer? _addressDebounce;
   LatLng? _lastAddressLocation;
   String? _locationError;
+  String? _countryCode;
+  String _street = '', _number = '', _district = '', _city = '';
   String _addressText = 'Localizando endereço...';
   static const LatLng _fallbackLocation = LatLng(
     -22.5361,
     -55.7256,
   );
-  static const CameraPosition _initialCameraPosition = CameraPosition(
-    target: _fallbackLocation,
-    zoom: 16,
-  );
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
+    if (widget.initialLatitude != null && widget.initialLongitude != null) {
+      _selectedLocation =
+          LatLng(widget.initialLatitude!, widget.initialLongitude!);
+    }
+    if (widget.useCurrentLocation) {
+      _getCurrentLocation();
+    } else {
+      _loadingLocation = false;
+      _addressText = 'Ajuste o marcador para o local exato da entrega';
+      if (widget.initialQuery.isNotEmpty) {
+        _searchController.text = widget.initialQuery;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _searchAddress();
+        });
+      }
+    }
   }
 
   @override
   void dispose() {
     _addressDebounce?.cancel();
     _complementController.dispose();
+    _referenceController.dispose();
+    _searchController.dispose();
+    _mapController?.dispose();
     super.dispose();
   }
 
@@ -67,65 +101,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
       });
     }
     try {
-      final serviceEnabled =
-          await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        if (!mounted) return;
-        setState(() {
-          _selectedLocation = _fallbackLocation;
-          _loadingLocation = false;
-          _locationError =
-              'Ative a localização do aparelho para encontrarmos você automaticamente.';
-        });
-        await _moveCameraTo(
-          _fallbackLocation,
-          zoom: 16,
-        );
-        await _updateAddress(_fallbackLocation);
-        return;
-      }
-      LocationPermission permission =
-          await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission =
-            await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.denied) {
-        if (!mounted) return;
-        setState(() {
-          _selectedLocation = _fallbackLocation;
-          _loadingLocation = false;
-          _locationError =
-              'Permissão de localização não concedida. Você ainda pode escolher o ponto manualmente movendo o mapa.';
-        });
-        await _moveCameraTo(
-          _fallbackLocation,
-          zoom: 16,
-        );
-        await _updateAddress(_fallbackLocation);
-        return;
-      }
-      if (permission == LocationPermission.deniedForever) {
-        if (!mounted) return;
-        setState(() {
-          _selectedLocation = _fallbackLocation;
-          _loadingLocation = false;
-          _locationError =
-              'A permissão de localização está bloqueada. Você pode escolher o ponto manualmente ou liberar a permissão nas configurações do aparelho.';
-        });
-        await _moveCameraTo(
-          _fallbackLocation,
-          zoom: 16,
-        );
-        await _updateAddress(_fallbackLocation);
-        return;
-      }
-      final position =
-          await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-        ),
-      );
+      final position = await const CustomerLocation().request();
       final currentLocation = LatLng(
         position.latitude,
         position.longitude,
@@ -146,8 +122,9 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
       setState(() {
         _selectedLocation = _fallbackLocation;
         _loadingLocation = false;
-        _locationError =
-            'Não foi possível obter sua localização automaticamente. Ajuste o ponto movendo o mapa.';
+        _locationError = e is CustomerLocationFailure
+            ? e.message
+            : 'Não foi possível obter sua localização. Digite o endereço ou ajuste o ponto no mapa.';
       });
       await _moveCameraTo(
         _fallbackLocation,
@@ -156,6 +133,32 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
       await _updateAddress(_fallbackLocation);
     }
   }
+
+  Future<void> _searchAddress() async {
+    final query = _searchController.text.trim();
+    if (_searching || query.length < 3) return;
+    FocusScope.of(context).unfocus();
+    setState(() => _searching = true);
+    try {
+      final point = await searchAddress(query);
+      if (!mounted) return;
+      final location = LatLng(point.latitude, point.longitude);
+      setState(() {
+        _selectedLocation = location;
+        _locationError = null;
+      });
+      await _moveCameraTo(location);
+      await _updateAddress(location);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _locationError =
+            'Não encontramos esse endereço. Confira rua, número e cidade ou escolha o ponto no mapa.');
+      }
+    } finally {
+      if (mounted) setState(() => _searching = false);
+    }
+  }
+
   Future<void> _moveCameraTo(
     LatLng location, {
     double zoom = 18,
@@ -171,6 +174,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
       ),
     );
   }
+
   void _onMapCreated(
     GoogleMapController controller,
   ) {
@@ -186,17 +190,25 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
       );
     }
   }
+
   void _onCameraMoveStarted() {
     if (!mounted) return;
+    _addressDebounce?.cancel();
+    _addressRequestId++;
+    _lastAddressLocation = null;
     setState(() {
       _movingMap = true;
+      _countryCode = null;
+      _loadingAddress = false;
     });
   }
+
   void _onCameraMove(
     CameraPosition position,
   ) {
     _selectedLocation = position.target;
   }
+
   void _onCameraIdle() {
     if (!mounted) return;
 
@@ -211,8 +223,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
     _addressDebounce?.cancel();
 
     final lastLocation = _lastAddressLocation;
-    if (lastLocation != null &&
-        _isSameAddressPoint(lastLocation, location)) {
+    if (lastLocation != null && _isSameAddressPoint(lastLocation, location)) {
       return;
     }
 
@@ -231,6 +242,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
     return (a.latitude - b.latitude).abs() < tolerance &&
         (a.longitude - b.longitude).abs() < tolerance;
   }
+
   Future<void> _updateAddress(
     LatLng location,
   ) async {
@@ -240,22 +252,24 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
 
     setState(() {
       _loadingAddress = true;
+      _countryCode = null;
     });
 
     try {
-      final jsResult = await _chamaeReverseGeocode(
-        location.latitude,
-        location.longitude,
-      ).toDart;
-
-      final address = jsResult.toDart;
+      final result =
+          await reverseGeocode(location.latitude, location.longitude);
+      final address = result.text;
 
       if (!mounted || requestId != _addressRequestId) return;
 
       setState(() {
-        _addressText = address.isNotEmpty
-            ? address
-            : 'Endereço não identificado';
+        _countryCode = result.countryCode;
+        _street = result.street;
+        _number = result.number;
+        _district = result.district;
+        _city = result.city;
+        _addressText =
+            address.isNotEmpty ? address : 'Endereço não identificado';
         _lastAddressLocation = location;
         _loadingAddress = false;
       });
@@ -263,15 +277,23 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
       if (!mounted || requestId != _addressRequestId) return;
 
       setState(() {
+        _countryCode = null;
         _addressText = 'Endereço não identificado';
         _loadingAddress = false;
       });
     }
   }
+
   void _confirmLocation() {
     Navigator.pop(
       context,
       AddressMapResult(
+        countryCode: _countryCode,
+        street: _street,
+        number: _number,
+        district: _district,
+        city: _city,
+        reference: _referenceController.text.trim(),
         latitude: _selectedLocation.latitude,
         longitude: _selectedLocation.longitude,
         addressText: _addressText,
@@ -279,6 +301,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -286,6 +309,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0C0C0C),
         foregroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
         titleSpacing: 0,
         title: const Column(
@@ -294,12 +318,13 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
             Text(
               'Local de entrega',
               style: TextStyle(
+                color: Colors.white,
                 fontSize: 17,
                 fontWeight: FontWeight.w900,
               ),
             ),
             Text(
-              'Posicione o pino exatamente onde deseja receber',
+              'Ajuste o marcador para o local exato da entrega',
               style: TextStyle(
                 color: Colors.white60,
                 fontSize: 10,
@@ -311,6 +336,32 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
       ),
       body: Column(
         children: [
+          Padding(
+              padding: const EdgeInsets.all(12),
+              child: TextField(
+                controller: _searchController,
+                textInputAction: TextInputAction.search,
+                onSubmitted: (_) => _searchAddress(),
+                decoration: InputDecoration(
+                    labelText: 'Buscar endereço e número',
+                    suffixIcon: _searching
+                        ? const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2)))
+                        : IconButton(
+                            tooltip: 'Buscar endereço',
+                            onPressed: _searchAddress,
+                            icon: const Icon(Icons.search))),
+              )),
+          if (_locationError != null)
+            TextButton.icon(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.edit_location_alt_outlined),
+                label: const Text('Digitar endereço')),
           if (_locationError != null)
             Container(
               width: double.infinity,
@@ -347,10 +398,9 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
               children: [
                 GoogleMap(
                   initialCameraPosition:
-                      _initialCameraPosition,
+                      CameraPosition(target: _selectedLocation, zoom: 16),
                   onMapCreated: _onMapCreated,
-                  onCameraMoveStarted:
-                      _onCameraMoveStarted,
+                  onCameraMoveStarted: _onCameraMoveStarted,
                   onCameraMove: _onCameraMove,
                   onCameraIdle: _onCameraIdle,
                   mapType: MapType.normal,
@@ -390,8 +440,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black
-                                    .withValues(alpha: 0.30),
+                                color: Colors.black.withValues(alpha: 0.30),
                                 blurRadius: 10,
                                 offset: const Offset(
                                   0,
@@ -409,15 +458,12 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                         Container(
                           width: 5,
                           height: 13,
-                          decoration:
-                              const BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Color(
                               0xFF111111,
                             ),
-                            borderRadius:
-                                BorderRadius.vertical(
-                              bottom:
-                                  Radius.circular(5),
+                            borderRadius: BorderRadius.vertical(
+                              bottom: Radius.circular(5),
                             ),
                           ),
                         ),
@@ -429,8 +475,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                           height: 4,
                           decoration: BoxDecoration(
                             color: Colors.black.withValues(alpha: 0.30),
-                            borderRadius:
-                                BorderRadius.circular(
+                            borderRadius: BorderRadius.circular(
                               20,
                             ),
                           ),
@@ -441,25 +486,21 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                 ),
                 if (_loadingLocation)
                   Container(
-                    color: Colors.black
-                        .withValues(alpha: 0.22),
+                    color: Colors.black.withValues(alpha: 0.22),
                     child: const Center(
                       child: Card(
                         child: Padding(
-                          padding:
-                              EdgeInsets.symmetric(
+                          padding: EdgeInsets.symmetric(
                             horizontal: 22,
                             vertical: 16,
                           ),
                           child: Row(
-                            mainAxisSize:
-                                MainAxisSize.min,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               SizedBox(
                                 width: 20,
                                 height: 20,
-                                child:
-                                    CircularProgressIndicator(
+                                child: CircularProgressIndicator(
                                   strokeWidth: 2.5,
                                   color: Color(
                                     0xFFFFCC00,
@@ -470,8 +511,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                               Text(
                                 'Localizando você...',
                                 style: TextStyle(
-                                  fontWeight:
-                                      FontWeight.w800,
+                                  fontWeight: FontWeight.w800,
                                 ),
                               ),
                             ],
@@ -485,27 +525,22 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                   top: 16,
                   child: IgnorePointer(
                     child: Container(
-                      padding:
-                          const EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white
-                            .withValues(alpha: 0.94),
-                        borderRadius:
-                            BorderRadius.circular(20),
+                        color: Colors.white.withValues(alpha: 0.94),
+                        borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black
-                                .withValues(alpha: 0.12),
+                            color: Colors.black.withValues(alpha: 0.12),
                             blurRadius: 8,
                           ),
                         ],
                       ),
                       child: Row(
-                        mainAxisSize:
-                            MainAxisSize.min,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(
                             Icons.open_with_rounded,
@@ -514,14 +549,10 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            _movingMap
-                                ? 'Posicionando...'
-                                : 'Arraste o mapa',
-                            style:
-                                const TextStyle(
+                            _movingMap ? 'Posicionando...' : 'Arraste o mapa',
+                            style: const TextStyle(
                               fontSize: 10,
-                              fontWeight:
-                                  FontWeight.w800,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ],
@@ -532,19 +563,12 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                 Positioned(
                   right: 16,
                   bottom: 18,
-                  child:
-                      FloatingActionButton.small(
-                    heroTag:
-                        'current_location',
-                    backgroundColor:
-                        Colors.white,
-                    foregroundColor:
-                        Colors.black,
+                  child: FloatingActionButton.small(
+                    heroTag: 'current_location',
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
                     elevation: 5,
-                    onPressed:
-                        _loadingLocation
-                            ? null
-                            : _getCurrentLocation,
+                    onPressed: _loadingLocation ? null : _getCurrentLocation,
                     child: const Icon(
                       Icons.my_location_rounded,
                     ),
@@ -553,10 +577,11 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
               ],
             ),
           ),
-          Container(
+          Flexible(
+              child: SingleChildScrollView(
+                  child: Container(
             color: Colors.white,
-            padding:
-                const EdgeInsets.fromLTRB(
+            padding: const EdgeInsets.fromLTRB(
               16,
               14,
               16,
@@ -565,8 +590,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
             child: SafeArea(
               top: false,
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Row(
                     children: [
@@ -586,8 +610,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                               0xFF555555,
                             ),
                             fontSize: 11,
-                            fontWeight:
-                                FontWeight.w600,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -595,14 +618,12 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                   ),
                   const SizedBox(height: 12),
                   Container(
-                    padding:
-                        const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: const Color(
                         0xFFF4F5F7,
                       ),
-                      borderRadius:
-                          BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
@@ -619,14 +640,11 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                                 ? 'Localizando endereço...'
                                 : _addressText,
                             maxLines: 2,
-                            overflow:
-                                TextOverflow.ellipsis,
-                            style:
-                                const TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
                               fontSize: 12,
                               height: 1.25,
-                              fontWeight:
-                                  FontWeight.w800,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ),
@@ -635,8 +653,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                           const SizedBox(
                             width: 16,
                             height: 16,
-                            child:
-                                CircularProgressIndicator(
+                            child: CircularProgressIndicator(
                               strokeWidth: 2,
                               color: Color(
                                 0xFFFFCC00,
@@ -686,41 +703,41 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  TextField(
+                      controller: _referenceController,
+                      decoration: const InputDecoration(
+                          labelText: 'Referência (opcional)')),
+                  const SizedBox(height: 12),
                   SizedBox(
                     height: 50,
-                    child:
-                        ElevatedButton.icon(
-                      style:
-                          ElevatedButton.styleFrom(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
                         elevation: 0,
-                        backgroundColor:
-                            const Color(
+                        backgroundColor: const Color(
                           0xFFFFCC00,
                         ),
-                        foregroundColor:
-                            Colors.black,
-                        shape:
-                            RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
                             13,
                           ),
                         ),
                       ),
-                      onPressed:
-                          _loadingLocation ||
-                                    !_mapReady ||
-                                    _movingMap
-                                ? null
-                                : _confirmLocation,
+                      onPressed: _loadingLocation ||
+                              !_mapReady ||
+                              _movingMap ||
+                              _loadingAddress ||
+                              _searching ||
+                              (_addressDebounce?.isActive ?? false)
+                          ? null
+                          : _confirmLocation,
                       icon: const Icon(
                         Icons.check_circle_rounded,
                       ),
                       label: const Text(
-                        'Confirmar local de entrega',
+                        'Confirmar localização',
                         style: TextStyle(
-                          fontWeight:
-                              FontWeight.w900,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
                     ),
@@ -728,7 +745,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                 ],
               ),
             ),
-          ),
+          ))),
         ],
       ),
     );

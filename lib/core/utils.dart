@@ -14,9 +14,11 @@ class PixUtils {
 
     final valorStr = valor.toStringAsFixed(2);
     final chaveFormatted = formatField('01', chavePix);
-    final merchantAccountInfo = formatField('00', 'br.gov.bcb.pix') + chaveFormatted;
+    final merchantAccountInfo =
+        formatField('00', 'br.gov.bcb.pix') + chaveFormatted;
 
-    String payload = '000201${formatField('26', merchantAccountInfo)}${formatField('52', '0000')}${formatField('53', '986')}${formatField('54', valorStr)}${formatField('58', 'BR')}${formatField('59', nomeRecebedor.toUpperCase())}${formatField('60', cidadeRecebedor.toUpperCase())}${formatField('62', formatField('05', txId))}6304';
+    String payload =
+        '000201${formatField('26', merchantAccountInfo)}${formatField('52', '0000')}${formatField('53', '986')}${formatField('54', valorStr)}${formatField('58', 'BR')}${formatField('59', nomeRecebedor.toUpperCase())}${formatField('60', cidadeRecebedor.toUpperCase())}${formatField('62', formatField('05', txId))}6304';
 
     final crc = _calcularCRC16(payload);
     return payload + crc;
@@ -38,6 +40,7 @@ class PixUtils {
     return crc.toRadixString(16).toUpperCase().padLeft(4, '0');
   }
 }
+
 class AppStrings {
   static String get(String key, String language) {
     const pt = {

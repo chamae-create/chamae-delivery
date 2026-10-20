@@ -1,30 +1,29 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'core/theme.dart';
 import 'screens/splash_screen.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    try {
-      final auth = FirebaseAuth.instance;
-      final user = await auth.authStateChanges().first;
-      if (user == null) {
-        await auth.signInAnonymously();
-      }
-    } catch (e) {
-      debugPrint('Erro ao autenticar cliente: $e');
-    }
-  } catch (e) {
-    debugPrint('Erro ao inicializar Firebase: $e');
-  }
   runApp(const ChamaeDeliveryApp());
+}
+
+Future<void> initializeCustomerSession() async {
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+            options: DefaultFirebaseOptions.currentPlatform)
+        .timeout(const Duration(seconds: 15));
+  }
+  FirebaseFirestore.instance.settings =
+      const Settings(persistenceEnabled: true);
+  final auth = FirebaseAuth.instance;
+  if (kIsWeb) await auth.setPersistence(Persistence.LOCAL);
+  await auth.authStateChanges().first.timeout(const Duration(seconds: 15));
 }
 
 class AppScrollBehavior extends MaterialScrollBehavior {
@@ -58,19 +57,24 @@ class ChamaeDeliveryApp extends StatelessWidget {
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.55),
+                      color: Colors.black.withValues(alpha: 0.55),
                       blurRadius: 28,
                       offset: const Offset(0, 8),
                     ),
                   ],
                 ),
-                child: ClipRect(child: child),
+                child: LayoutBuilder(
+                    builder: (context, constraints) => MediaQuery(
+                        data: MediaQuery.of(context).copyWith(
+                            size: Size(
+                                constraints.maxWidth, constraints.maxHeight)),
+                        child: ClipRect(child: child))),
               ),
             ),
           ),
         );
       },
-      home: const SplashScreen(),
+      home: const SplashScreen(initialize: initializeCustomerSession),
     );
   }
 }
