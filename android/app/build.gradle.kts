@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.chamae_delivery"
+    namespace = "br.com.loumak.chamae"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -18,8 +18,10 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.chamae_delivery"
+        manifestPlaceholders["MAPS_API_KEY"] = providers.gradleProperty("CHAMAE_MAPS_API_KEY")
+            .orElse(providers.environmentVariable("CHAMAE_MAPS_API_KEY")).getOrElse("")
+        // Official Chamaê application ID; Firebase must register the same package.
+        applicationId = "br.com.loumak.chamae"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

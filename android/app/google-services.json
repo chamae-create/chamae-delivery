@@ -7,12 +7,25 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:302882774102:android:c15c7c4802822bd3b92ff7",
+        "mobilesdk_app_id": "1:302882774102:android:4c5058e95fed7870b92ff7",
         "android_client_info": {
-          "package_name": "com.chamae.delivery"
+          "package_name": "br.com.loumak.chamae"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "302882774102-q1j4vc3f9jhv3a0kgm6lq9gmjhet9ucq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.loumak.chamae",
+            "certificate_hash": "d3cd735722d2922f7353f72698495f378c626e0e"
+          }
+        },
+        {
+          "client_id": "302882774102-5vqtg4utv707sjuk8fhmsl4828fq02lj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCHN5Ubq-CYLcZfVgnPyJ794RDUraGDvfo"
@@ -20,7 +33,91 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "302882774102-5vqtg4utv707sjuk8fhmsl4828fq02lj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "302882774102-m1ni9u2394f179pfe8ikdbvecjmq2f0f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.chamaeDelivery"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302882774102:android:c15c7c4802822bd3b92ff7",
+        "android_client_info": {
+          "package_name": "com.chamae.delivery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "302882774102-5vqtg4utv707sjuk8fhmsl4828fq02lj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHN5Ubq-CYLcZfVgnPyJ794RDUraGDvfo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "302882774102-5vqtg4utv707sjuk8fhmsl4828fq02lj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "302882774102-m1ni9u2394f179pfe8ikdbvecjmq2f0f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.chamaeDelivery"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302882774102:android:d9ee75482eb53771b92ff7",
+        "android_client_info": {
+          "package_name": "com.example.chamae_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "302882774102-5vqtg4utv707sjuk8fhmsl4828fq02lj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHN5Ubq-CYLcZfVgnPyJ794RDUraGDvfo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "302882774102-5vqtg4utv707sjuk8fhmsl4828fq02lj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "302882774102-m1ni9u2394f179pfe8ikdbvecjmq2f0f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.chamaeDelivery"
+              }
+            }
+          ]
         }
       }
     },
@@ -31,7 +128,12 @@
           "package_name": "com.example.chamae_delivery"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "302882774102-5vqtg4utv707sjuk8fhmsl4828fq02lj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCHN5Ubq-CYLcZfVgnPyJ794RDUraGDvfo"
@@ -39,7 +141,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "302882774102-5vqtg4utv707sjuk8fhmsl4828fq02lj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "302882774102-m1ni9u2394f179pfe8ikdbvecjmq2f0f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.chamaeDelivery"
+              }
+            }
+          ]
         }
       }
     }

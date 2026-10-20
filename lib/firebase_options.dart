@@ -48,24 +48,6 @@ class DefaultFirebaseOptions {
     authDomain: 'chamae-delivery.firebaseapp.com',
     storageBucket: 'chamae-delivery.firebasestorage.app',
   );
-
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCHN5Ubq-CYLcZfVgnPyJ794RDUraGDvfo',
-    appId: '1:302882774102:android:621044625161ed6cb92ff7',
-    messagingSenderId: '302882774102',
-    projectId: 'chamae-delivery',
-    storageBucket: 'chamae-delivery.firebasestorage.app',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCiLHOSd7bHW7NDQvYDvOvCRYdd7ZpAbU8',
-    appId: '1:302882774102:ios:dfb16d465c042541b92ff7',
-    messagingSenderId: '302882774102',
-    projectId: 'chamae-delivery',
-    storageBucket: 'chamae-delivery.firebasestorage.app',
-    iosBundleId: 'com.example.chamaeDelivery',
-  );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyCiLHOSd7bHW7NDQvYDvOvCRYdd7ZpAbU8',
     appId: '1:302882774102:ios:bf76262742aeade2b92ff7',
@@ -81,6 +63,23 @@ class DefaultFirebaseOptions {
     messagingSenderId: '302882774102',
     projectId: 'chamae-delivery',
     authDomain: 'chamae-delivery.firebaseapp.com',
+    storageBucket: 'chamae-delivery.firebasestorage.app',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyCiLHOSd7bHW7NDQvYDvOvCRYdd7ZpAbU8',
+    appId: '1:302882774102:ios:e4e61ce4ae1ffcbfb92ff7',
+    messagingSenderId: '302882774102',
+    projectId: 'chamae-delivery',
+    storageBucket: 'chamae-delivery.firebasestorage.app',
+    iosBundleId: 'br.com.loumak.chamae',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyCHN5Ubq-CYLcZfVgnPyJ794RDUraGDvfo',
+    appId: '1:302882774102:android:4c5058e95fed7870b92ff7',
+    messagingSenderId: '302882774102',
+    projectId: 'chamae-delivery',
     storageBucket: 'chamae-delivery.firebasestorage.app',
   );
 }

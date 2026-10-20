@@ -1,4 +1,4 @@
-package com.example.chamae_delivery
+package br.com.loumak.chamae
 
 import io.flutter.embedding.android.FlutterActivity
 

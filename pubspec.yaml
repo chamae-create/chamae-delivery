@@ -22,6 +22,7 @@ dependencies:
   geocoding: ^5.0.0
   cloud_functions: ^6.5.0
   firebase_auth: ^6.7.0
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:
