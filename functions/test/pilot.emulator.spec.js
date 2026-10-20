@@ -56,6 +56,9 @@ before(async () => {
   await env.clearFirestore();
   app = initializeApp({projectId: "demo-chamae-rules"});
   db = getFirestore(app);
+  // TEST ONLY: this pilot asserts the supported legacy delivery fee below.
+  // Seed after clearFirestore; no real origin, pricing table or Routes secret.
+  await db.doc("deliveryConfiguration/current").set({mode: "legacy"});
   const policy = customerPolicyFixture();
   await db.doc("customerPolicies/current").set(policy);
   await db.doc("customerProfiles/buyer").set(

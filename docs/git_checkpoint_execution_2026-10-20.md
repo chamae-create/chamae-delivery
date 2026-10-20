@@ -6,6 +6,8 @@ Fonte principal: docs/git_checkpoint_audit_2026-10-20.md, incluindo seu fechamen
 
 ## RESULTADO
 
+**Atualização posterior de diagnóstico (2026-10-20): 326/326 testes de emulador aprovados após correção exclusiva do setup do piloto. A correção e esta atualização integram o commit adicional de teste autorizado após o diagnóstico. A seção final detalha a resolução; os resultados originais abaixo são históricos.**
+
 Os sete commits de conteúdo abaixo preservam o trabalho auditado. O fechamento tem **pendência de validação integrada de backend**: 40 testes do piloto E2E falharam por pré-condição ausente no setup. O cliente passou na validação final. Nenhuma correção funcional foi realizada para mascarar ou contornar falhas.
 
 ## COMMITS CRIADOS
@@ -137,4 +139,124 @@ Este arquivo será adicionado e commitado separadamente no fechamento; por isso 
 - Firebase/Maps/OAuth: restrições externas não bloqueiam estes commits locais, mas bloqueiam produção/publicação até verificação de package/SHA, Play signing, bundle, APIs permitidas, origens/domínios/redirects. Nenhuma chave trocada, nenhum secret solicitado.
 - Nenhum push, deploy, reset, clean, restore, checkout destrutivo, rebase, squash, exclusão ou correção funcional foi realizado.
 
-CHECKPOINT LOCAL DO APP CLIENTE POSSUI PENDÊNCIAS
+Resultado histórico do fechamento: CHECKPOINT LOCAL DO APP CLIENTE POSSUI PENDÊNCIAS. A pendência do piloto foi resolvida no diagnóstico abaixo; o fechamento adicional está registrado ao final.
+
+## DIAGNÓSTICO POSTERIOR — 40 FALHAS DO EMULADOR
+
+Data: 2026-10-20. Escopo autorizado: diagnosticar as 40 falhas e corrigir somente fixture/setup. HEAD mantido em 01cbe9e; os oito commits existentes não foram alterados.
+
+### Causa raiz e classificação
+
+**G1 — falha de fixture/setup de configuração do emulador, não falha real de código de produção.** As 40 falhas pertenciam a functions/test/pilot.emulator.spec.js e nasciam em createOrder (linha 101 da versão commitada). O teste esperava financialValidationStatus=validated e recebia rejected; o log do handler trazia DELIVERY_CONFIGURATION_MISSING. Nenhuma dessas 40 asserções indicava, por si, defeito distinto de caixa, estoque, autorização ou entrega.
+
+O before limpa o banco com env.clearFirestore e cria política, perfil e entregadores, mas omitia deliveryConfiguration/current. prepareDelivery em functions/delivery-service.js exige esse documento para customerFlowVersion=2. A rejeição sem configuração é **comportamento fail-closed esperado do backend**, preservado integralmente. O piloto já espera explicitamente deliveryFee=10 e totalBRL=70.60 e exercita o contrato legado suportado; declarar mode=legacy no setup fornece a pré-condição que faltava, sem transformar ausência de configuração em fallback de produção.
+
+| Categoria solicitada | Diagnóstico |
+|---|---|
+| Falha real de código | Não identificada nestas 40 falhas; nenhum código de produção modificado |
+| Falha de fixture | Sim: fixture inicial incompleta após limpeza do banco |
+| Falha de configuração | Sim, restrita ao documento local ausente no banco do emulador |
+| Dependência externa ausente | Não: o cenário legado não precisa de Maps/Routes, conta real ou secret remoto |
+| Comportamento esperado do ambiente piloto | A rejeição sem configuração é esperada; o erro estava no setup esperar aprovação sem declarar o modo de frete |
+
+### Inventário individual das 40 falhas originais
+
+Em todas as linhas, G1 significa documento deliveryConfiguration/current ausente. Erro principal comum: ERR_ASSERTION (expected validated; actual rejected), causado por DELIVERY_CONFIGURATION_MISSING. Arquivo completo de todas as linhas: functions/test/pilot.emulator.spec.js. Nomes e IDs abaixo foram extraídos do TAP da execução original, sem renomear cenários.
+
+| ID original | Nome do teste | Arquivo | Erro principal / dependência |
+|---:|---|---|---|
+| 286 | pilot E2E: create, official finance, operate, privacy, stock and cashier | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 287 | multi-order settlement replay preserves one receipt | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 288 | overlapping concurrent cashiers cannot pay the same delivery twice | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 289 | invalid member rolls back entire settlement {"courierPaid":true} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 290 | invalid member rolls back entire settlement {"financialValidationStatus":"pending"} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 291 | invalid member rolls back entire settlement {"deliveryFee":99} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 292 | invalid member rolls back entire settlement {"status":"Saiu para Entrega"} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 293 | invalid member rolls back entire settlement {"courierUid":""} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 294 | invalid member rolls back entire settlement {"courierUid":"other-rider"} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 295 | invalid member rolls back entire settlement {"stockReservationStatus":"released"} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 296 | invalid member rolls back entire settlement {"stockProcessingStatus":"requires_review"} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 297 | completion fails closed {"courierUid":""} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 298 | completion fails closed {"financialValidationStatus":"pending"} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 299 | completion fails closed {"status":"Em Separação"} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 300 | completion fails closed {"stockReservationStatus":"released"} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 301 | completion fails closed {"status":"Concluído","completedAt":null} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 302 | completion fails closed {"stockProcessingStatus":"processed"} | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 303 | inconsistent reserved inventory rolls back completion and projection | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 304 | suspension immediately revokes reads before trigger | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 305 | operations_admin critical SDK writes are denied | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 306 | superadmin critical SDK writes are denied | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 307 | finance critical SDK writes are denied | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 308 | legacy without financial approval remains readable but cannot operate | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 310 | processed PIX completion never debits inventory again | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 311 | legacy missing validation: separate, official=true | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 312 | legacy missing validation: separate, official=false | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 313 | legacy missing validation: assign, official=true | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 314 | legacy missing validation: assign, official=false | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 315 | legacy missing validation: dispatch, official=true | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 316 | legacy missing validation: dispatch, official=false | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 317 | legacy missing validation: complete, official=true | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 318 | legacy missing validation: complete, official=false | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 319 | legacy missing validation: settle, official=true | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 320 | legacy missing validation: settle, official=false | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 321 | legacy missing validation: replace, official=true | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 322 | legacy missing validation: replace, official=false | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 323 | legacy missing validation: unassign, official=true | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 324 | legacy missing validation: unassign, official=false | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 325 | assignment requires official finance even with validated flag | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+| 326 | mixed modern and legacy settlement rejects the whole batch | pilot.emulator.spec.js | rejected ≠ validated; G1 |
+
+### Setup, configuração e arquivos examinados
+
+| Item | Constatação / ação |
+|---|---|
+| functions/test/pilot.emulator.spec.js | Único teste alterado: seed de deliveryConfiguration/current com mode=legacy no before, após clearFirestore e inicialização do app demo; dois comentários documentam o escopo |
+| functions/delivery-service.js, prepareDelivery | Guarda de configuração obrigatória e ramo legacy existentes; somente leitura, sem alteração |
+| functions/config/delivery-pricing-initial.json | Template routeBands: schemaVersion=2, minimumPolicy=replace, origin=null. Não é publicação automática nem documento current do emulador; permaneceu intacto |
+| Origem da loja | Nenhuma origem/coordenada real inventada. Modo legado não exige origem ou tabela ativa |
+| Pricing / raio / Routes | Suítes específicas existentes preservam fixtures sintéticas próprias e providers controlados. Nenhuma tabela real ou chave Routes foi acrescentada ao piloto |
+| functions/test/customer-policy-fixture.js | Política TEST-ONLY e perfil coerente já eram semeados; hash/versões e acceptedAt da fixture estavam presentes. Nenhum aceite ou perfil real alterado |
+| functions/test/backend-fixture.js | Carrega handlers reais exportados via .run contra o Firestore Emulator; algoritmo financeiro/estoque não foi substituído por mock para obter aprovação |
+| Secrets | Nenhum secret novo/simulado necessário ao trecho corrigido. O modo legacy não consulta a chave Routes; o setup não usa PIN remoto ou cobrança Mercado Pago. Nenhuma credencial fornecida, lida do console ou versionada |
+| Variáveis de teste | FIRESTORE_EMULATOR_HOST=127.0.0.1:8187 e GCLOUD_PROJECT=demo-chamae-rules validados pelo runner; Firebase CLI fornece configuração demo/hub local. Não foi exigido Auth Emulator: os contextos autenticados já são fixtures da suíte |
+| firebase.post_login.json | Configuração auxiliar usa porta 8189; não explica a falha: testes estavam conectados ao emulador. Para a suíte completa, radius/final-operations exigem 8187 e o runner usou configuração temporária nessa porta |
+| Firestore Rules | Cópia idêntica usada para iniciar o emulador; Rules reais lidas pelos testes. Nenhuma regra modificada |
+
+### Correção exclusiva de teste
+
+No before existente, imediatamente depois de db = getFirestore(app), foi acrescentado apenas:
+
+```javascript
+  // TEST ONLY: this pilot asserts the supported legacy delivery fee below.
+  // Seed after clearFirestore; no real origin, pricing table or Routes secret.
+  await db.doc("deliveryConfiguration/current").set({mode: "legacy"});
+```
+
+A gravação só ocorre dentro do teste, após as verificações existentes de host localhost e com projectId demo-chamae-rules. Não há import dessa fixture pelo entrypoint de produção. Não se modificaram asserções para aceitar rejected nem se enfraqueceu a validação do backend. A cobertura negativa existente de configuração ausente, tabela/origem inválida e falha de Routes permanece intacta. Os handlers e campos de produto não foram refatorados.
+
+### Nova execução completa
+
+**326 testes aprovados; 0 falhas; 0 cancelados; 0 ignorados.** Runner e emulators:exec encerraram com saída 0. Os 40 cenários do piloto anteriormente falhos passaram com a pré-condição explícita.
+
+Executada a mesma cobertura completa, com concorrência 1: firestore.rules.spec.js, courier-deliveries.emulator.spec.js, courier-assignment.emulator.spec.js, pilot.emulator.spec.js, order-chat.emulator.spec.js, delivery-radius.emulator.spec.js e final-operations.emulator.spec.js. Firestore Emulator local, sem Functions Emulator e sem produção. O TAP e a saída capturada do CLI ficaram em diretório temporário da máquina. Os logs automáticos firebase-debug.log e firestore-debug.log permanecem locais e ignorados; nenhum log ou dump de ambiente foi acrescentado ao Git. Lint do único arquivo de teste modificado: saída 0, sem apontamentos. Não foi necessário repetir testes Flutter ou modificar seus resultados anteriores, pois não houve mudança de cliente.
+
+| Execução | Total | Aprovados | Falhas |
+|---|---:|---:|---:|
+| Checkpoint original (histórico) | 326 | 286 | 40 |
+| Após seed exclusivo de teste | 326 | 326 | 0 |
+
+### Preservação / Git
+
+Na etapa de diagnóstico, somente functions/test/pilot.emulator.spec.js e este relatório receberam mudanças e permaneceram não staged. Os oito commits anteriores foram preservados. Não houve commit naquela etapa; o commit adicional foi autorizado posteriormente, conforme fechamento abaixo. Nenhum push, deploy, alteração de regra de negócio, configuração de produção ou exclusão foi executado.
+
+A aprovação é da suíte local de emulador. Restrições externas Firebase/Maps/OAuth continuam sendo verificações pré-produção independentes, sem impacto neste resultado.
+
+EMULADOR APROVADO PARA CHECKPOINT
+
+## FECHAMENTO — COMMIT LOCAL ADICIONAL DA FIXTURE
+
+Autorizado o nono commit local, com mensagem test: corrigir setup do piloto para configuracao de entrega. Escopo exclusivo: functions/test/pilot.emulator.spec.js e docs/git_checkpoint_execution_2026-10-20.md. Nenhum arquivo de produção, configuração local, log ou outro teste incluído. Os oito commits anteriores permanecem ancestrais sem reescrita.
+
+Validação preservada: 326 testes do emulador aprovados, zero falhas; lint do piloto aprovado. O código de teste é o mesmo validado no diagnóstico, sem necessidade de repetir a suíte apenas para registrar o commit. Índice conferido antes/depois; permanecem fora os mesmos gerados/configuração local, quatro M sem diff efetivo e capture.ps1 específico da máquina. Hash do commit deste fechamento: consultar git log -1 --format=%h -- docs/git_checkpoint_execution_2026-10-20.md. Sem push ou deploy.
+
+CHECKPOINT LOCAL DO APP CLIENTE CONCLUÍDO
