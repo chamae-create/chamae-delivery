@@ -1,0 +1,211 @@
+﻿{
+    "finalCaptureCount":  29,
+    "physicalDevice":  "NUU M2 / API 24",
+    "captureMethod":  "adb screencap and pull",
+    "fixtures":  true,
+    "files":  [
+                  {
+                      "file":  "local_cart.png",
+                      "bytes":  93035,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "9860BE15AFFA2452C306000AB1384DA68E39EF8D8727ABF51EC12E4B8848D805"
+                  },
+                  {
+                      "file":  "local_cart-footer.png",
+                      "bytes":  90241,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "66E48551841BE2A2D0486FAE9D296320D63C4F1CDD104FBDDBD15B9DBC016E38"
+                  },
+                  {
+                      "file":  "local_catalog.png",
+                      "bytes":  94422,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "B1F58A2FCBFA1A2050263B684DAFB4B22C702CA1CE8970099B96797EF1604ABC"
+                  },
+                  {
+                      "file":  "local_categories.png",
+                      "bytes":  172331,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "D624E668BE444673D0F19108755EBC9EAFA3D19EDB5A2F34792F83A1E365AAD2"
+                  },
+                  {
+                      "file":  "local_chat.png",
+                      "bytes":  119919,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "331A83880012841337F972CA6A18A0A064563AD46EB41A5F9476227515B37C73"
+                  },
+                  {
+                      "file":  "local_chat-keyboard.png",
+                      "bytes":  130708,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "720A1F2F2AEB0D20F8344F2ED6A4D382F5F176B99376D012D5F9B596EE9305A2"
+                  },
+                  {
+                      "file":  "local_chat-keyboard-footer.png",
+                      "bytes":  110866,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "CC6F2559F740870425110B74B3A19F720ACEEE1EC63C986B9C1C84A3708E8487"
+                  },
+                  {
+                      "file":  "local_chat-merchant.png",
+                      "bytes":  127523,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "C16A811033B81D8EF0FA18C1E6905102DD3870C384AFDD1957E7CD982E17FC3C"
+                  },
+                  {
+                      "file":  "local_chat-merchant-footer.png",
+                      "bytes":  122035,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "931C20533227263A48AB793EBE830CD2026633FFAE4B1C2C69BB024E0FA29936"
+                  },
+                  {
+                      "file":  "local_checkout.png",
+                      "bytes":  109089,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "1F4E94BFFAB1D8C6DF195DF6681BFAA208B34731086CB0EB06491D2350CECEBC"
+                  },
+                  {
+                      "file":  "local_checkout-footer.png",
+                      "bytes":  99957,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "216C0DEFAD3161F1D018E05D79C4607BBBCCF1BC111466B9412EFD8666A542C3"
+                  },
+                  {
+                      "file":  "local_history.png",
+                      "bytes":  85261,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "B720B4E9F1C2166A06C3A737C63DE28DC92683BF1A0CF81CE8185FEE6A3101F4"
+                  },
+                  {
+                      "file":  "local_home.png",
+                      "bytes":  489272,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "599AF64063C15E741AD777B543F7B77945B974AD0BD842154665DEABE7CCD84E"
+                  },
+                  {
+                      "file":  "local_home_products.png",
+                      "bytes":  110345,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "6D1FA04489DB66A0C95C790A68E092EE282AFDA23FB766D36D30DA5E68E16F62"
+                  },
+                  {
+                      "file":  "local_map.png",
+                      "bytes":  136928,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "CE4E99CDDDB32C114E03AD9B342F9E8F23C0741A8ED831FF22525E8A3841D60D"
+                  },
+                  {
+                      "file":  "local_map-footer.png",
+                      "bytes":  98116,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "3D847AA9EB0FE38F423428BFB881D74CEAD40B8ED3BE69EC3AA1A07E8E3B0288"
+                  },
+                  {
+                      "file":  "local_orders.png",
+                      "bytes":  161404,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "572274FFD88C0BFF87BF7543282BC5C0914B4431AADEEB55BFE34B5F3C5FEC95"
+                  },
+                  {
+                      "file":  "local_pix-creating.png",
+                      "bytes":  45255,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "828AABEA29C45380CE9F12AE11555F2F5AF201403409B8D7BA4911C00CEF228D"
+                  },
+                  {
+                      "file":  "local_pix-error.png",
+                      "bytes":  58120,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "DC87D42327D272E7C03B3A3E627D634B37918E8ECF6E166FBD5483234F27A0B8"
+                  },
+                  {
+                      "file":  "local_pix-expired.png",
+                      "bytes":  66467,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "40B6787922C7778DDAC50F4A37A3524CAA65483F57291A4E080CD308244C0881"
+                  },
+                  {
+                      "file":  "local_pix-footer.png",
+                      "bytes":  71292,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "A3B0618409DEB65D5EF4DB21C3D007909C66AAAB77151B1CB3753C9586D36659"
+                  },
+                  {
+                      "file":  "local_pix-paid.png",
+                      "bytes":  57333,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "DB71AF34CDF43780F6B1B899CD6155132133B38486FB347BC142C6ADBE4BF4A1"
+                  },
+                  {
+                      "file":  "local_pix-qr.png",
+                      "bytes":  62300,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "271EF8F29164F30166164C065DC249AFDCE180092AD083A9CC72634FC0F04ADE"
+                  },
+                  {
+                      "file":  "local_pix-retry.png",
+                      "bytes":  59681,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "E376EFAE4FD300235F2C1CB983A746D3C95AB7F298575AA1E42277F34A80A8AB"
+                  },
+                  {
+                      "file":  "local_pix-waiting.png",
+                      "bytes":  64480,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "E242C2BE7BC15C36DD579F0E59C0D2566580E3B955E95F0556A7702B06A95951"
+                  },
+                  {
+                      "file":  "local_product.png",
+                      "bytes":  81924,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "0CCF6A8EC874D530370234079F446105A61F20A85FB323F0FDFF45780081A653"
+                  },
+                  {
+                      "file":  "local_product-footer.png",
+                      "bytes":  92513,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "B41E3AEFC3F7A52543CE733B9198970AF9D7B8CC3EBB2B6030AE5D54595CC4FD"
+                  },
+                  {
+                      "file":  "local_profile.png",
+                      "bytes":  202026,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "92234AE70111CD3EAB215B8E80BBA994154E9EF9575B2A94DC2DFCAA5A18D177"
+                  },
+                  {
+                      "file":  "local_profile-footer.png",
+                      "bytes":  95820,
+                      "width":  720,
+                      "height":  1280,
+                      "sha256":  "B452093DEFA8E1596C5763F306B7DE0318305FADDA01E0889FC93F516D501712"
+                  }
+              ]
+}

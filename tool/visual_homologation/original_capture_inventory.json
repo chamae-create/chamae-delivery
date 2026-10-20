@@ -1,0 +1,177 @@
+﻿[
+    {
+        "name":  "cart_1440.0.png",
+        "sha256":  "4312DC6BF26101D9870CA554E1876424A1606261814C51E024C4A9806C888649",
+        "bytes":  59092
+    },
+    {
+        "name":  "cart_320.0.png",
+        "sha256":  "F772BA9EE0A85E358514249E9842C55D77DA8AE51D94620EECF6ED4676B09E16",
+        "bytes":  51459
+    },
+    {
+        "name":  "cart_390.0.png",
+        "sha256":  "C90D2918076B160FFDC6017367CCB74588961A62DBC276FF22BDEF7F573B4B61",
+        "bytes":  52296
+    },
+    {
+        "name":  "cart_430.0.png",
+        "sha256":  "938CBDB5EE603238460EB573BCD4F272D275B345E8E26185CFD42B4EC8F40B00",
+        "bytes":  53389
+    },
+    {
+        "name":  "cart_768.0.png",
+        "sha256":  "42E00D42FC0F6C5FAB55E8E20BA732B20A0BA01998FE0E6D5F7FC0843603F891",
+        "bytes":  54277
+    },
+    {
+        "name":  "categories_1440.0.png",
+        "sha256":  "B2DD373BCAA7D0009ED512A64D149B38A3912895D10182425728CAC0D29C0A66",
+        "bytes":  703777
+    },
+    {
+        "name":  "categories_320.0.png",
+        "sha256":  "18EFCB13CADCFC8DDABA2EF76B2CF935F9D2EA95DFEAD195051CFCF9FE886F5D",
+        "bytes":  180125
+    },
+    {
+        "name":  "categories_390.0.png",
+        "sha256":  "0D39B3C1F347B689CC1DC7E45911AB8777F039EF43E9EF00EA5EB93AD523B69D",
+        "bytes":  208930
+    },
+    {
+        "name":  "categories_430.0.png",
+        "sha256":  "1A7A773837C8B46C37C1E3D8A6052A1AE03B7AD9389C3097D8058A72D3C80E73",
+        "bytes":  234663
+    },
+    {
+        "name":  "categories_768.0.png",
+        "sha256":  "940F9578BE7569D9177158E315B4A607ED2F86EE1CCA1FFD40E523EA5A998DD4",
+        "bytes":  535608
+    },
+    {
+        "name":  "checkout_1440.0.png",
+        "sha256":  "9D1B9EFFEE5286B8D3F4E01451EF40F59FE1259FEF661FEA66B7C03A3A308494",
+        "bytes":  80334
+    },
+    {
+        "name":  "checkout_320.0.png",
+        "sha256":  "052FEA4EEB494E8C9F45FF067B207AE226695BC6223B58B6A443512DD8314B0A",
+        "bytes":  67288
+    },
+    {
+        "name":  "checkout_390.0.png",
+        "sha256":  "F2AFBB2EDDF0EB3446BE55B56A4009F100ADEF00C57ABCE3B70F007F67A4BED8",
+        "bytes":  69311
+    },
+    {
+        "name":  "checkout_430.0.png",
+        "sha256":  "DBD47DC0291011BCBB6DCE45522656709DB9E50CE2384DF3A2212C09221C1B96",
+        "bytes":  69954
+    },
+    {
+        "name":  "checkout_768.0.png",
+        "sha256":  "FD79326E24E06BF36F1E97E108E18A18DC96F63B42B49B72E817712D92BFF786",
+        "bytes":  74476
+    },
+    {
+        "name":  "home_1440.0.png",
+        "sha256":  "19D434ED18CEF806025FF53423F6173871F0CBBA2EEA93AE2C5FF0D54A931843",
+        "bytes":  666211
+    },
+    {
+        "name":  "home_320.0.png",
+        "sha256":  "9614C2DC60871773D1369AD751E1DA765E01E4B16EA2D6FBAD6499140B6D6D29",
+        "bytes":  56843
+    },
+    {
+        "name":  "home_390.0.png",
+        "sha256":  "EB2B4BA75E80F840BC69977247074E542F5966CAC89FD5F51D5491C70A6FD6A7",
+        "bytes":  190220
+    },
+    {
+        "name":  "home_430.0.png",
+        "sha256":  "2E99CA7E8FBC2C948F8347098522B7D3520AD5A1EA08A9F3D62EAF32F755F7EA",
+        "bytes":  214643
+    },
+    {
+        "name":  "home_768.0.png",
+        "sha256":  "B7C582E951F071E356F5B8786430DD5A31270782980F28E6CC489C0D9EC97894",
+        "bytes":  507115
+    },
+    {
+        "name":  "product_1440.0.png",
+        "sha256":  "BBAD6012F389A944C944A1D4B0AE38C08E8B9A291A0897D2C89FE01947D7BF18",
+        "bytes":  355628
+    },
+    {
+        "name":  "product_320.0.png",
+        "sha256":  "3A6DD9E88C32ACB8F1C4C37D623AADAAC52706F3C274A236BFD2952DD9EFA4B6",
+        "bytes":  96936
+    },
+    {
+        "name":  "product_390.0.png",
+        "sha256":  "70B45C583A3DA5CFD11EB1A7D9AF1DE7E10F3CA1E534ED959DB9CA6F5DEB4C7A",
+        "bytes":  108790
+    },
+    {
+        "name":  "product_430.0.png",
+        "sha256":  "7E40CB56787A8947843F802B6CF590CF3A3CED73FE7A2DFDD17083F476925BC8",
+        "bytes":  125711
+    },
+    {
+        "name":  "product_768.0.png",
+        "sha256":  "3E682DF17C55F1569D785CD1134DF12F64BC84B9E5D99C92B8D5D6B089E3A7E8",
+        "bytes":  234959
+    },
+    {
+        "name":  "profile_1440.0.png",
+        "sha256":  "DABFE55E6F4A87FD84638829AB8F5B1D32FFF69CC835B6B0407430BDCFA23895",
+        "bytes":  113382
+    },
+    {
+        "name":  "profile_320.0.png",
+        "sha256":  "4D7F949704FEB00E9DC120F3A0684C75D35F032360890E141030AA931D0A0A38",
+        "bytes":  76484
+    },
+    {
+        "name":  "profile_390.0.png",
+        "sha256":  "80CEFE343EEC1DD0754BAB60DE71F9F176492DA3B96C530FE7AFD5765B198049",
+        "bytes":  82353
+    },
+    {
+        "name":  "profile_430.0.png",
+        "sha256":  "440F6AFB323B4C4197F93D1963CEE85402E164D8CBC745634C564200E30D67F7",
+        "bytes":  81024
+    },
+    {
+        "name":  "profile_768.0.png",
+        "sha256":  "801813C7DC68628840FB8A6A63CC5396BFD58EA0A1F97582AE7F66EB51C3DCD6",
+        "bytes":  104241
+    },
+    {
+        "name":  "tracking_1440.0.png",
+        "sha256":  "A8CAE9210FA9BE93FDF8761B50D69E6F349098B2CC5228474F38DCE76F72FF06",
+        "bytes":  97822
+    },
+    {
+        "name":  "tracking_320.0.png",
+        "sha256":  "9D8CA224B06CF9C4F6CBCEB11A112A1E91AE9A626936A7697E502BF5BF9626E0",
+        "bytes":  61510
+    },
+    {
+        "name":  "tracking_390.0.png",
+        "sha256":  "C961A1B3AAD53E19A1F6CE5B3A0D8D7273D90471D5897B62AA7CF47F6FD92F59",
+        "bytes":  65140
+    },
+    {
+        "name":  "tracking_430.0.png",
+        "sha256":  "703F2023FAE05D0014C55347070A48D23A6857C8CD73A9D3E68BEE1C283551B4",
+        "bytes":  66908
+    },
+    {
+        "name":  "tracking_768.0.png",
+        "sha256":  "A0EA93241E0F7D33D9E51356ECC240CD01CF48B4A9693B23A3037D503080DDAD",
+        "bytes":  87059
+    }
+]

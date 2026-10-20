@@ -1,0 +1,34 @@
+﻿[
+    {
+        "file":  "01_categories_reference.jpeg",
+        "sha256":  "71B4CB5B895F6D86080403C69FAFC62F32467FD3C78797C9FC8AABDF12A73FC0"
+    },
+    {
+        "file":  "02_home_reference.jpeg",
+        "sha256":  "07629E2C7059536415059D65474E7E8D1EBDE995799C6A1EE7F649F107C6BCF9"
+    },
+    {
+        "file":  "03_cart_reference.jpeg",
+        "sha256":  "96BA919D266645D6A56B5E5D3D841DBB4693F1A1D45DD93808F4CC193ABF5574"
+    },
+    {
+        "file":  "04_checkout_reference.jpeg",
+        "sha256":  "80F8CE8D0FFA647316BD7FEFF00438E6BDD4B1F585F1E710383B285B95EE6BDE"
+    },
+    {
+        "file":  "05_tracking_reference.jpeg",
+        "sha256":  "BD120031D4E4E9279BF6A2AE71293C6DA6416C3666298BCF8E25279ABFBA8C5B"
+    },
+    {
+        "file":  "06_product_reference.jpeg",
+        "sha256":  "E02A9BF6234D4466FF00492DB27959D290DED971A40F2A410D5AF5BD10A9E8E5"
+    },
+    {
+        "file":  "07_profile_reference.jpeg",
+        "sha256":  "A22008EE5AEC82BDC43D89C93970F28AE40C3E341DA09B9C203FDCAC152D8F29"
+    },
+    {
+        "file":  "README.md",
+        "sha256":  "C8163A79914A2D28E8E2BB95B8BC6CF7B3668B54E0FBC5DDA5468772E3422B2D"
+    }
+]

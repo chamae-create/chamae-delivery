@@ -1,0 +1,12 @@
+﻿{
+    "protectedFileCount":  75,
+    "changedProtectedFiles":  [
+                                  "lib\\widgets\\pix_payment_dialog.dart"
+                              ],
+    "pixRuntimeBeforeBuildIdenticalIgnoringWhitespace":  true,
+    "firebaseInitializedByHarness":  false,
+    "releaseHarnessBlocked":  true,
+    "capturesArePhysicalAdbScreenshots":  true,
+    "chatGatewayPrefixIdenticalIgnoringFormatting":  true,
+    "mapBeforeBuildIdenticalIgnoringFormatting":  true
+}
