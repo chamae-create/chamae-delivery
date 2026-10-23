@@ -1,0 +1,29 @@
+workflows:
+  ios-unsigned:
+    name: Chamae - primeira compilacao iOS (sem assinatura)
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    environment:
+      flutter: 3.47.5
+      xcode: latest
+      cocoapods: default
+    # Checkout is performed by Codemagic. Start this workflow manually.
+    # No signing, secrets, publishing or automatic triggers in this workflow.
+    scripts:
+      - name: Flutter dependencies
+        script: flutter pub get --enforce-lockfile
+      - name: Static analysis
+        script: flutter analyze --no-pub
+      - name: Focused Firebase configuration tests
+        script: flutter test --no-pub test/production_firebase_configuration_test.dart
+      - name: Validate native configuration
+        script: |
+          set -euo pipefail
+          plutil -lint ios/Runner/Info.plist ios/Runner/GoogleService-Info.plist ios/Flutter/AppFrameworkInfo.plist ios/Runner.xcodeproj/project.pbxproj
+          ruby -c ios/Podfile
+      - name: Compile iOS without signing
+        script: flutter build ios --debug --no-codesign --no-pub
+    artifacts:
+      - build/ios/iphoneos/*.app
+      - /tmp/xcodebuild_logs/*.log
+      - ios/Podfile.lock
