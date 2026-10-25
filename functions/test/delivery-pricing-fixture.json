@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 2,
+  "minimumPolicy": "replace",
+  "maxDistanceMeters": 14500,
+  "origin": null,
+  "bands": [
+    {
+      "minExclusiveMeters": 0,
+      "maxInclusiveMeters": 1000,
+      "priceCents": 600,
+      "enabled": true,
+      "order": 0
+    },
+    {
+      "minExclusiveMeters": 1000,
+      "maxInclusiveMeters": 1500,
+      "priceCents": 700,
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "minExclusiveMeters": 1500,
+      "maxInclusiveMeters": 2000,
+      "priceCents": 800,
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "minExclusiveMeters": 2000,
+      "maxInclusiveMeters": 2500,
+      "priceCents": 900,
+      "enabled": true,
+      "order": 3
+    },
+    {
+      "minExclusiveMeters": 2500,
+      "maxInclusiveMeters": 3000,
+      "priceCents": 1000,
+      "enabled": true,
+      "order": 4
+    },
+    {
+      "minExclusiveMeters": 3000,
+      "maxInclusiveMeters": 3500,
+      "priceCents": 1100,
+      "enabled": true,
+      "order": 5
+    },
+    {
+      "minExclusiveMeters": 3500,
+      "maxInclusiveMeters": 4000,
+      "priceCents": 1200,
+      "enabled": true,
+      "order": 6
+    },
+    {
+      "minExclusiveMeters": 4000,
+      "maxInclusiveMeters": 4500,
+      "priceCents": 1300,
+      "enabled": true,
+      "order": 7
+    },
+    {
+      "minExclusiveMeters": 4500,
+      "maxInclusiveMeters": 5000,
+      "priceCents": 1400,
+      "enabled": true,
+      "order": 8
+    },
+    {
+      "minExclusiveMeters": 5000,
+      "maxInclusiveMeters": 5500,
+      "priceCents": 1500,
+      "enabled": true,
+      "order": 9
+    },
+    {
+      "minExclusiveMeters": 5500,
+      "maxInclusiveMeters": 6000,
+      "priceCents": 1600,
+      "enabled": true,
+      "order": 10
+    },
+    {
+      "minExclusiveMeters": 6000,
+      "maxInclusiveMeters": 6500,
+      "priceCents": 1700,
+      "enabled": true,
+      "order": 11
+    },
+    {
+      "minExclusiveMeters": 6500,
+      "maxInclusiveMeters": 7000,
+      "priceCents": 1800,
+      "enabled": true,
+      "order": 12
+    },
+    {
+      "minExclusiveMeters": 7000,
+      "maxInclusiveMeters": 7500,
+      "priceCents": 1900,
+      "enabled": true,
+      "order": 13
+    },
+    {
+      "minExclusiveMeters": 7500,
+      "maxInclusiveMeters": 8000,
+      "priceCents": 2000,
+      "enabled": true,
+      "order": 14
+    },
+    {
+      "minExclusiveMeters": 8000,
+      "maxInclusiveMeters": 8500,
+      "priceCents": 2100,
+      "enabled": true,
+      "order": 15
+    },
+    {
+      "minExclusiveMeters": 8500,
+      "maxInclusiveMeters": 9000,
+      "priceCents": 2200,
+      "enabled": true,
+      "order": 16
+    },
+    {
+      "minExclusiveMeters": 9000,
+      "maxInclusiveMeters": 9500,
+      "priceCents": 2300,
+      "enabled": true,
+      "order": 17
+    },
+    {
+      "minExclusiveMeters": 9500,
+      "maxInclusiveMeters": 10000,
+      "priceCents": 2400,
+      "enabled": true,
+      "order": 18
+    },
+    {
+      "minExclusiveMeters": 10000,
+      "maxInclusiveMeters": 10500,
+      "priceCents": 2500,
+      "enabled": true,
+      "order": 19
+    },
+    {
+      "minExclusiveMeters": 10500,
+      "maxInclusiveMeters": 11000,
+      "priceCents": 2700,
+      "enabled": true,
+      "order": 20
+    },
+    {
+      "minExclusiveMeters": 11000,
+      "maxInclusiveMeters": 11500,
+      "priceCents": 2900,
+      "enabled": true,
+      "order": 21
+    },
+    {
+      "minExclusiveMeters": 11500,
+      "maxInclusiveMeters": 12000,
+      "priceCents": 3100,
+      "enabled": true,
+      "order": 22
+    },
+    {
+      "minExclusiveMeters": 12000,
+      "maxInclusiveMeters": 12500,
+      "priceCents": 3300,
+      "enabled": true,
+      "order": 23
+    },
+    {
+      "minExclusiveMeters": 12500,
+      "maxInclusiveMeters": 13000,
+      "priceCents": 3500,
+      "enabled": true,
+      "order": 24
+    },
+    {
+      "minExclusiveMeters": 13000,
+      "maxInclusiveMeters": 13500,
+      "priceCents": 3700,
+      "enabled": true,
+      "order": 25
+    },
+    {
+      "minExclusiveMeters": 13500,
+      "maxInclusiveMeters": 14000,
+      "priceCents": 3900,
+      "enabled": true,
+      "order": 26
+    },
+    {
+      "minExclusiveMeters": 14000,
+      "maxInclusiveMeters": 14500,
+      "priceCents": 4000,
+      "enabled": true,
+      "order": 27
+    }
+  ]
+}

@@ -7,7 +7,7 @@ const {generatePin, encryptPin, decryptPin, newOrderVerifier, checkAttempt} = re
 const {ownPin} = require("../customer-security");
 
 const origin = {latitude: -20, longitude: -50}; // Synthetic test coordinates, NOT the store.
-const destination = {latitude: -20.01, longitude: -50.01, countryCode: "BR"};
+const destination = {latitude: -20.01, longitude: -50.01, countryCode: "BR", confirmed: true};
 const table = () => ({minimumPolicy: "replace", origin, bands: [
   {fromMeters: 0, toMeters: 1100, feeCents: 450, status: "active"},
   {fromMeters: 1100, toMeters: 3000, feeCents: 725, status: "active"},
@@ -70,24 +70,25 @@ test("100m subdivisions are drafts and keep the previous complete price", () => 
   assert.deepEqual(rows.map((r) => r.toMeters), [1100, 1200, 1300]);
   assert.ok(rows.every((r) => r.status === "draft" && r.feeCents === 1234));
 });
-test("minimum is explicit: pending fails; replacement/floor are distinct", () => {
+test("pending and historical floor cannot price new deliveries", () => {
   const t = table(); t.minimumPolicy = "pending";
   assert.throws(() => validateTable(t), /MINIMUM_POLICY_PENDING/);
   t.minimumPolicy = "floor800";
-  assert.equal(priceForDistance(t, 2000), 800);
+  assert.throws(() => priceForDistance(t, 2000), /MINIMUM_POLICY_PENDING/);
   t.minimumPolicy = "replace";
   assert.equal(priceForDistance(t, 2000), 725);
 });
 test("route provider fake; failure and unconfigured provider never fall back to straight line", async () => {
   const args = {table: table(), origin, destination, uid: "customer", version: "v1", now: 100};
-  const q = await buildQuote({...args, provider: {route: async () => ({status: "ok", distanceMeters: 2300})}});
+  const q = await buildQuote({...args, provider: {route: async () => ({
+    status: "ok", distanceMeters: 2300, provider: "test-route"})}});
   assert.equal(q.feeCents, 725); assert.equal(q.distanceMeters, 2300);
   await assert.rejects(buildQuote({...args, provider: new RoutingProvider()}), /NOT_CONFIGURED/);
   await assert.rejects(buildQuote({...args, provider: {route: async () => ({status: "error"})}}), /ROUTE_UNAVAILABLE/);
 });
 test("frozen quote ignores forged client fee; owner, destination, expiration and reuse are bound", async () => {
   const q = await buildQuote({table: table(), origin, destination, uid: "customer", version: "v1", now: 100,
-    provider: {route: async () => ({status: "ok", distanceMeters: 2300})}});
+    provider: {route: async () => ({status: "ok", distanceMeters: 2300, provider: "test-route"})}});
   const order = {customerUid: "customer", deliveryAddress: destination, deliveryFee: 99999};
   const frozen = validateQuote(q, order, "o1", 200);
   assert.equal(frozen.deliveryFee, 7.25); assert.equal(frozen.configurationVersion, "v1");

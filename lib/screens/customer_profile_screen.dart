@@ -1,5 +1,6 @@
 import '../widgets/customer_order_history_card.dart';
 import '../widgets/customer_visual.dart';
+import '../widgets/customer_feedback.dart';
 import '../widgets/delivery_pin_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +10,8 @@ import '../core/models.dart';
 import '../core/theme.dart';
 import 'tracking_screen.dart';
 import '../data/customer_auth.dart';
+import '../data/customer_account.dart';
+import 'customer_account_closure_screen.dart';
 import '../data/customer_onboarding.dart';
 import 'legal_document_screen.dart';
 import 'customer_onboarding_screen.dart';
@@ -18,12 +21,14 @@ class CustomerProfileScreen extends StatefulWidget {
   final Future<void> Function() selectAddress;
   final CustomerAuth? auth;
   final CustomerOnboardingRepository? onboarding;
+  final CustomerAccountRepository? account;
   const CustomerProfileScreen(
       {super.key,
       this.address,
       required this.selectAddress,
       this.auth,
-      this.onboarding});
+      this.onboarding,
+      this.account});
   @override
   State<CustomerProfileScreen> createState() => _CustomerProfileScreenState();
 }
@@ -36,10 +41,18 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   late Future<CustomerOnboardingState>? _state = _repository?.load();
   bool _busy = false;
   String? _error;
+  void _reloadProfile() {
+    final state = _repository?.load();
+    setState(() {
+      _state = state;
+    });
+  }
+
   Future<void> _logout() async {
     final confirmed = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
+                scrollable: true,
                 title: const Text('Sair da conta?'),
                 content: const Text(
                     'Seus pedidos e seu carrinho continuarão vinculados a esta conta.'),
@@ -133,6 +146,13 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                             const CustomerSectionTitle(
                                 title: 'Minha conta',
                                 icon: Icons.person_outline_rounded),
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting)
+                              const CustomerFeedback(
+                                  title: 'Buscando os dados da sua conta',
+                                  message:
+                                      'Seu perfil já vai aparecer por aqui.',
+                                  loading: true),
                             ListTile(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
@@ -167,11 +187,13 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                   subtitle: Text(
                                       'Data declarada: ${dob.split('-').reversed.join('/')}')),
                             if (snapshot.hasError)
-                              TextButton(
-                                  onPressed: () => setState(
-                                      () => _state = _repository?.load()),
-                                  child: const Text(
-                                      'Tentar carregar dados novamente')),
+                              CustomerFeedback(
+                                title: 'Não foi possível atualizar seu perfil.',
+                                message:
+                                    'Confira sua conexão e tente novamente. Seus dados não foram apagados.',
+                                icon: Icons.cloud_off_outlined,
+                                onRetry: _reloadProfile,
+                              ),
                             if (snapshot.data != null &&
                                 !snapshot.data!.acceptedCurrent &&
                                 _repository != null)
@@ -185,8 +207,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                                   repository: _repository!,
                                                   onComplete: () {
                                                     Navigator.pop(context);
-                                                    setState(() => _state =
-                                                        _repository!.load());
+                                                    _reloadProfile();
                                                   }))),
                                   child: const Text(
                                       'Conferir documentos atualizados')),
@@ -278,6 +299,26 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                                     _busy || _auth == null ? null : _logout,
                                 icon: const Icon(Icons.logout),
                                 label: const Text('Sair da conta')),
+                            if (widget.account != null ||
+                                (identity != null &&
+                                    !identity.anonymous &&
+                                    _auth is FirebaseCustomerAuth))
+                              TextButton.icon(
+                                  onPressed: _busy
+                                      ? null
+                                      : () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) =>
+                                                  CustomerAccountClosureScreen(
+                                                      repository: widget
+                                                              .account ??
+                                                          FirebaseCustomerAccount(_auth
+                                                              as FirebaseCustomerAuth)))),
+                                  icon: const Icon(Icons.delete_outline,
+                                      color: AppColors.error),
+                                  label: const Text('Excluir minha conta',
+                                      style: TextStyle(color: AppColors.error))),
                             const Divider(),
                             const Padding(
                                 padding: EdgeInsets.all(16),

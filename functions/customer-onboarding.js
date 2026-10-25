@@ -2,6 +2,7 @@ const {createHash} = require("node:crypto");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {FieldValue} = require("firebase-admin/firestore");
 const {verifiedCustomerToken} = require("./customer-identity");
+const {assertCustomerAccountActive} = require("./customer-account-state");
 
 const policyFields = ["revision", "termsVersion", "privacyVersion", "alcoholVersion",
   "termsText", "privacyText", "alcoholNotice", "termsUrl", "privacyUrl", "minimumAgeByCountry"];
@@ -61,6 +62,7 @@ async function acceptDocuments(db, request) {
   if (!birthDate(data.birthDate)) throw new HttpsError("invalid-argument", "Informe uma data de nascimento válida.");
   const profileRef = db.collection("customerProfiles").doc(uid);
   return db.runTransaction(async (tx) => {
+    await assertCustomerAccountActive(db, uid, tx);
     const policyDoc = await tx.get(db.collection("customerPolicies").doc("current"));
     const old = await tx.get(profileRef);
     const courier = await tx.get(db.collection("couriers").doc(uid));
@@ -90,6 +92,7 @@ async function acceptDocuments(db, request) {
 async function prepareCustomerEligibility(tx, db, order) {
   // Old orders retain the financial/stock flow that existed when created.
   if (order.customerFlowVersion !== 2) return null;
+  await assertCustomerAccountActive(db, order.customerUid, tx);
   const policyDoc = await tx.get(db.collection("customerPolicies").doc("current"));
   const profileDoc = await tx.get(db.collection("customerProfiles").doc(order.customerUid));
   const policy = validPolicy(policyDoc.data());

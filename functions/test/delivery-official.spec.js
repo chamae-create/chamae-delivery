@@ -1,8 +1,12 @@
 const {test} = require("node:test");
 const assert = require("node:assert/strict");
-const initial = require("../config/delivery-pricing-initial.json");
+// Synthetic test prices only; never used as production configuration.
+const initial = require("./delivery-pricing-fixture.json");
 const {validateTable, priceForDistance} = require("../delivery-pricing");
-const {saveVersion, quoteDelivery, prepareDelivery, createDeliveryFunctions} = require("../delivery-service");
+const {saveVersion, quoteDelivery: realQuoteDelivery, prepareDelivery, createDeliveryFunctions} =
+  require("../delivery-service");
+const {countryVerifier} = require("./operational-fixture");
+const quoteDelivery = (db, request, provider) => realQuoteDelivery(db, request, provider, countryVerifier);
 const {GoogleRoutesProvider} = require("../google-routes-provider");
 const origin = {latitude: -20, longitude: -50}; // Synthetic test point, never store coordinates.
 const table = () => ({...structuredClone(initial), origin});
@@ -34,6 +38,27 @@ function configured() {
   f.docs.set("deliveryPricingVersions/v1", {published: true, status: "published", table: table()});
   return f;
 }
+
+test("KB03 country failure precedes route and never persists a quote", async () => {
+  const {db, docs} = configured(); let routes = 0;
+  await assert.rejects(realQuoteDelivery(db, req(), {route: async () => {
+    routes++; return router().route();
+  }}, {verify: async () => {
+    const {GoogleDestinationCountry} = require("../destination-country");
+    return new GoogleDestinationCountry({apiKey: "TEST_ONLY", fetchImpl: async () => ({ok: true,
+      json: async () => ({status: "ZERO_RESULTS", results: []})})}).verify(destination());
+  }}), (error) => error.details.reason === "DESTINATION_COUNTRY_UNVERIFIED");
+  assert.equal(routes, 0);
+  assert.equal([...docs.keys()].some((key) => key.startsWith("deliveryQuotes/")), false);
+});
+
+test("KB03 cached quotes without server country evidence cannot bypass verification", async () => {
+  const {db, docs} = configured();
+  const q = await quoteDelivery(db, req(), router());
+  delete docs.get(`deliveryQuotes/${q.quoteId}`).destinationVerification;
+  await assert.rejects(quoteDelivery(db, req(), router()),
+      (error) => error.details.reason === "DESTINATION_COUNTRY_UNVERIFIED");
+});
 const router = (distanceMeters = 8243) => ({route: async () => ({status: "ok", distanceMeters,
   durationSeconds: 100, provider: "google-routes"})});
 
@@ -138,10 +163,16 @@ test("Routes failure, missing config/table/origin and out of area block without 
     assert.equal([...docs.keys()].some((k) => k.startsWith("deliveryQuotes/")), false);
   }
 });
-test("new flow without configuration fails closed; historical order keeps existing freight", async () => {
-  const {db} = memory();
-  await assert.rejects(db.runTransaction((tx) => prepareDelivery(tx, db, {id: "new"}, {customerFlowVersion: 2})));
-  assert.equal((await db.runTransaction((tx) => prepareDelivery(tx, db, {id: "old"}, {}, 1000))).feeCents, 1000);
+test("all new financials without configuration fail closed, including legacy clients", async () => {
+  const {db, docs} = memory();
+  for (const config of [null, {mode: "legacy"}, {mode: "routeBands"},
+    {mode: "routeBands", activeVersion: "bad/path"}]) {
+    if (config) docs.set("deliveryConfiguration/current", config);
+    for (const order of [{customerFlowVersion: 2}, {}]) {
+      await assert.rejects(db.runTransaction((tx) => prepareDelivery(tx, db, {id: "new"}, order)));
+    }
+    await assert.rejects(quoteDelivery(db, req(), router()));
+  }
 });
 test("callable binds dedicated Routes secret; missing credential and Google error never fall back", async () => {
   const f = createDeliveryFunctions(memory().db);
@@ -219,4 +250,68 @@ test("publication racing with Routes invalidates the in-flight quote", async () 
     await publishTable(db, 12000, "r"); return router(14500).route();
   }}));
   assert.equal([...docs.keys()].some((k) => k.startsWith("deliveryQuotes/")), false);
+});
+
+test("initial production template has no price and cannot authorize deliveries", async () => {
+  const template = require("../config/delivery-pricing-initial.json");
+  assert.equal(template.origin, null);
+  assert.ok(template.bands.every((b) => b.priceCents === null && b.enabled === false));
+  assert.throws(() => validateTable(template));
+  const {db, docs} = configured();
+  docs.get("deliveryPricingVersions/v1").table = template;
+  await assert.rejects(quoteDelivery(db, req(), router()));
+});
+
+test("300 contiguous 100m bands support 30km and preserve the exact applied band", async () => {
+  const {db, docs} = configured();
+  const t = {...table(), maxDistanceMeters: 30000, bands: Array.from({length: 300}, (_, order) => ({
+    minExclusiveMeters: order * 100, maxInclusiveMeters: (order + 1) * 100,
+    priceCents: order + 1, enabled: true, order,
+  }))}; // Synthetic, noncommercial test prices.
+  docs.get("deliveryPricingVersions/v1").table = t;
+  assert.equal(priceForDistance(t, 1100), 11);
+  assert.equal(priceForDistance(t, 1101), 12);
+  const q = await quoteDelivery(db, req(), router(30000));
+  const frozen = await db.runTransaction((tx) => prepareDelivery(tx, db, {id: "o1"}, {
+    customerUid: "buyer", deliveryAddress: destination(), deliveryQuoteId: q.quoteId,
+  }));
+  assert.equal(frozen.snapshot.distanceUnit, "m");
+  assert.equal(frozen.snapshot.distanceSource, "route");
+  assert.deepEqual(frozen.snapshot.appliedBand, t.bands[299]);
+  await assert.rejects(quoteDelivery(db, req("BR", "z".repeat(24)), router(30001)));
+});
+
+test("explicit inactive status, mismatched version and unknown schema block quote and acceptance", async () => {
+  for (const change of [{status: "inactive"}, {status: "draft"}, {published: false},
+    {version: "other"}, {table: {...table(), schemaVersion: 99}},
+    {table: {...table(), origin: null}}]) {
+    const {db, docs} = configured();
+    const q = await quoteDelivery(db, req(), router());
+    Object.assign(docs.get("deliveryPricingVersions/v1"), change);
+    await assert.rejects(quoteDelivery(db, req("BR", "z".repeat(24)), router()));
+    await assert.rejects(db.runTransaction((tx) => prepareDelivery(tx, db, {id: "o1"}, {
+      customerUid: "buyer", deliveryAddress: destination(), deliveryQuoteId: q.quoteId,
+    })));
+  }
+});
+
+test("acceptance rejects changed origin, private price, expired quote and unconfirmed destination", async () => {
+  for (const invalid of ["origin", "price", "expired", "confirmation", "source", "unit", "reuse"]) {
+    const {db, docs} = configured();
+    const q = await quoteDelivery(db, req(), router());
+    const privateQuote = docs.get(`deliveryQuotes/${q.quoteId}`);
+    const address = destination();
+    if (invalid === "origin") docs.get("deliveryPricingVersions/v1").table.origin = {latitude: -21, longitude: -50};
+    if (invalid === "price") privateQuote.feeCents = 1;
+    if (invalid === "expired") privateQuote.expiresAtMs = privateQuote.createdAtMs + 1;
+    if (invalid === "confirmation") address.confirmed = false;
+    if (invalid === "source") privateQuote.distanceSource = "haversine";
+    if (invalid === "unit") privateQuote.distanceUnit = "km";
+    if (invalid === "reuse") privateQuote.orderId = "another";
+    if (invalid === "expired") privateQuote.createdAtMs -= 300000;
+    if (invalid === "expired") privateQuote.expiresAtMs -= 300000;
+    await assert.rejects(db.runTransaction((tx) => prepareDelivery(tx, db, {id: "o1"}, {
+      customerUid: "buyer", deliveryAddress: address, deliveryQuoteId: q.quoteId,
+    })));
+  }
 });

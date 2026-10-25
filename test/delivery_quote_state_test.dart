@@ -21,6 +21,49 @@ const br = DeliveryAddress(
 const py = DeliveryAddress(
     latitude: -20.01, longitude: -50.01, countryCode: 'PY', confirmed: true);
 void main() {
+  Map<String, dynamic> response() => {
+        'mode': 'routeBands',
+        'deliveryFee': 7.25,
+        'quoteId': 'a' * 64,
+        'version': 'test-v1',
+        'distanceMeters': 1101,
+        'distanceUnit': 'm',
+        'distanceSource': 'route',
+        'routingProvider': 'test-route',
+        'quotedAtMs': DateTime.now().millisecondsSinceEpoch,
+        'expiresAtMs': DateTime.now().millisecondsSinceEpoch + 300000,
+      };
+
+  test(
+      'server quote parser refuses legacy, incomplete, expired and nonroute data',
+      () {
+    for (final change in <Map<String, dynamic>>[
+      {'mode': 'legacy'},
+      {'deliveryFee': double.nan},
+      {'deliveryFee': -1},
+      {'distanceMeters': double.infinity},
+      {'distanceMeters': -1},
+      {'distanceMeters': 30001},
+      {'version': ''},
+      {'quoteId': null},
+      {'routingProvider': ''},
+      {'distanceSource': 'haversine'},
+      {'distanceUnit': 'km'},
+      {'expiresAtMs': 1},
+      {'quotedAtMs': null},
+    ]) {
+      expect(() => DeliveryQuote.fromMap({...response(), ...change}),
+          throwsStateError,
+          reason: change.toString());
+    }
+    expect(() => DeliveryQuote.fromMap(null), throwsStateError);
+    expect(() => DeliveryQuote.fromMap({'deliveryFee': 10, 'mode': 'legacy'}),
+        throwsStateError);
+    final quote = DeliveryQuote.fromMap(response());
+    expect(quote.fee, 7.25);
+    expect(quote.distanceMeters, 1101);
+    expect(DeliveryQuote.fromMap({...response(), 'deliveryFee': 0}).fee, 0);
+  });
   testWidgets('outside area removes freight and blocks cart continuation',
       (tester) async {
     final q = PendingQuoter();

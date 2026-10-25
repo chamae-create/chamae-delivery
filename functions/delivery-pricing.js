@@ -28,9 +28,8 @@ function canonicalTable(table) {
 function validateTable(table) {
   if (!table || !Array.isArray(table.bands) || !table.bands.length ||
       table.bands.length > 300) fail("INVALID_BANDS");
-  const legacy = table.schemaVersion !== 2 && !table.bands.some((b) => b && "maxInclusiveMeters" in b);
-  if (legacy ? !["replace", "floor800"].includes(table.minimumPolicy) :
-    table.minimumPolicy !== "replace") fail("MINIMUM_POLICY_PENDING");
+  if (table.minimumPolicy !== "replace") fail("MINIMUM_POLICY_PENDING");
+  if (table.schemaVersion != null && ![1, 2].includes(table.schemaVersion)) fail("INVALID_SCHEMA_VERSION");
   const canonical = canonicalTable(table);
   if (!Number.isSafeInteger(canonical.maxDistanceMeters) ||
       canonical.maxDistanceMeters <= 0 || canonical.maxDistanceMeters > 30000) fail("INVALID_MAX_DISTANCE");
@@ -48,7 +47,7 @@ function validateTable(table) {
   return table;
 }
 
-function priceForDistance(table, meters) {
+function bandForDistance(table, meters) {
   validateTable(table);
   if (!Number.isFinite(meters) || meters < 0) fail("INVALID_DISTANCE");
   const canonical = canonicalTable(table);
@@ -58,9 +57,11 @@ function priceForDistance(table, meters) {
   const band = canonical.bands.find((b) => meters <= b.maxInclusiveMeters &&
     (meters > b.minExclusiveMeters || b.minExclusiveMeters === 0));
   if (!band) fail("OUT_OF_RANGE");
-  // Compatibility for immutable historical versions only. New saves reject floor800.
-  return table.schemaVersion !== 2 && table.minimumPolicy === "floor800" ?
-    Math.max(800, band.priceCents) : band.priceCents;
+  return {...band};
+}
+
+function priceForDistance(table, meters) {
+  return bandForDistance(table, meters).priceCents;
 }
 
 function subdivide100(band) {
@@ -90,15 +91,17 @@ async function buildQuote({table, provider, origin, destination, uid,
   if (!uid || !version) fail("INVALID_QUOTE_OWNER");
   const route = await provider.route({origin, destination});
   if (!route || route.status !== "ok" ||
+      typeof route.provider !== "string" || !route.provider.trim() ||
       !Number.isFinite(route.distanceMeters) || route.distanceMeters < 0) {
     fail("ROUTE_UNAVAILABLE");
   }
   const feeCents = priceForDistance(table, route.distanceMeters);
   return {uid, version, origin, destination, feeCents,
+    distanceUnit: "m", distanceSource: "route",
     distanceMeters: route.distanceMeters,
     durationSeconds: Number.isFinite(route.durationSeconds) &&
       route.durationSeconds >= 0 ? route.durationSeconds : null,
-    provider: String(route.provider || "configured").slice(0, 60),
+    provider: route.provider.slice(0, 60),
     createdAtMs: now, expiresAtMs: now + ttlMs};
 }
 
@@ -109,20 +112,25 @@ const samePoint = (a, b) => point(a) && point(b) &&
 
 function validateQuote(quote, order, orderId, now = Date.now()) {
   if (!quote || quote.uid !== order.customerUid ||
+      order.deliveryAddress?.confirmed !== true ||
+      !["BR", "PY"].includes(order.deliveryAddress?.countryCode) ||
       !samePoint(quote.destination, order.deliveryAddress) ||
       quote.destination.countryCode !== order.deliveryAddress.countryCode ||
       !Number.isSafeInteger(quote.feeCents) || quote.feeCents < 0 ||
       !Number.isFinite(quote.distanceMeters) || quote.distanceMeters > 30000 ||
       quote.distanceMeters < 0 || !quote.version || !point(quote.origin) ||
+      quote.distanceUnit !== "m" || quote.distanceSource !== "route" ||
+      typeof quote.provider !== "string" || !quote.provider.trim() ||
       !Number.isFinite(quote.createdAtMs) || !Number.isFinite(quote.expiresAtMs) ||
       quote.expiresAtMs <= quote.createdAtMs ||
       (quote.orderId && quote.orderId !== orderId) ||
       (!quote.orderId && quote.expiresAtMs <= now)) fail("INVALID_OR_EXPIRED_QUOTE");
   return {distanceMeters: quote.distanceMeters, deliveryFee: quote.feeCents / 100,
+    distanceUnit: "m", distanceSource: "route",
     configurationVersion: quote.version, quotedAtMs: quote.createdAtMs,
     origin: quote.origin, destination: quote.destination,
-    routingProvider: quote.provider || "legacy-configured"};
+    routingProvider: quote.provider};
 }
 
 module.exports = {DeliveryError, canonicalTable, validateTable, priceForDistance, subdivide100,
-  RoutingProvider, buildQuote, validateQuote, fingerprint, point};
+  bandForDistance, RoutingProvider, buildQuote, validateQuote, fingerprint, point};

@@ -3,7 +3,12 @@
   "description": "Cloud Functions for Firebase",
   "scripts": {
     "lint": "eslint .",
-    "test": "node --test test/financial.spec.js test/courier-deliveries.spec.js test/courier-assignment.spec.js test/order-operations.spec.js test/delivery-contracts.spec.js test/customer-onboarding.spec.js test/delivery-official.spec.js",
+    "test": "node --test test/financial.spec.js test/courier-deliveries.spec.js test/courier-assignment.spec.js test/order-operations.spec.js test/delivery-contracts.spec.js test/customer-onboarding.spec.js test/delivery-official.spec.js test/order-acceptance.spec.js test/order-cancellation.spec.js test/delivery-contingency.spec.js test/customer-account.spec.js test/customer-provider-revocation.spec.js",
+    "test:privacy": "node --test test/customer-account.spec.js test/customer-provider-revocation.spec.js",
+    "test:privacy:emulator": "node --test --test-concurrency=1 test/customer-account.emulator.spec.js test/customer-privacy.emulator.spec.js",
+    "test:contingency:emulator": "node --test --test-concurrency=1 test/delivery-contingency.emulator.spec.js",
+    "test:cancellation:emulator": "node --test --test-concurrency=1 test/order-cancellation.emulator.spec.js",
+    "test:acceptance:emulator": "node --test --test-concurrency=1 test/order-acceptance.emulator.spec.js",
     "test:couriers:emulator": "node --test --test-concurrency=1 test/courier-deliveries.emulator.spec.js test/courier-assignment.emulator.spec.js test/pilot.emulator.spec.js",
     "test:rules": "node --test test/firestore.rules.spec.js",
     "serve": "firebase emulators:start --only functions",

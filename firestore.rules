@@ -3,7 +3,16 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() {
-      return request.auth != null;
+      return request.auth != null
+        && (!exists(/databases/$(database)/documents/customerAccountClosures/$(request.auth.uid))
+          || get(/databases/$(database)/documents/customerAccountClosures/$(request.auth.uid)).data.get('status', '') == 'blocked');
+    }
+
+    // Only the owner can observe deletion progress, including with an existing
+    // token while the rest of the account is locked. Never accept client writes.
+    match /customerAccountClosures/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, write: if false;
     }
 
     // O cliente atual usa Auth anônimo; roles administrativas nunca o aceitam.
@@ -74,16 +83,38 @@ service cloud.firestore {
         && address.latitude >= -90 && address.latitude <= 90
         && address.longitude >= -180 && address.longitude <= 180
         && address.get('countryCode', '') in ['BR', 'PY']
+        && (!('country' in address) || address.country == address.countryCode)
+        && (!('deliveryLocation' in data) || data.deliveryLocation == null
+          || (data.deliveryLocation is latlng
+            && data.deliveryLocation.latitude() == address.latitude
+            && data.deliveryLocation.longitude() == address.longitude))
         && address.get('street', '') is string && address.street.size() > 0
         && address.get('city', '') is string && address.city.size() > 0
         && (address.get('noNumber', false) == true
           || (address.get('number', '') is string && address.number.size() > 0));
     }
 
+    // Rules timestamps are UTC. MS currently has UTC-4, without seasonal DST.
+    // Node acceptance additionally uses the named America/Campo_Grande zone.
+    function storeAcceptsAt(instant) {
+      return instant.hours() >= 12 || instant.hours() < 4;
+    }
+
+    function paymentAllowedForDestination(data) {
+      let country = data.get('deliveryAddress', {}).get('countryCode', '');
+      let method = data.get('paymentMethod', '');
+      return country in ['BR', 'PY']
+        && (method in ['PIX', 'Dinheiro', 'Pagamento dividido']
+          || (country == 'BR' && method in ['Maquininha',
+            'Maquininha - Débito à vista', 'Maquininha - Crédito à vista']));
+    }
+
     function validOrderCreate(data, documentId) {
       // Contrato real de _montarDadosPedido. Valores aqui são propostas do cliente;
       // validação financeira/estoque e confirmação de pagamento são do backend.
       return ownsOrder(data)
+        && storeAcceptsAt(request.time)
+        && paymentAllowedForDestination(data)
         && !exists(/databases/$(database)/documents/customerOrderCancellations/$(request.auth.uid)/orders/$(documentId))
         && confirmedDestination(data)
         && verifiedCustomerIdentity()
@@ -266,6 +297,14 @@ service cloud.firestore {
       allow list, write: if false;
     }
 
+    match /orderDeliveryIncidents/{orderId} {
+      allow read: if isSuperadmin() && !isCourierAccount();
+      allow write: if false;
+      match /events/{eventId} {
+        allow read: if isSuperadmin() && !isCourierAccount();
+        allow write: if false;
+      }
+    }
     match /{document=**} {
       allow read, write: if false;
     }

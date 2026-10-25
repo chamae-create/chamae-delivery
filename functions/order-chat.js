@@ -1,6 +1,7 @@
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {FieldValue} = require("firebase-admin/firestore");
 const {createHash} = require("node:crypto");
+const {assertCustomerAccountActive} = require("./customer-account-state");
 const options = {region: "southamerica-east1", maxInstances: 10};
 const fail = (code, message) => {
   throw new HttpsError(code, message);
@@ -37,6 +38,7 @@ function input(request, send) {
  * @return {Promise<Object>} Order and actor type.
  */
 async function authorize(tx, db, auth, orderId) {
+  await assertCustomerAccountActive(db, auth.uid, tx);
   const [order, courier] = await Promise.all([
     tx.get(db.doc("orders/" + orderId)),
     tx.get(db.doc("couriers/" + auth.uid)),
@@ -54,6 +56,10 @@ async function authorize(tx, db, auth, orderId) {
     fail("permission-denied", "Pedido indisponível.");
   }
   const data = order.data();
+  if (data.personalDataRedactedAt) {
+    fail("failed-precondition", "Conversa encerrada.");
+  }
+  await assertCustomerAccountActive(db, data.customerUid, tx);
   if (data.financialValidationStatus !== "validated") {
     fail("failed-precondition", "Pedido sem validação operacional.");
   }

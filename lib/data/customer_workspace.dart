@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'customer_bootstrap.dart';
+import '../core/order_confirmation_policy.dart';
 
 abstract class CustomerWorkspace {
   Future<Map<String, dynamic>> read();
@@ -30,11 +31,16 @@ List<Map<String, dynamic>> remainingCart(List cart, List purchased) {
 
 class FirebaseCustomerWorkspace implements CustomerWorkspace {
   final String uid;
-  FirebaseCustomerWorkspace() : uid = FirebaseAuth.instance.currentUser!.uid;
+  final FirebaseAuth auth;
+  final FirebaseFirestore firestore;
+  FirebaseCustomerWorkspace({FirebaseAuth? auth, FirebaseFirestore? firestore})
+      : auth = auth ?? FirebaseAuth.instance,
+        firestore = firestore ?? FirebaseFirestore.instance,
+        uid = (auth ?? FirebaseAuth.instance).currentUser!.uid;
   DocumentReference<Map<String, dynamic>> get _ref =>
-      FirebaseFirestore.instance.collection('customerWorkspaces').doc(uid);
+      firestore.collection('customerWorkspaces').doc(uid);
   void _check() {
-    if (FirebaseAuth.instance.currentUser?.uid != uid) {
+    if (auth.currentUser?.uid != uid) {
       throw StateError('Sua sessão mudou. Abra o aplicativo novamente.');
     }
   }
@@ -68,18 +74,17 @@ class FirebaseCustomerWorkspace implements CustomerWorkspace {
   @override
   Future<bool> completeOrder(String documentId) async {
     _check();
-    return FirebaseFirestore.instance.runTransaction((tx) async {
+    return firestore.runTransaction((tx) async {
       _check();
       final workspace = await tx.get(_ref);
       final data = workspace.data() ?? {};
       final pending = data['pending'];
       if (pending is! Map || pending['documentId'] != documentId) return false;
-      final order = await tx
-          .get(FirebaseFirestore.instance.collection('orders').doc(documentId));
+      final order =
+          await tx.get(firestore.collection('orders').doc(documentId));
       if (!order.exists || order.data()?['customerUid'] != uid) return false;
       final payload = order.data()!;
-      if (payload['pixRequested'] == true &&
-          payload['paymentStatus'] != 'Pago') {
+      if (!orderIsConfirmed(payload) || order.metadata.hasPendingWrites) {
         return false;
       }
       _check();

@@ -1,7 +1,6 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
 const {before, after, test} = require("node:test");
+const {rulesAt} = require("./operational-fixture");
 const {customerPolicyFixture, customerProfileFixture} =
     require("./customer-policy-fixture");
 const {
@@ -34,9 +33,7 @@ before(async () => {
     projectId: "demo-chamae-rules",
     firestore: {
       host: address.hostname, port: Number(address.port),
-      rules: fs.readFileSync(
-          path.join(__dirname, "../../firestore.rules"), "utf8",
-      ),
+      rules: rulesAt(),
     },
   });
   await environment.clearFirestore();

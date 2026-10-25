@@ -6,18 +6,23 @@ import 'pix_payment_presentation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../data/customer_orders.dart';
+import '../core/order_confirmation_policy.dart';
 
 class PixPaymentDialog extends StatefulWidget {
   final DocumentReference<Map<String, dynamic>> orderReference;
   final String orderId;
   final double totalBRL;
   final Future<void> Function() onPaid;
+  final Stream<Map<String, dynamic>?>? orderStream;
+  final String? Function()? currentUid;
   const PixPaymentDialog({
     super.key,
     required this.orderReference,
     required this.orderId,
     required this.totalBRL,
     required this.onPaid,
+    this.orderStream,
+    this.currentUid,
   });
   @override
   State<PixPaymentDialog> createState() => PixPaymentDialogState();
@@ -32,8 +37,12 @@ class PixPaymentDialogState extends State<PixPaymentDialog> {
   String _paymentStatus = 'Aguardando confirmação';
   bool _paymentApproved = false;
   bool _finishing = false;
+  bool _confirmed = false;
   String? _authorizedCustomerUid;
   String? _errorMessage;
+  String? get _currentUid => widget.currentUid == null
+      ? FirebaseAuth.instance.currentUser?.uid
+      : widget.currentUid!();
   @override
   void initState() {
     super.initState();
@@ -49,14 +58,18 @@ class PixPaymentDialogState extends State<PixPaymentDialog> {
             'O pagamento está demorando para carregar. Confira sua conexão e tente novamente.');
       }
     });
-    _subscription = CustomerOrders(
-      auth: FirebaseAuth.instance,
-      firestore: FirebaseFirestore.instance,
-    ).watchDocumentId(widget.orderReference.id).listen(
+    _subscription = (widget.orderStream ??
+            CustomerOrders(
+              auth: FirebaseAuth.instance,
+              firestore: FirebaseFirestore.instance,
+            ).watchDocumentId(widget.orderReference.id))
+        .listen(
       _handleSnapshot,
       onError: (Object error) {
         if (!mounted) return;
         setState(() {
+          _confirmed = false;
+          _paymentApproved = false;
           _errorMessage =
               'Não foi possível acompanhar o pagamento. Tente novamente.';
         });
@@ -68,6 +81,9 @@ class PixPaymentDialogState extends State<PixPaymentDialog> {
     Map<String, dynamic>? data,
   ) {
     if (!mounted) return;
+    _confirmed = data != null &&
+        orderIsConfirmed(data) &&
+        data['paymentStatus'] == 'Pago';
     if (data == null) {
       setState(() {
         _authorizedCustomerUid = null;
@@ -92,6 +108,7 @@ class PixPaymentDialogState extends State<PixPaymentDialog> {
       _createStatus = nextCreateStatus;
       _paymentStatus = nextPaymentStatus;
       _errorMessage = null;
+      if (!_confirmed) _paymentApproved = false;
       if (nextCreateStatus == 'error') {
         _errorMessage =
             'Não foi possível gerar o PIX. Confira o pedido antes de tentar novamente.';
@@ -101,7 +118,7 @@ class PixPaymentDialogState extends State<PixPaymentDialog> {
             'Este PIX expirou ou não pôde ser concluído. Confira o pagamento do seu pedido.';
       }
     });
-    if (nextPaymentStatus == 'Pago' && !_finishing) {
+    if (_confirmed && !_finishing) {
       _finalizarPagamento();
     }
   }
@@ -122,7 +139,9 @@ class PixPaymentDialogState extends State<PixPaymentDialog> {
     );
     if (!mounted) return;
     if (_authorizedCustomerUid != customerUid ||
-        FirebaseAuth.instance.currentUser?.uid != customerUid) {
+        _currentUid != customerUid ||
+        !_confirmed) {
+      _finishing = false;
       return;
     }
     Navigator.of(context).pop();

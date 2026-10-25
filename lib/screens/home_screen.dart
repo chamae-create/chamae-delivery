@@ -43,11 +43,17 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
   bool _filterOnlyCombos = false;
   final TextEditingController _searchCtrl = TextEditingController();
   final ScrollController _categoryScrollCtrl = ScrollController();
+  final FocusNode _searchFocus = FocusNode();
+  final ScrollController _homeScrollCtrl = ScrollController();
+  final GlobalKey _searchAnchor = GlobalKey();
+  final GlobalKey _catalogAnchor = GlobalKey();
+  bool _searchVisible = false;
   final Map<String, CartItem> _cart = {};
   DeliveryAddress? _deliveryAddress;
   DeliveryQuoteController? _deliveryQuote;
   String _selectedCurrency = 'BRL';
   Timer? _hoursTimer;
+  late bool _storeWasOpen;
   CustomerWorkspace? _workspace;
   bool _workspaceReady = true;
   String? _persistenceError;
@@ -74,8 +80,12 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             .collection('products')
             .snapshots()
             .map((s) => s.docs.map(Product.fromFirestore).toList());
+    _storeWasOpen = isStoreOpen();
     _hoursTimer = Timer.periodic(const Duration(minutes: 1), (_) {
-      if (mounted) setState(() {});
+      final open = isStoreOpen();
+      if (mounted && open != _storeWasOpen) {
+        setState(() => _storeWasOpen = open);
+      }
     });
   }
 
@@ -100,9 +110,9 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
       case 'PYG':
         return 'G\$ ${converted.toStringAsFixed(0)}';
       case 'USD':
-        return 'US\$ ${converted.toStringAsFixed(2)}';
+        return 'US\$ ${converted.toStringAsFixed(2).replaceAll('.', ',')}';
       default:
-        return 'R\$ ${converted.toStringAsFixed(2)}';
+        return 'R\$ ${converted.toStringAsFixed(2).replaceAll('.', ',')}';
     }
   }
 
@@ -122,6 +132,8 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
     _deliveryQuote?.dispose();
     _hoursTimer?.cancel();
     _searchCtrl.dispose();
+    _searchFocus.dispose();
+    _homeScrollCtrl.dispose();
     _categoryScrollCtrl.dispose();
     super.dispose();
   }
@@ -362,7 +374,11 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                                         ? () => update(() => quantity--)
                                         : null,
                                     icon: const Icon(Icons.remove)),
-                                Text('$quantity'),
+                                Semantics(
+                                    liveRegion: true,
+                                    label: 'Quantidade selecionada: $quantity',
+                                    child: ExcludeSemantics(
+                                        child: Text('$quantity'))),
                                 IconButton(
                                     tooltip: 'Aumentar quantidade',
                                     onPressed: quantity < product.stock
@@ -535,108 +551,150 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
     }
   }
 
+  void _openSearch() {
+    setState(() => _searchVisible = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _searchFocus.requestFocus();
+      final anchor = _searchAnchor.currentContext;
+      if (anchor != null) {
+        Scrollable.ensureVisible(anchor,
+            duration: const Duration(milliseconds: 220), alignment: .1);
+      }
+    });
+  }
+
+  Future<void> _showAllProducts() async {
+    while (mounted && _homeScrollCtrl.hasClients) {
+      final object = _catalogAnchor.currentContext?.findRenderObject();
+      if (object is RenderBox && object.hasSize) {
+        await Scrollable.ensureVisible(_catalogAnchor.currentContext!,
+            duration: const Duration(milliseconds: 220), alignment: 0);
+        return;
+      }
+      final position = _homeScrollCtrl.position;
+      final next = (position.pixels + position.viewportDimension * .7)
+          .clamp(position.minScrollExtent, position.maxScrollExtent);
+      if (next <= position.pixels) return;
+      await _homeScrollCtrl.animateTo(next,
+          duration: const Duration(milliseconds: 180), curve: Curves.easeOut);
+    }
+  }
+
   Widget _buildHeader() {
     return Container(
       decoration: const BoxDecoration(
           color: AppTheme.lightBg,
           border: Border(bottom: BorderSide(color: AppColors.borderLight))),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(children: [
-                    Image.asset('assets/images/logo.png',
-                        width: 76,
-                        height: 64,
-                        semanticLabel: 'Chamaê Delivery',
-                        fit: BoxFit.contain),
-                    const SizedBox(width: 12),
-                    Expanded(
-                        child: InkWell(
-                            onTap: _selectDeliveryLocation,
-                            borderRadius: BorderRadius.circular(16),
-                            child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                child: Row(children: [
-                                  const Icon(Icons.location_on_rounded,
-                                      color: AppColors.darkGold),
-                                  const SizedBox(width: 6),
-                                  Expanded(
-                                      child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                        const Text('Entregar em',
-                                            style: TextStyle(
-                                                color: AppColors.textSecondary,
-                                                fontSize: 12)),
-                                        Text(
-                                            _deliveryAddress?.addressText ??
-                                                'Escolha seu endereço',
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w800)),
-                                      ])),
-                                  const Icon(Icons.expand_more, size: 18),
-                                ])))),
-                    IconButton(
-                        tooltip: 'Carrinho',
-                        onPressed: _openCart,
-                        icon: Badge(
-                            isLabelVisible: _totalItemsCount > 0,
-                            label: Text('$_totalItemsCount'),
-                            backgroundColor: AppTheme.primaryYellow,
-                            textColor: AppTheme.darkBg,
-                            child: const Icon(Icons.shopping_cart_outlined))),
-                  ]),
-                  const SizedBox(height: 8),
-                  Row(children: [
-                    Icon(Icons.circle,
-                        size: 7,
-                        color: isStoreOpen()
-                            ? AppColors.accentGreen
-                            : AppColors.textSecondary),
-                    const SizedBox(width: 8),
-                    Expanded(
-                        child: Text(storeHoursLabel(),
-                            style: const TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600))),
-                    PopupMenuButton<String>(
-                        tooltip: 'Moeda de exibição',
-                        initialValue: _selectedCurrency,
-                        onSelected: (currency) =>
-                            setState(() => _selectedCurrency = currency),
-                        itemBuilder: (_) => const [
-                              PopupMenuItem(
-                                  value: 'BRL', child: Text('Real (BRL)')),
-                              PopupMenuItem(
-                                  value: 'PYG', child: Text('Guarani (PYG)')),
-                              PopupMenuItem(
-                                  value: 'USD', child: Text('Dólar (USD)')),
-                            ],
-                        child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Text(_selectedCurrency,
-                                style: const TextStyle(
-                                    color: AppColors.darkGold,
-                                    fontWeight: FontWeight.w800)))),
-                  ]),
-                  if (_deliveryAddress != null && _deliveryQuote != null)
-                    Card(
-                        child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: DeliveryQuoteSummary(
-                                controller: _deliveryQuote!))),
-                ])),
-      ),
+      padding: const EdgeInsets.fromLTRB(12, 4, 8, 6),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          Image.asset('assets/images/home/logo_transparent.png',
+              width: MediaQuery.sizeOf(context).width < 350 ? 84 : 100,
+              height: 64,
+              cacheWidth: 256,
+              fit: BoxFit.contain,
+              semanticLabel: 'Chamaê Delivery'),
+          const SizedBox(width: 8),
+          Expanded(
+              child: Semantics(
+                  button: true,
+                  label: 'Selecionar endereço de entrega',
+                  child: InkWell(
+                      onTap: _selectDeliveryLocation,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Row(children: [
+                            const Icon(Icons.location_on_rounded,
+                                color: AppColors.darkGold, size: 19),
+                            const SizedBox(width: 4),
+                            Expanded(
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                  const Text('Entregar em',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          color: AppColors.textSecondary)),
+                                  Text(
+                                      _deliveryAddress?.addressText ??
+                                          'Escolha seu endereço',
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                          fontSize: 12,
+                                          height: 1.2,
+                                          fontWeight: FontWeight.w800)),
+                                ])),
+                            const Icon(Icons.expand_more, size: 16),
+                          ]))))),
+          IconButton(
+              tooltip: 'Buscar produtos',
+              onPressed: _openSearch,
+              icon: const Icon(Icons.search_rounded, size: 25)),
+          IconButton(
+              tooltip: 'Carrinho',
+              onPressed: _openCart,
+              icon: Badge(
+                  isLabelVisible: _totalItemsCount > 0,
+                  label: Text('$_totalItemsCount'),
+                  backgroundColor: AppTheme.primaryYellow,
+                  textColor: AppTheme.darkBg,
+                  child: const Icon(Icons.shopping_cart_outlined, size: 25))),
+        ]),
+        Row(children: [
+          Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                Row(children: [
+                  Icon(Icons.circle,
+                      size: 7,
+                      color: isStoreOpen()
+                          ? AppColors.accentGreen
+                          : AppColors.textSecondary),
+                  const SizedBox(width: 6),
+                  Expanded(
+                      child: Text(storeHoursLabel(),
+                          style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600))),
+                ]),
+                if (_deliveryAddress != null && _deliveryQuote != null)
+                  Padding(
+                      padding: const EdgeInsets.only(top: 3),
+                      child: DefaultTextStyle.merge(
+                          style: const TextStyle(fontSize: 11),
+                          child: DeliveryQuoteSummary(
+                              controller: _deliveryQuote!))),
+              ])),
+          PopupMenuButton<String>(
+              tooltip: 'Moeda de exibição',
+              initialValue: _selectedCurrency,
+              onSelected: (currency) =>
+                  setState(() => _selectedCurrency = currency),
+              itemBuilder: (_) => const [
+                    PopupMenuItem(value: 'BRL', child: Text('Real (BRL)')),
+                    PopupMenuItem(value: 'PYG', child: Text('Guarani (PYG)')),
+                    PopupMenuItem(value: 'USD', child: Text('Dólar (USD)')),
+                  ],
+              child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(_selectedCurrency,
+                        style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.darkGold,
+                            fontWeight: FontWeight.w800)),
+                    const Icon(Icons.expand_more,
+                        color: AppColors.darkGold, size: 15),
+                  ]))),
+        ]),
+      ]),
     );
   }
 
@@ -718,81 +776,331 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             ));
   }
 
-  Widget _buildFeatureButton({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
-    return Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(15),
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(
-            milliseconds: 180,
-          ),
-          height: 64 + 50 * (MediaQuery.textScalerOf(context).scale(1) - 1),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 12,
-          ),
-          decoration: BoxDecoration(
-            color: selected ? AppTheme.primaryYellow : AppColors.surfaceWhite,
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(
-              color: AppTheme.primaryYellow,
-              width: 1.4,
-            ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                color: selected ? Colors.black : AppColors.darkGold,
-                size: 25,
-              ),
-              const SizedBox(width: 9),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: selected ? Colors.black : AppColors.textMain,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color:
-                            selected ? Colors.black87 : AppColors.textSecondary,
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: selected ? Colors.black : AppColors.textMain,
-                size: 20,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  Widget _sectionTitle(String title, IconData icon,
+          {String? action, VoidCallback? onAction, Key? key}) =>
+      Padding(
+          key: key,
+          padding: const EdgeInsets.fromLTRB(16, 14, 12, 8),
+          child: Row(children: [
+            Icon(icon, color: AppColors.darkGold, size: 23),
+            const SizedBox(width: 7),
+            Expanded(
+                child: Text(title,
+                    style: const TextStyle(
+                        fontSize: 19,
+                        height: 1.15,
+                        fontWeight: FontWeight.w800))),
+            if (action != null)
+              TextButton(
+                  onPressed: onAction,
+                  style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 6)),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(action, style: const TextStyle(fontSize: 11)),
+                    const Icon(Icons.chevron_right, size: 17),
+                  ])),
+          ]));
+
+  // Only explicitly beverage/ice categories use the ice artwork. Mixed
+  // convenience categories do not imply cold storage for each product.
+  bool _coldArtwork(Product product) => const {
+        'cervejas',
+        'energéticos',
+        'refrigerantes & sucos',
+        'água',
+        'gelo',
+      }.contains(product.category.trim().toLowerCase());
+
+  BoxDecoration _productBackdrop(Product product) => BoxDecoration(
+      color: AppTheme.darkBg,
+      gradient: _coldArtwork(product) ? null : CustomerVisual.charcoal,
+      image: !_coldArtwork(product)
+          ? null
+          : const DecorationImage(
+              image: ResizeImage(
+                  AssetImage('assets/images/home/commerce_backdrop.png'),
+                  width: 600),
+              fit: BoxFit.cover));
+
+  Widget _commerceImage(Product product) => DecoratedBox(
+      decoration: _productBackdrop(product),
+      child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: _buildProductImage(product.imageUrl)));
+
+  Widget _buildOfferCard(Product product) {
+    final scale = MediaQuery.textScalerOf(context).scale(1);
+    return Semantics(
+        button: true,
+        label: 'Ver oferta de ${product.name}',
+        child: Material(
+            color: AppTheme.darkBg,
+            borderRadius: BorderRadius.circular(18),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () => _showProduct(product),
+              child: Ink(
+                  decoration: _productBackdrop(product),
+                  child: Stack(children: [
+                    Positioned(
+                        top: 6,
+                        bottom: 6,
+                        right: 2,
+                        width: scale > 1.3 ? 76 : 112,
+                        child: ExcludeSemantics(
+                            child: ProductImage(url: product.imageUrl))),
+                    Positioned.fill(
+                        child: DecoratedBox(
+                            decoration: BoxDecoration(
+                                gradient: LinearGradient(colors: [
+                      Colors.black.withValues(alpha: .92),
+                      Colors.black.withValues(alpha: .55),
+                      Colors.transparent
+                    ], stops: const [
+                      0,
+                      .55,
+                      1
+                    ])))),
+                    Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SizedBox(
+                            width: scale > 1.3 ? 184 : 156,
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text('OFERTA DO DIA',
+                                      style: TextStyle(
+                                          color: AppTheme.primaryYellow,
+                                          fontSize: 10,
+                                          letterSpacing: .6,
+                                          fontWeight: FontWeight.w800)),
+                                  const SizedBox(height: 6),
+                                  Expanded(
+                                      child: Text(product.name,
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              height: 1.1,
+                                              fontWeight: FontWeight.w800))),
+                                  Text(_formatMoney(product.price),
+                                      maxLines: 2,
+                                      style: const TextStyle(
+                                          color: AppTheme.primaryYellow,
+                                          fontSize: 21,
+                                          fontWeight: FontWeight.w900)),
+                                  const SizedBox(height: 6),
+                                  Container(
+                                      constraints:
+                                          const BoxConstraints(minHeight: 48),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 13),
+                                      decoration: BoxDecoration(
+                                          gradient: CustomerVisual.gold,
+                                          borderRadius:
+                                              BorderRadius.circular(24)),
+                                      child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Flexible(
+                                                child: Text(
+                                                    commerciallyAvailable(
+                                                            product)
+                                                        ? 'Aproveitar'
+                                                        : 'Indisponível',
+                                                    style: const TextStyle(
+                                                        color: AppTheme.darkBg,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        fontSize: 12))),
+                                            const Icon(Icons.chevron_right,
+                                                color: AppTheme.darkBg,
+                                                size: 19),
+                                          ])),
+                                ]))),
+                  ])),
+            )));
+  }
+
+  Widget _productGrid(List<Product> products) => SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      sliver: SliverLayoutBuilder(
+          builder: (context, constraints) => SliverGrid(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: constraints.crossAxisExtent > 1100
+                      ? 5
+                      : constraints.crossAxisExtent > 850
+                          ? 4
+                          : constraints.crossAxisExtent > 600
+                              ? 3
+                              : 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 12,
+                  mainAxisExtent: 242 +
+                      190 * (MediaQuery.textScalerOf(context).scale(1) - 1)),
+              delegate: SliverChildBuilderDelegate(
+                  (context, index) => _buildProductCard(products[index]),
+                  childCount: products.length))));
+
+  Widget _categoryPreview(List<Product> products) {
+    final categories = _categories
+        .where((c) => c != 'Todos' && products.any((p) => p.category == c))
+        .toList();
+    return SizedBox(
+        height: 120 + 60 * (MediaQuery.textScalerOf(context).scale(1) - 1),
+        child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: categories.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 10),
+            itemBuilder: (context, i) {
+              final category = categories[i];
+              final matching =
+                  products.where((p) => p.category == category).toList();
+              return SizedBox(
+                  width: 178,
+                  child: Material(
+                    borderRadius: BorderRadius.circular(18),
+                    color: AppTheme.darkBg,
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                        onTap: () => _selectCategory(category),
+                        child: Stack(fit: StackFit.expand, children: [
+                          _commerceImage(matching.first),
+                          const DecoratedBox(
+                              decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                Color(0x22000000),
+                                Color(0xEE141414)
+                              ]))),
+                          Positioned(
+                              left: 12,
+                              right: 8,
+                              bottom: 12,
+                              child: Row(children: [
+                                Expanded(
+                                    child: Text(category,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w800))),
+                                const Icon(Icons.arrow_circle_right,
+                                    color: AppTheme.primaryYellow, size: 26),
+                              ])),
+                        ])),
+                  ));
+            }));
+  }
+
+  List<Widget> _buildCatalogContent(List<Product> source) {
+    if (_categoryOverview) {
+      return [
+        SliverToBoxAdapter(
+            child: _sectionTitle('Categorias', Icons.grid_view_rounded)),
+        SliverToBoxAdapter(child: _buildCategoryOverview(source)),
+      ];
+    }
+    final products = visibleCatalogProducts(source,
+        query: _searchQuery,
+        category: _selectedCategory,
+        onlyOffers: _filterOnlyOffers,
+        onlyCombos: _filterOnlyCombos);
+    if (products.isEmpty) {
+      return [
+        const SliverToBoxAdapter(
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(24, 35, 24, 80),
+                child: Column(children: [
+                  Icon(Icons.search_off_rounded,
+                      size: 45, color: AppColors.textSecondary),
+                  SizedBox(height: 10),
+                  Text('Nenhum produto encontrado.',
+                      textAlign: TextAlign.center)
+                ])))
+      ];
+    }
+    final landing = _selectedCategory == 'Todos' &&
+        !_filterOnlyOffers &&
+        !_filterOnlyCombos &&
+        _searchQuery.isEmpty;
+    if (!landing) {
+      final title = _filterOnlyOffers
+          ? 'Ofertas do Dia'
+          : _filterOnlyCombos
+              ? 'Combos Festa'
+              : _selectedCategory != 'Todos'
+                  ? _selectedCategory
+                  : 'Resultados da busca';
+      return [
+        SliverToBoxAdapter(
+            child: _sectionTitle(title, Icons.storefront_outlined,
+                action: 'Ver todos',
+                onAction: () => setState(() {
+                      _selectedCategory = 'Todos';
+                      _filterOnlyOffers = false;
+                      _filterOnlyCombos = false;
+                      _searchQuery = '';
+                      _searchCtrl.clear();
+                    }))),
+        _productGrid(products),
+      ];
+    }
+    final offers = visibleCatalogProducts(source, onlyOffers: true);
+    final popular = products.where((p) => p.salesCount > 0).take(6).toList();
+    return [
+      if (offers.isNotEmpty) ...[
+        SliverToBoxAdapter(
+            child: _sectionTitle(
+                'Promoções do dia', Icons.local_fire_department_rounded,
+                action: 'Ver todas', onAction: _showOffers)),
+        SliverToBoxAdapter(
+            child: SizedBox(
+                height:
+                    190 + 120 * (MediaQuery.textScalerOf(context).scale(1) - 1),
+                child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: offers.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 12),
+                    itemBuilder: (context, i) => SizedBox(
+                        width: 272, child: _buildOfferCard(offers[i]))))),
+      ],
+      if (popular.isNotEmpty) ...[
+        SliverToBoxAdapter(
+            child: _sectionTitle(
+                'Mais pedidos', Icons.workspace_premium_outlined,
+                action: 'Ver todos', onAction: _showAllProducts)),
+        SliverToBoxAdapter(
+            child: SizedBox(
+                height:
+                    242 + 190 * (MediaQuery.textScalerOf(context).scale(1) - 1),
+                child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: popular.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 10),
+                    itemBuilder: (context, i) => SizedBox(
+                        width: 164, child: _buildProductCard(popular[i]))))),
+      ],
+      SliverToBoxAdapter(
+          child: _sectionTitle(
+              'Compre por categoria', Icons.storefront_outlined,
+              action: 'Ver todas',
+              onAction: () => setState(() => _categoryOverview = true))),
+      SliverToBoxAdapter(child: _categoryPreview(products)),
+      SliverToBoxAdapter(
+          child: _sectionTitle('Todos os produtos', Icons.shopping_bag_outlined,
+              key: _catalogAnchor)),
+      _productGrid(products),
+    ];
   }
 
   Widget _buildSearch() {
@@ -812,7 +1120,9 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           ),
         ],
       ),
+      key: _searchAnchor,
       child: TextField(
+        focusNode: _searchFocus,
         controller: _searchCtrl,
         onChanged: (value) {
           setState(() {
@@ -820,6 +1130,8 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           });
         },
         decoration: const InputDecoration(
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
           hintText: 'Buscar bebidas e conveniência',
           hintStyle: TextStyle(
             color: AppColors.textSecondary,
@@ -845,280 +1157,220 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
   }
 
   Widget _buildCategories() {
+    final scale = MediaQuery.textScalerOf(context).scale(1);
+    final shortcuts = [
+      'Todos',
+      'Cervejas',
+      'Energéticos',
+      'Ofertas do Dia',
+      'Combos Festa',
+      ..._categories
+          .where((c) => !{'Todos', 'Cervejas', 'Energéticos'}.contains(c))
+    ];
     return SizedBox(
-      height: 104 + 65 * (MediaQuery.textScalerOf(context).scale(1) - 1),
-      child: ListView.builder(
-        controller: _categoryScrollCtrl,
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-        ),
-        itemCount: _categories.length,
-        itemBuilder: (context, index) {
-          final category = _categories[index];
-          final selected = category == _selectedCategory;
-          return Padding(
-            padding: const EdgeInsets.only(
-              right: 12,
-            ),
-            child: InkWell(
-              onTap: () {
-                _selectCategory(category);
-              },
-              borderRadius: BorderRadius.circular(50),
-              child: SizedBox(
-                width: 100,
-                child: Column(
-                  children: [
-                    AnimatedContainer(
-                      duration: const Duration(
-                        milliseconds: 180,
-                      ),
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        color: selected
-                            ? AppTheme.primaryYellow
-                            : AppColors.surfaceWhite,
-                        border: Border.all(
-                          color: selected
-                              ? AppTheme.primaryYellow
-                              : AppColors.borderLight,
-                          width: selected ? 2 : 1,
+        height: 88 + 65 * (scale - 1),
+        child: ListView.builder(
+            controller: _categoryScrollCtrl,
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
+            itemCount: shortcuts.length,
+            itemBuilder: (context, index) {
+              final category = shortcuts[index];
+              final offer = category == 'Ofertas do Dia',
+                  combo = category == 'Combos Festa';
+              final selected = offer
+                  ? _filterOnlyOffers
+                  : combo
+                      ? _filterOnlyCombos
+                      : !_categoryOverview &&
+                          !_filterOnlyOffers &&
+                          !_filterOnlyCombos &&
+                          category == _selectedCategory;
+              return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: SizedBox(
+                    width: scale > 1.3 ? 100 : 76,
+                    child: Semantics(
+                      button: true,
+                      selected: selected,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(17),
+                        onTap: offer
+                            ? _showOffers
+                            : combo
+                                ? _showCombos
+                                : () => _selectCategory(category),
+                        child: Ink(
+                          decoration: BoxDecoration(
+                              gradient: selected ? CustomerVisual.gold : null,
+                              color: selected ? null : const Color(0xFFFFFCF5),
+                              borderRadius: BorderRadius.circular(17),
+                              border: Border.all(
+                                  color: selected
+                                      ? AppTheme.primaryYellow
+                                      : AppColors.borderLight),
+                              boxShadow: const [
+                                BoxShadow(
+                                    color: Color(0x0D916A16),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 3))
+                              ]),
+                          child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 3, vertical: 8),
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                        offer
+                                            ? Icons.local_offer_outlined
+                                            : combo
+                                                ? Icons.local_bar_outlined
+                                                : _categoryIcon(category),
+                                        size: 27,
+                                        color: AppColors.textMain),
+                                    const SizedBox(height: 5),
+                                    Flexible(
+                                        child: Text(category,
+                                            textAlign: TextAlign.center,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                fontSize: 10,
+                                                height: 1.1,
+                                                fontWeight: selected
+                                                    ? FontWeight.w800
+                                                    : FontWeight.w600))),
+                                  ])),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        _categoryIcon(category),
-                        size: 25,
-                        color: AppColors.textMain,
                       ),
                     ),
-                    const SizedBox(height: 5),
-                    Text(
-                      category,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black87,
-                        fontSize: 11,
-                        fontWeight:
-                            selected ? FontWeight.w900 : FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
+                  ));
+            }));
   }
 
   Widget _buildProductCard(Product product) {
     final cartQty = _cart[product.id]?.quantity ?? 0;
-    return GestureDetector(
-        onTap: () => _showProduct(product),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color:
-                  cartQty > 0 ? AppTheme.primaryYellow : AppColors.borderLight,
-              width: cartQty > 0 ? 1.8 : 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.055),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                flex: 56,
-                child: Stack(
+    final available = commerciallyAvailable(product),
+        money = _formatMoney(product.price);
+    final large =
+        MediaQuery.textScalerOf(context).scale(1) > 1.3 || money.length > 11;
+    final add = IconButton.filled(
+        tooltip: available ? 'Adicionar ${product.name}' : 'Indisponível',
+        onPressed: available ? () => _addToCart(product) : null,
+        style: IconButton.styleFrom(
+            backgroundColor: AppTheme.primaryYellow,
+            foregroundColor: AppTheme.darkBg,
+            minimumSize: const Size(48, 48)),
+        icon: const Icon(Icons.add_rounded, size: 26));
+    return Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        elevation: 1,
+        shadowColor: const Color(0x22916A16),
+        child: InkWell(
+          onTap: () => _showProduct(product),
+          child: Ink(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                      color: cartQty > 0
+                          ? AppTheme.primaryYellow
+                          : AppColors.borderLight,
+                      width: cartQty > 0 ? 1.8 : 1)),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Positioned.fill(
-                      child: Container(
-                        decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                                colors: [Color(0xFFFFFFFF), Color(0xFFF1E6D1)],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter)),
-                        padding: const EdgeInsets.all(8),
-                        child: _buildProductImage(
-                          product.imageUrl,
-                        ),
-                      ),
-                    ),
-                    if (product.isOffer)
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 5,
-                          ),
-                          decoration: const BoxDecoration(
-                            color: AppTheme.primaryYellow,
-                            borderRadius: BorderRadius.only(
-                              bottomRight: Radius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'PROMOÇÃO',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 44,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    9,
-                    8,
-                    9,
-                    9,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          product.name.toUpperCase(),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFF171717),
-                            fontSize: 11,
-                            height: 1.15,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                      FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            _formatMoney(product.price),
-                            style: const TextStyle(
-                              color: Color(0xFF111111),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          )),
-                      const SizedBox(height: 7),
-                      if (cartQty == 0)
-                        SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              backgroundColor: AppTheme.primaryYellow,
-                              foregroundColor: Colors.black,
-                              padding: EdgeInsets.zero,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  9,
-                                ),
-                              ),
-                            ),
-                            onPressed: commerciallyAvailable(product)
-                                ? () {
-                                    _addToCart(product);
-                                  }
-                                : null,
-                            icon: const Icon(
-                              Icons.add_shopping_cart_rounded,
-                              size: 16,
-                            ),
-                            label: Text(
-                              commerciallyAvailable(product)
-                                  ? 'Adicionar'
-                                  : 'Indisponível',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ),
-                        )
-                      else
-                        Container(
-                          height: 34,
-                          decoration: BoxDecoration(
-                            color: AppTheme.primaryYellow,
-                            borderRadius: BorderRadius.circular(9),
-                          ),
-                          child: Row(
+                    Expanded(
+                        child: Stack(fit: StackFit.expand, children: [
+                      _commerceImage(product),
+                      if (product.isOffer)
+                        Positioned(
+                            left: 6,
+                            bottom: 6,
+                            child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 7, vertical: 4),
+                                decoration: BoxDecoration(
+                                    color: AppTheme.primaryYellow,
+                                    borderRadius: BorderRadius.circular(8)),
+                                child: const Text('PROMOÇÃO',
+                                    style: TextStyle(
+                                        fontSize: 9,
+                                        color: AppTheme.darkBg,
+                                        fontWeight: FontWeight.w800)))),
+                      if (cartQty > 0) ...[
+                        Positioned(
+                            left: 4,
+                            top: 4,
+                            child: IconButton.filledTonal(
+                                tooltip:
+                                    'Diminuir quantidade de ${product.name}',
+                                onPressed: () => _removeFromCart(product.id),
+                                style: IconButton.styleFrom(
+                                    backgroundColor: AppTheme.lightBg,
+                                    foregroundColor: AppTheme.darkBg,
+                                    minimumSize: const Size(48, 48)),
+                                icon: const Icon(Icons.remove_rounded))),
+                        Positioned(
+                            right: 6,
+                            top: 8,
+                            child: Semantics(
+                                label: '$cartQty no carrinho',
+                                child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                        color: AppTheme.primaryYellow,
+                                        borderRadius:
+                                            BorderRadius.circular(14)),
+                                    child: Text('$cartQty',
+                                        style: const TextStyle(
+                                            color: AppTheme.darkBg,
+                                            fontWeight: FontWeight.w800))))),
+                      ],
+                    ])),
+                    Padding(
+                        padding: const EdgeInsets.fromLTRB(9, 8, 7, 7),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    _removeFromCart(
-                                      product.id,
-                                    );
-                                  },
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.remove_rounded,
-                                      size: 18,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                '$cartQty',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () {
-                                    _addToCart(product);
-                                  },
-                                  child: const Center(
-                                    child: Icon(
-                                      Icons.add_rounded,
-                                      size: 18,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+                              Text(product.name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      color: AppColors.textMain,
+                                      fontSize: 12,
+                                      height: 1.15,
+                                      fontWeight: FontWeight.w700)),
+                              const SizedBox(height: 5),
+                              if (large) ...[
+                                Text(money,
+                                    style: const TextStyle(
+                                        color: AppColors.darkGold,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w900)),
+                                Align(
+                                    alignment: Alignment.centerRight,
+                                    child: add),
+                              ] else
+                                Row(children: [
+                                  Expanded(
+                                      child: Text(money,
+                                          style: const TextStyle(
+                                              color: AppColors.darkGold,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w900))),
+                                  add,
+                                ]),
+                              if (!available)
+                                const Text('Indisponível',
+                                    style: TextStyle(
+                                        color: AppColors.textSecondary,
+                                        fontSize: 11)),
+                            ])),
+                  ])),
         ));
   }
 
@@ -1136,7 +1388,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         child: SafeArea(
             top: false,
             child: SizedBox(
-              height: 72 + 90 * (MediaQuery.textScalerOf(context).scale(1) - 1),
+              height: 64 + 70 * (MediaQuery.textScalerOf(context).scale(1) - 1),
               child: Row(children: [
                 _bottomItem(
                     icon: Icons.home_rounded,
@@ -1158,11 +1410,6 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                         context,
                         MaterialPageRoute(
                             builder: (_) => const CustomerHistoryScreen()))),
-                _bottomItem(
-                    icon: Icons.shopping_cart_outlined,
-                    label: 'Carrinho',
-                    badge: _totalItemsCount,
-                    onTap: _openCart),
                 _bottomItem(
                     icon: Icons.person_outline_rounded,
                     label: 'Perfil',
@@ -1224,9 +1471,12 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             const SizedBox(height: 3),
             Text(
               label,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
+                height: 1.1,
                 color: selected ? AppColors.darkGold : AppColors.textSecondary,
-                fontSize: 9,
+                fontSize: 11,
                 fontWeight: selected ? FontWeight.w900 : FontWeight.w500,
               ),
             ),
@@ -1234,6 +1484,46 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         ),
       ),
     );
+  }
+
+  List<Widget> _catalogSlivers(AsyncSnapshot<List<Product>> snapshot) {
+    if (snapshot.hasError) {
+      return [
+        SliverToBoxAdapter(
+            child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(children: [
+                  const Text('Não foi possível carregar os produtos.'),
+                  TextButton(
+                      onPressed: () => setState(() {
+                            _productsStream = widget.products ??
+                                FirebaseFirestore.instance
+                                    .collection('products')
+                                    .snapshots()
+                                    .map((s) => s.docs
+                                        .map(Product.fromFirestore)
+                                        .toList());
+                          }),
+                      child: const Text('Tentar novamente')),
+                ])))
+      ];
+    }
+    if (!snapshot.hasData) {
+      return [
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.all(40),
+            child: Center(
+              child: CircularProgressIndicator(
+                color: AppTheme.primaryYellow,
+              ),
+            ),
+          ),
+        )
+      ];
+    }
+
+    return _buildCatalogContent(snapshot.data!);
   }
 
   @override
@@ -1245,251 +1535,60 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           child: Center(
               child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1200),
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                if (_cartNotice != null)
-                  SliverToBoxAdapter(
-                      child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(_cartNotice!,
-                              style: const TextStyle(color: AppColors.error)))),
-                if (_persistenceError != null)
-                  SliverToBoxAdapter(
-                      child: MaterialBanner(
-                          content: Text(_persistenceError!),
-                          actions: [
-                        TextButton(
-                            onPressed:
-                                _workspaceReady ? _persistCart : _restoreCart,
-                            child: const Text('Tentar novamente'))
-                      ])),
-                SliverToBoxAdapter(
-                  child: _buildHeader(),
-                ),
-                const SliverToBoxAdapter(
-                  child: SponsorVideoBanner(),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      16,
-                      2,
-                      16,
-                      8,
-                    ),
-                    child: Row(
-                      children: [
-                        _buildFeatureButton(
-                          icon: Icons.local_fire_department_rounded,
-                          title: 'Ofertas do Dia',
-                          subtitle: 'Preços imperdíveis',
-                          selected: _filterOnlyOffers,
-                          onTap: _showOffers,
-                        ),
-                        const SizedBox(width: 8),
-                        _buildFeatureButton(
-                          icon: Icons.local_bar_rounded,
-                          title: 'Combos Festa',
-                          subtitle: 'Monte seu combo',
-                          selected: _filterOnlyCombos,
-                          onTap: _showCombos,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      16,
-                      2,
-                      16,
-                      10,
-                    ),
-                    child: _buildSearch(),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: _buildCategories(),
-                ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      16,
-                      3,
-                      16,
-                      10,
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.local_fire_department_rounded,
-                            size: 24, color: AppColors.darkGold),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            _categoryOverview
-                                ? 'Categorias'
-                                : _filterOnlyOffers
-                                    ? 'Ofertas do Dia'
-                                    : _filterOnlyCombos
-                                        ? 'Combos Festa'
-                                        : _selectedCategory != 'Todos'
-                                            ? _selectedCategory
-                                            : 'Produtos em Destaque',
-                            style: const TextStyle(
-                              color: Color(0xFF111111),
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ),
-                        if (_selectedCategory != 'Todos' ||
-                            _filterOnlyOffers ||
-                            _filterOnlyCombos)
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _selectedCategory = 'Todos';
-                                _filterOnlyOffers = false;
-                                _filterOnlyCombos = false;
-                              });
-                            },
-                            child: const Text(
-                              'Ver todos',
-                              style: TextStyle(
-                                color: Color(0xFF111111),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-                StreamBuilder<List<Product>>(
-                  key: const ValueKey('catalog-stream'),
-                  stream: _productsStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return SliverToBoxAdapter(
-                          child: Padding(
-                              padding: const EdgeInsets.all(24),
-                              child: Column(children: [
-                                const Text(
-                                    'Não foi possível carregar os produtos.'),
-                                TextButton(
-                                    onPressed: () => setState(() {
-                                          _productsStream = widget.products ??
-                                              FirebaseFirestore.instance
-                                                  .collection('products')
-                                                  .snapshots()
-                                                  .map((s) => s.docs
-                                                      .map(
-                                                          Product.fromFirestore)
-                                                      .toList());
-                                        }),
-                                    child: const Text('Tentar novamente')),
-                              ])));
-                    }
-                    if (!snapshot.hasData) {
-                      return const SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.all(40),
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: AppTheme.primaryYellow,
-                            ),
-                          ),
-                        ),
-                      );
-                    }
+            child: StreamBuilder<List<Product>>(
+                key: const ValueKey('catalog-stream'),
+                stream: _productsStream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
                     _latestProducts = {for (final p in snapshot.data!) p.id: p};
-                    if (_categoryOverview) {
-                      return SliverToBoxAdapter(
-                          child: _buildCategoryOverview(snapshot.data!));
-                    }
-                    final products = visibleCatalogProducts(
-                      snapshot.data!,
-                      query: _searchQuery,
-                      category: _selectedCategory,
-                      onlyOffers: _filterOnlyOffers,
-                      onlyCombos: _filterOnlyCombos,
-                    );
-                    if (products.isEmpty) {
-                      return const SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(
-                            24,
-                            35,
-                            24,
-                            120,
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.search_off_rounded,
-                                size: 45,
-                                color: Color(0xFFB5B5B5),
-                              ),
-                              SizedBox(height: 10),
-                              Text(
-                                'Nenhum produto encontrado.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Color(0xFF777777),
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                    return SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(
-                        16,
-                        0,
-                        16,
-                        24,
+                  }
+                  return CustomScrollView(
+                    controller: _homeScrollCtrl,
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      if (_cartNotice != null)
+                        SliverToBoxAdapter(
+                            child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Text(_cartNotice!,
+                                    style: const TextStyle(
+                                        color: AppColors.error)))),
+                      if (_persistenceError != null)
+                        SliverToBoxAdapter(
+                            child: MaterialBanner(
+                                content: Text(_persistenceError!),
+                                actions: [
+                              TextButton(
+                                  onPressed: _workspaceReady
+                                      ? _persistCart
+                                      : _restoreCart,
+                                  child: const Text('Tentar novamente'))
+                            ])),
+                      SliverToBoxAdapter(
+                        child: _buildHeader(),
                       ),
-                      sliver: SliverGrid(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount:
-                              MediaQuery.sizeOf(context).width > 1100
-                                  ? 5
-                                  : MediaQuery.sizeOf(context).width > 850
-                                      ? 4
-                                      : MediaQuery.sizeOf(context).width > 600
-                                          ? 3
-                                          : 2,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          mainAxisExtent: 330 +
-                              180 *
-                                  (MediaQuery.textScalerOf(context).scale(1) -
-                                      1),
-                        ),
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            return _buildProductCard(
-                              products[index],
-                            );
-                          },
-                          childCount: products.length,
-                        ),
+                      const SliverToBoxAdapter(
+                        child: SponsorVideoBanner(),
                       ),
-                    );
-                  },
-                ),
-              ],
-            ),
+                      SliverToBoxAdapter(child: _buildCategories()),
+                      if (_searchVisible)
+                        SliverToBoxAdapter(
+                            child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                                child: _buildSearch())),
+                      ..._catalogSlivers(snapshot),
+                      SliverToBoxAdapter(
+                          child: SizedBox(height: _cart.isNotEmpty ? 100 : 28)),
+                    ],
+                  );
+                }),
           ))),
       bottomNavigationBar: _buildBottomNavigation(),
       floatingActionButton: _cart.isNotEmpty
           ? FloatingActionButton.extended(
               heroTag: 'chamae_cart_button',
+              tooltip: 'Carrinho',
               elevation: 6,
               backgroundColor: AppTheme.primaryYellow,
               foregroundColor: Colors.black,

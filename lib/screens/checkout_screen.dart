@@ -1,4 +1,6 @@
 import '../widgets/customer_visual.dart';
+import '../widgets/customer_feedback.dart';
+import '../widgets/store_hours_builder.dart';
 import '../widgets/product_image.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -90,7 +92,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _selectedCurrency = 'BRL';
     _nameCtrl.text = UserSession.fullName;
     _phoneCtrl.text = UserSession.whatsapp;
-    if (widget.quoter != null) _refreshQuote();
+    _refreshQuote();
     if (widget.verification != null) {
       _verification.isVerified().then((verified) {
         if (mounted) setState(() => _verified = verified);
@@ -183,7 +185,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   double get _subtotal => widget.cartItems
       .fold(0.0, (accumulated, i) => accumulated + i.totalPrice);
-  double get _deliveryFee => _quote?.fee ?? (widget.quoter == null ? 10 : 0);
+  // Zero is only an internal placeholder; pending totals cannot be displayed
+  // or submitted until the server supplies a quote.
+  double get _deliveryFee => _quote?.fee ?? 0;
   double get _customerFee =>
       (_subtotal * .01 * 100).round() / 100; // Taxa de 1% do cliente
   double get _totalFinal => _subtotal + _deliveryFee + _customerFee;
@@ -595,7 +599,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           content: Text('Confirme o destino da entrega antes de continuar.')));
       return false;
     }
-    if (_quoting || (widget.quoter != null && _quote == null)) return false;
+    if (_quoting || _quote == null) return false;
     if (!isStoreOpen()) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(storeHoursLabel())));
@@ -958,6 +962,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             context,
             MaterialPageRoute(
                 builder: (_) => TrackingScreen(
+                    showConfirmation: true,
                     orderId: created.orderId,
                     documentId: created.reference.id)));
         return;
@@ -979,6 +984,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) => TrackingScreen(
+                  showConfirmation: true,
                   orderId: created.orderId,
                   documentId: created.reference.id,
                 ),
@@ -1022,6 +1028,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => TrackingScreen(
+            showConfirmation: true,
             orderId: created.orderId,
             documentId: created.reference.id,
           ),
@@ -1063,43 +1070,54 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         ],
       );
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      StoreHoursBuilder(builder: _buildScreen);
+
+  Widget _buildScreen(BuildContext context, bool storeOpen, String hoursLabel) {
     if (_pendingOrder != null && !_isLoading) {
       return Scaffold(
         appBar: AppBar(title: const Text('Seu pedido')),
         body: SafeArea(
-            child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Icon(Icons.receipt_long_outlined, size: 64),
-                      const SizedBox(height: 24),
-                      const Text(
-                          'Seu pedido foi iniciado. Confira a confirmação para continuar.',
-                          textAlign: TextAlign.center),
-                      const SizedBox(height: 24),
-                      ElevatedButton(
-                          onPressed: _pendingPayload?['pixRequested'] == true
-                              ? _iniciarPagamentoPixReal
-                              : _gravarPedidoFirestore,
-                          child: Text(_pendingPayload?['pixRequested'] == true
-                              ? 'Retomar PIX'
-                              : 'Verificar pedido')),
-                      TextButton(
-                          onPressed: _revisePending,
-                          child: const Text('Revisar sacola antes de enviar')),
-                    ]))),
+            child: SingleChildScrollView(
+                child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Icon(Icons.receipt_long_outlined, size: 64),
+                          const SizedBox(height: 24),
+                          const Text(
+                              'Seu pedido foi iniciado. Confira a confirmação para continuar.',
+                              textAlign: TextAlign.center),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                              onPressed:
+                                  _pendingPayload?['pixRequested'] == true
+                                      ? _iniciarPagamentoPixReal
+                                      : _gravarPedidoFirestore,
+                              child: Text(
+                                  _pendingPayload?['pixRequested'] == true
+                                      ? 'Retomar PIX'
+                                      : 'Verificar pedido')),
+                          TextButton(
+                              onPressed: _revisePending,
+                              child:
+                                  const Text('Revisar sacola antes de enviar')),
+                        ])))),
       );
     }
     return Scaffold(
       appBar: AppBar(title: const Text('Finalizar Pedido')),
-      persistentFooterButtons:
-          !isStoreOpen() ? [Text(storeHoursLabel())] : null,
+      persistentFooterButtons: !storeOpen ? [Text(hoursLabel)] : null,
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: AppTheme.primaryYellow))
+              child: SingleChildScrollView(
+                  child: CustomerFeedback(
+                      title: 'Conferindo os detalhes do seu pedido',
+                      message:
+                          'Aguarde por aqui. Seu carrinho continua guardado.',
+                      loading: true)))
           : SingleChildScrollView(
               padding: CustomerVisual.pagePadding(context),
               child: Column(
@@ -1110,6 +1128,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       subtitle:
                           'Seu endereço, seus itens e a forma de pagamento.',
                       icon: Icons.shopping_bag_outlined),
+                  if (!storeOpen)
+                    const Padding(
+                        padding: EdgeInsets.only(bottom: 16),
+                        child: Text(
+                            'O catálogo continua disponível. Os pedidos voltam às 08:00 (MS).')),
                   if (!_verified) ...[
                     const Text(
                         'Sua sessão precisa estar atualizada para comprar.'),
@@ -1119,11 +1142,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ],
                   if (_quoting) const LinearProgressIndicator(),
                   if (_quoteError != null)
-                    MaterialBanner(content: Text(_quoteError!), actions: [
-                      TextButton(
-                          onPressed: _refreshQuote,
-                          child: const Text('Tentar novamente'))
-                    ]),
+                    CustomerFeedback(
+                        title: _quoteError!,
+                        message:
+                            'Confira o endereço e tente calcular a entrega novamente.',
+                        icon: Icons.local_shipping_outlined,
+                        onRetry: _refreshQuote),
                   const Text('Entrega',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
@@ -1256,13 +1280,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                               fontSize: 14)),
                                       const SizedBox(height: 4),
                                       Text(
-                                          'R\$ ${item.price.toStringAsFixed(2)} un',
+                                          'R\$ ${item.price.toStringAsFixed(2).replaceAll('.', ',')} un',
                                           style: const TextStyle(
                                               color: AppColors.textSecondary,
                                               fontSize: 12)),
                                       const SizedBox(height: 4),
                                       Text(
-                                          '${item.quantity}x • R\$ ${item.totalPrice.toStringAsFixed(2)}',
+                                          '${item.quantity}x • R\$ ${item.totalPrice.toStringAsFixed(2).replaceAll('.', ',')}',
                                           style: const TextStyle(
                                               color: AppColors.darkGold,
                                               fontWeight: FontWeight.w900,
@@ -1508,7 +1532,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         const SizedBox(height: 6),
                         _summaryLine(
                             'Taxa de Entrega',
-                            widget.quoter != null && _quote == null
+                            _quote == null
                                 ? 'Aguardando cotação'
                                 : _formatCurrency(_deliveryFee)),
                         const SizedBox(height: 6),
@@ -1517,7 +1541,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         const Divider(height: 16),
                         _summaryLine(
                             'TOTAL',
-                            widget.quoter != null && _quote == null
+                            _quote == null
                                 ? 'Aguardando entrega'
                                 : _formatCurrency(_totalFinal),
                             total: true),
@@ -1701,9 +1725,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                     ),
-                    onPressed: _quoting ||
-                            (widget.quoter != null && _quote == null) ||
-                            !isStoreOpen()
+                    onPressed: _quoting || _quote == null || !storeOpen
                         ? null
                         : () {
                             if (!_validarDadosCliente()) return;

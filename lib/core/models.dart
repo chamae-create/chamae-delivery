@@ -251,4 +251,12 @@ class UserSession {
   static String document = '';
   static String language = 'pt';
   static bool isRegistered = false;
+
+  static void clearPersonalData() {
+    fullName = '';
+    socialName = '';
+    whatsapp = '';
+    document = '';
+    isRegistered = false;
+  }
 }

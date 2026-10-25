@@ -2,6 +2,7 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
 const {FieldValue} = require("firebase-admin/firestore");
 const {customer} = require("./delivery-service");
+const {assertCustomerAccountActive} = require("./customer-account-state");
 const {verifiedCustomerToken} = require("./customer-identity");
 const {generatePin, encryptPin, decryptPin} = require("./delivery-pin");
 const pinKey = defineSecret("CHAMAE_DELIVERY_PIN_KEY");
@@ -18,6 +19,7 @@ async function ownPin(db, request, key, reset = false) {
   const secretRef = db.collection("customerDeliverySecrets").doc(uid);
   const audit = db.collection("deliveryPinAudit").doc();
   return db.runTransaction(async (tx) => {
+    await assertCustomerAccountActive(db, uid, tx);
     const old = await tx.get(secretRef);
     // Reset only with no unfinished orders. Query errors (including missing
     // index) fail closed. Existing order PINs must never silently change.

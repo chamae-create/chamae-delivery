@@ -5,6 +5,10 @@ const vm = require("node:vm");
 const {test} = require("node:test");
 const {customerPolicyFixture, customerProfileFixture} =
     require("./customer-policy-fixture");
+const {deliveryFixture} = require("./delivery-fixture");
+const {useOpenClock, countryEvidence} = require("./operational-fixture");
+const {serverClock} = require("../order-acceptance");
+useOpenClock();
 
 const source = fs.readFileSync(path.join(__dirname, "../index.js"), "utf8");
 const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -13,7 +17,11 @@ const reference = (documentPath) => ({
 });
 
 const fixture = (overrides = {}, product = {}, options = {}) => {
+  useOpenClock();
+  const delivery = deliveryFixture();
   const initial = {
+    customerUid: "buyer", deliveryAddress: delivery.destination,
+    deliveryQuoteId: delivery.quoteId,
     itemsList: [{id: "p1", quantity: 3, price: 0.01, unitPrice: 0.01}],
     itemsTotal: 1, subtotal: 1, customerFee: 1, merchantFee: 1,
     merchantNet: 1, platformFee: 1, totalBRL: 1, deliveryFee: 1,
@@ -23,6 +31,7 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
     ...overrides,
   };
   const docs = new Map([
+    ...delivery.documents,
     ["orders/o1", clone(initial)],
     ["products/p1", {
       priceBRL: 20, stock: 20, reservedStock: 0, salesCount: 0, ...product,
@@ -49,6 +58,7 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
   const db = {
     collection: (name) => ({doc: (id) => {
       const ref = reference(`${name}/${id}`);
+      ref.get = async () => snapshot(ref);
       ref.update = async (fields) => apply(ref, fields);
       return ref;
     }}),
@@ -75,6 +85,7 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
         if (operation === "set") docs.set(ref.path, clone(fields));
         else apply(ref, fields);
       }
+      if (options.afterCommit) options.afterCommit();
     },
   };
   const context = {
@@ -82,9 +93,11 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
     console: {log: () => {}, warn: () => {}, error: () => {}},
     fetch: async (url, init) => {
       requests.push({url, ...init});
+      if (init.method === "POST" && options.onPost) await options.onPost(docs);
       const body = init.method === "POST" ? JSON.parse(init.body) : {};
       return {ok: true, status: 200, json: async () => ({
-        id: "ORD1", status: "processed", status_detail: "accredited",
+        id: "ORD1", status: options.providerStatus || "processed",
+        status_detail: options.providerDetail || "accredited",
         external_reference: "o1", processing_mode: "automatic",
         total_amount: options.mpAmount || body.total_amount || "70.60",
         transactions: {payments: [{
@@ -99,8 +112,14 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
       switch (name) {
         case "node:crypto": return require(name);
         case "./delivery-service": return require("../delivery-service");
+        case "./order-acceptance": return require("../order-acceptance");
+        case "./order-cancellation-state": return require("../order-cancellation-state");
+        case "./order-cancellation": return require("../order-cancellation");
+        case "./delivery-contingency": return require("../delivery-contingency");
+        case "./delivery-contingency-state": return require("../delivery-contingency-state");
         case "./customer-security": return require("../customer-security");
         case "./customer-onboarding": return require("../customer-onboarding");
+        case "./customer-account": return require("../customer-account");
         case "./catalog-commercial-policy":
           return require("../catalog-commercial-policy");
         case "./courier-deliveries": return require("../courier-deliveries");
@@ -182,11 +201,10 @@ const assertFinancial = (data) => {
 test("new flow checks consent before finance/PIX", async () => {
   const policy = customerPolicyFixture();
   const f = fixture({customerFlowVersion: 2, customerUid: "buyer",
-    deliveryAddress: {countryCode: "BR"}});
+    deliveryAddress: deliveryFixture().destination});
   f.docs.set("customerPolicies/current", policy);
   f.docs.set("customerProfiles/buyer",
       customerProfileFixture(policy, "TEST-TIMESTAMP"));
-  f.docs.set("deliveryConfiguration/current", {mode: "legacy"});
   await f.invoke("auto");
   assert.equal(f.requests.length, 1);
   assertFinancial(f.docs.get("orders/o1"));
@@ -223,7 +241,9 @@ for (const flow of ["auto", "manual", "reserve"]) {
           activeVersion: "v1"});
         f.docs.set(`deliveryQuotes/${quoteId}`, {uid: "buyer", version: "v1",
           origin: {latitude: -20, longitude: -50}, destination,
+          destinationVerification: countryEvidence(destination),
           distanceMeters: 2300, feeCents: 725, createdAtMs: Date.now(),
+          distanceUnit: "m", distanceSource: "route", provider: "test-route",
           expiresAtMs: Date.now() + 300000});
         f.docs.set("deliveryPricingVersions/v1", {published: true, table: {
           schemaVersion: 2, minimumPolicy: "replace",
@@ -239,6 +259,11 @@ for (const flow of ["auto", "manual", "reserve"]) {
         assert.equal(frozen.deliverySnapshot.configurationVersion, "v1");
         assert.equal(frozen.deliverySnapshot.distanceMeters, 2300);
         assert.equal(frozen.deliveryDistanceMeters, 2300);
+        assert.equal(frozen.deliveryDistanceUnit, "m");
+        assert.equal(frozen.deliveryDistanceSource, "route");
+        assert.equal(frozen.deliveryAppliedBand.priceCents, 725);
+        assert.deepEqual(f.docs.get("orders/o1").deliveryAppliedBand,
+            frozen.deliveryAppliedBand);
         assert.equal(frozen.deliveryPricingVersion, "v1");
         assert.equal(f.docs.get("orders/o1").deliveryPricingVersion, "v1");
         assert.equal(f.docs.get(`deliveryQuotes/${quoteId}`).orderId, "o1");
@@ -259,6 +284,156 @@ for (const flow of ["auto", "manual", "reserve"]) {
             f.docs.get("orderFinancials/o1").deliveryDistanceMeters, 2300);
         assert.equal(
             f.docs.get("orderFinancials/o1").deliveryPricingVersion, "v1");
+      });
+}
+
+// KB-03: exercise the real PIX/manual/reservation handlers, not only predicates.
+for (const flow of ["auto", "manual", "reserve"]) {
+  for (const [instant, allowed] of [
+    ["2026-10-24T11:59:00Z", false], ["2026-10-24T12:00:00Z", true],
+    ["2026-10-24T16:00:00Z", true], ["2026-10-25T03:59:00Z", true],
+    ["2026-10-25T04:00:00Z", false],
+  ]) {
+    test(`KB03 ${flow}: server instant ${instant}, allowed=${allowed}`, async () => {
+      const f = fixture(flow === "reserve" ? {paymentMethod: "Dinheiro", pixRequested: false} : {});
+      serverClock.now = () => Date.parse(instant);
+      const original = clone(f.docs.get("products/p1"));
+      await f.invoke(flow);
+      assert.equal(f.docs.has("orderFinancials/o1"), allowed);
+      assert.equal(f.requests.length, allowed && flow !== "reserve" ? 1 : 0);
+      if (!allowed) {
+        assert.deepEqual(f.docs.get("products/p1"), original);
+        assert.equal(f.docs.get(`deliveryQuotes/${deliveryFixture().quoteId}`).orderId, undefined);
+        const order = f.docs.get("orders/o1");
+        assert.equal(flow === "manual" ? f.responses.at(-1).body.erro : order.financialValidationError, "STORE_CLOSED");
+      }
+    });
+  }
+  test(`KB03 ${flow}: forged client clock/timezone cannot open store`, async () => {
+    const f = fixture({...(flow === "reserve" ? {paymentMethod: "Dinheiro", pixRequested: false} : {}),
+      createdAt: "2026-10-24T16:00:00Z", timezone: "Pacific/Honolulu", storeOpen: true, hour: 12});
+    serverClock.now = () => Date.parse("2026-10-25T04:00:00Z");
+    await f.invoke(flow);
+    assert.equal(f.requests.length, 0); assert.equal(f.docs.has("orderFinancials/o1"), false);
+    assert.equal(f.docs.get("products/p1").reservedStock, 0);
+  });
+  test(`KB03 ${flow}: transaction retry after closing has no financial/stock/PIX effect`, async () => {
+    const f = fixture(flow === "reserve" ? {paymentMethod: "Dinheiro", pixRequested: false} : {}, {}, {
+      retry: () => {
+        serverClock.now = () => Date.parse("2026-10-25T04:00:00Z");
+      },
+    });
+    await f.invoke(flow);
+    assert.equal(f.requests.length, 0); assert.equal(f.docs.has("orderFinancials/o1"), false);
+    assert.equal(f.docs.get("products/p1").reservedStock, 0);
+  });
+  for (const invalid of ["missing", "invalid", "forged", "coordinates", "owner", "unverified", "reused",
+    "projection", "alias", "topalias"]) {
+    test(`KB03 ${flow}: ${invalid} destination cannot create effects`, async () => {
+      const f = fixture(flow === "reserve" ? {paymentMethod: "Dinheiro", pixRequested: false} : {});
+      const order = f.docs.get("orders/o1"); const quote = f.docs.get(`deliveryQuotes/${order.deliveryQuoteId}`);
+      if (invalid === "missing") delete order.deliveryAddress.countryCode;
+      if (invalid === "invalid") order.deliveryAddress.countryCode = "XX";
+      if (invalid === "forged") order.deliveryAddress.countryCode = "PY";
+      if (invalid === "coordinates") order.deliveryAddress.longitude = -54;
+      if (invalid === "owner") quote.uid = "other";
+      if (invalid === "unverified") delete quote.destinationVerification;
+      if (invalid === "reused") quote.orderId = "another-order";
+      if (invalid === "projection") order.deliveryLocation = {latitude: -23, longitude: -54};
+      if (invalid === "alias") order.deliveryAddress.country = "PY";
+      if (invalid === "topalias") order.country = "PY";
+      const original = clone(f.docs.get("products/p1"));
+      await f.invoke(flow);
+      assert.equal(f.requests.length, 0); assert.equal(f.docs.has("orderFinancials/o1"), false);
+      assert.deepEqual(f.docs.get("products/p1"), original);
+      assert.equal(flow === "manual" ? f.responses.at(-1).body.erro : order.financialValidationError,
+          "DESTINATION_COUNTRY_UNVERIFIED");
+    });
+  }
+}
+
+for (const flow of ["auto", "manual"]) {
+  test(`KB03 ${flow}: closes between financial transaction and POST`, async () => {
+    const f = fixture({}, {}, {afterCommit: () => {
+      serverClock.now = () => Date.parse("2026-10-25T04:00:00Z");
+    }});
+    await f.invoke(flow);
+    assert.equal(f.requests.length, 0);
+    assert.equal(f.docs.has("orderFinancials/o1"), true, "created while open, never recalculated");
+    assert.equal(flow === "manual" ? f.responses.at(-1).body.erro : f.docs.get("orders/o1").mercadoPagoLastErrorCode,
+        "STORE_CLOSED");
+  });
+  test(`KB03 ${flow}: frozen financial alone cannot authorize new PIX after closing`, async () => {
+    const f = fixture(); await f.invoke(flow);
+    const financial = clone(f.docs.get("orderFinancials/o1"));
+    delete f.docs.get("orders/o1").mercadoPagoOrderId;
+    serverClock.now = () => Date.parse("2026-10-25T04:00:00Z");
+    await f.invoke(flow);
+    assert.equal(f.requests.length, 1); assert.deepEqual(f.docs.get("orderFinancials/o1"), financial);
+  });
+}
+
+for (const country of ["BR", "PY"]) {
+  for (const method of ["PIX", "Dinheiro", "Maquininha", "Maquininha - Débito à vista",
+    "Maquininha - Crédito à vista", "Pagamento dividido"]) {
+    test(`KB03 ${country} + ${method}: official country governs payment`, async () => {
+      const pix = method === "PIX"; const split = method === "Pagamento dividido";
+      const f = fixture({paymentMethod: method, pixRequested: pix, splitPayment: split,
+        paymentParts: split ? [{method: "Dinheiro", currency: "BRL", amountCurrency: 40},
+          {method: "Dinheiro", currency: "BRL", amountCurrency: 40}] : null});
+      const order = f.docs.get("orders/o1"); const quote = f.docs.get(`deliveryQuotes/${order.deliveryQuoteId}`);
+      order.deliveryAddress.countryCode = country; quote.destination.countryCode = country;
+      quote.destinationVerification.countryCode = country;
+      await f.invoke(pix ? "auto" : "reserve");
+      const allowed = country === "BR" || pix || method === "Dinheiro" || split;
+      assert.equal(f.docs.has("orderFinancials/o1"), allowed);
+      if (!allowed) {
+        assert.equal(f.docs.get("products/p1").reservedStock, 0);
+        assert.equal(order.financialValidationError, "PAYMENT_METHOD_NOT_ALLOWED_FOR_COUNTRY");
+      }
+    });
+  }
+}
+
+test("KB03: issued PIX still reconciles webhook and stock after store closes", async () => {
+  const f = fixture(); await f.invoke("auto");
+  const financial = clone(f.docs.get("orderFinancials/o1"));
+  serverClock.now = () => Date.parse("2026-10-25T04:00:00Z");
+  await f.invoke("webhook");
+  assert.equal(f.docs.get("orders/o1").paymentStatus, "Pago");
+  assert.equal(f.docs.get("products/p1").stock, 17);
+  assert.deepEqual(f.docs.get("orderFinancials/o1"), financial);
+});
+
+for (const flow of ["auto", "manual", "reserve"]) {
+  for (const mode of ["missing", "legacy"]) {
+    test(`${flow}: ${mode} config blocks charge/reservation for old client`,
+        async () => {
+          const f = fixture(flow === "reserve" ? {
+            paymentMethod: "Dinheiro", pixRequested: false,
+          } : {});
+          if (mode === "missing") {
+            f.docs.delete("deliveryConfiguration/current");
+          } else {
+            f.docs.set("deliveryConfiguration/current", {mode: "legacy"});
+          }
+          await f.invoke(flow);
+          assert.equal(f.docs.has("orderFinancials/o1"), false);
+          assert.equal(f.requests.length, 0);
+          assert.equal(f.docs.get("products/p1").reservedStock, 0);
+        });
+  }
+  test(`${flow}: frozen financials survive missing config without migration`,
+      async () => {
+        const f = fixture(flow === "reserve" ? {
+          paymentMethod: "Dinheiro", pixRequested: false,
+        } : {});
+        await f.invoke(flow);
+        const financial = clone(f.docs.get("orderFinancials/o1"));
+        f.docs.delete("deliveryConfiguration/current");
+        await f.invoke(flow);
+        assert.deepEqual(f.docs.get("orderFinancials/o1"), financial);
+        assertFinancial(f.docs.get("orders/o1"));
       });
 }
 
@@ -484,6 +659,8 @@ test("delivery completion restores frozen financial fields without repricing",
       await f.invoke("reserve");
       const order = f.docs.get("orders/o1");
       order.status = "Concluído";
+      order.deliveryConfirmedAt = "TEST_SERVER_PROOF";
+      order.deliveryCollectionConfirmedAt = "TEST_SERVER_PROOF";
       order.totalBRL = 1;
       f.docs.get("products/p1").priceBRL = 100;
       await f.invoke("resolve");
@@ -494,14 +671,16 @@ test("delivery completion restores frozen financial fields without repricing",
       assert.equal(f.docs.get("products/p1").stock, 17);
     });
 
-test("legacy reserved order completes without a financial migration",
+test("legacy reserved completion without delivery/collection evidence fails closed",
     async () => {
       const f = fixture({
         paymentMethod: "Dinheiro", pixRequested: false,
         stockReservationStatus: "reserved", status: "Concluído", totalBRL: 33,
       }, {reservedStock: 3});
       await f.invoke("resolve");
-      assert.equal(f.docs.get("orders/o1").stockReservationStatus, "finalized");
+      assert.equal(f.docs.get("orders/o1").stockReservationStatus, "reserved");
+      assert.equal(f.docs.get("products/p1").stock, 20);
+      assert.notEqual(f.docs.get("orders/o1").paymentStatus, "Pago");
       assert.equal(f.docs.get("orders/o1").totalBRL, 33);
     });
 
@@ -577,3 +756,39 @@ for (const flow of ["auto", "reserve"]) {
     });
   }
 }
+
+for (const flow of ["auto", "manual"]) {
+  test("KB04 " + flow + ": cancelled order cannot create PIX", async () => {
+    const f = fixture(); f.docs.get("orders/o1").status = "Cancelado";
+    await f.invoke(flow);
+    assert.equal(f.requests.length, 0);
+    assert.equal(f.docs.has("orderFinancials/o1"), false);
+    assert.equal(f.docs.get("orders/o1").status, "Cancelado");
+  });
+  test("KB04 " + flow + ": cancellation before POST prevents outgoing request", async () => {
+    const f = fixture({}, {}, {afterCommit: () => {
+      f.docs.get("orders/o1").status = "Cancelado";
+    }});
+    await f.invoke(flow); assert.equal(f.requests.length, 0);
+    assert.equal(f.docs.get("orders/o1").status, "Cancelado");
+  });
+  test("KB04 " + flow + ": cancellation during POST preserves state and records uncertainty", async () => {
+    const f = fixture({}, {}, {onPost: (docs) => {
+      docs.get("orders/o1").status = "Cancelado";
+    }});
+    await f.invoke(flow); assert.equal(f.requests.length, 1);
+    assert.equal(f.docs.get("orders/o1").status, "Cancelado");
+    assert.equal(f.docs.get("orderCompensations/o1").refundStatus, "verification_required");
+    assert.equal(f.docs.get("products/p1").stock, 20);
+  });
+}
+test("KB04 official paid webhook after cancellation records payment without any stock debit", async () => {
+  const f = fixture(); await f.invoke("auto");
+  const order = f.docs.get("orders/o1"); order.status = "Cancelado";
+  const financial = clone(f.docs.get("orderFinancials/o1"));
+  await f.invoke("webhook"); await f.invoke("webhook");
+  assert.equal(order.status, "Cancelado"); assert.equal(order.paymentStatus, "Pago");
+  assert.equal(f.docs.get("products/p1").stock, 20);
+  assert.equal(f.docs.get("orderCompensations/o1").refundStatus, "required");
+  assert.deepEqual(f.docs.get("orderFinancials/o1"), financial);
+});

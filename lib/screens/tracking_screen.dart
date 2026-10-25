@@ -5,14 +5,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../data/customer_orders.dart';
 import '../data/customer_workspace.dart';
+import '../core/order_confirmation_policy.dart';
 import 'home_screen.dart';
 import 'tracking_view.dart';
 
 class TrackingScreen extends StatefulWidget {
   final String orderId;
   final String? documentId;
+  final bool showConfirmation;
 
-  const TrackingScreen({super.key, required this.orderId, this.documentId});
+  const TrackingScreen(
+      {super.key,
+      required this.orderId,
+      this.documentId,
+      this.showConfirmation = false});
 
   @override
   State<TrackingScreen> createState() => _TrackingScreenState();
@@ -31,7 +37,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
       final id = data?['_documentId'];
       if (id is String &&
           !_reconciling.contains(id) &&
-          (data?['pixRequested'] != true || data?['paymentStatus'] == 'Pago')) {
+          data != null &&
+          orderIsConfirmed(data)) {
         _reconciling.add(id);
         unawaited(FirebaseCustomerWorkspace()
             .completeOrder(id)
@@ -65,6 +72,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
   Widget build(BuildContext context) => TrackingView(
         key: ValueKey(widget.documentId ?? widget.orderId),
         orderId: widget.orderId,
+        showConfirmation: widget.showConfirmation,
         orderStream: _stream,
         onRetry: () => setState(() {
           _stream = _watch();

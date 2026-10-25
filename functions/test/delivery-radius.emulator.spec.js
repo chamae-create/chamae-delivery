@@ -2,8 +2,11 @@ const assert = require("node:assert/strict");
 const {test, before, after} = require("node:test");
 const {initializeApp, deleteApp} = require("firebase-admin/app");
 const {getFirestore} = require("firebase-admin/firestore");
-const {saveVersion, quoteDelivery, prepareDelivery} =
+const {saveVersion, quoteDelivery: realQuoteDelivery, prepareDelivery} =
     require("../delivery-service");
+const {countryVerifier} = require("./operational-fixture");
+const quoteDelivery = (db, request, provider) =>
+  realQuoteDelivery(db, request, provider, countryVerifier);
 let app; let db;
 const origin = {latitude: -20, longitude: -50}; // Synthetic fixture only.
 const destination = {...origin, countryCode: "BR", confirmed: true};
@@ -47,6 +50,6 @@ test("Firestore transaction: draft, publication and radius", async () => {
   const extended = await quoteDelivery(db, {...buyer,
     data: {...buyer.data, requestId: "x".repeat(24)}}, provider);
   assert.equal(extended.distanceMeters, 14500);
-  // Other emulator suites use legacy fixtures, so leave no global config.
+  // Leave no active configuration for another isolated emulator suite.
   await activeRef.delete();
 });

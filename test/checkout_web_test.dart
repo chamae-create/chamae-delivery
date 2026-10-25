@@ -6,6 +6,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:chamae_delivery/core/models.dart';
 import 'package:chamae_delivery/core/theme.dart';
 import 'package:chamae_delivery/screens/checkout_screen.dart';
+import 'package:chamae_delivery/data/delivery_quote.dart';
+
+class TestQuoter implements DeliveryQuoter {
+  @override
+  Future<DeliveryQuote> quote(DeliveryAddress destination) async =>
+      const DeliveryQuote(7.25, 'test-only', 'routeBands');
+}
 
 void main() {
   testWidgets('checkout preserva carrinho, total e entrada no pagamento PIX',
@@ -29,6 +36,7 @@ void main() {
         theme: AppTheme.lightTheme,
         home: CheckoutScreen(
           cartItems: cart,
+          quoter: TestQuoter(),
           onCartCleared: () => cartCleared = true,
           deliveryAddress: const DeliveryAddress(
               latitude: -22.53,
@@ -41,8 +49,8 @@ void main() {
     await tester.ensureVisible(button);
     await tester.pumpAndSettle();
     expect(button, findsOneWidget);
-    // 2 x R$20 + entrega R$10 + taxa de cliente de 1% = R$50,40.
-    expect(find.textContaining('50,40'), findsWidgets);
+    // Synthetic quoted freight: 2 x R$20 + R$7.25 + 1% = R$47.65.
+    expect(find.textContaining('47,65'), findsWidgets);
     expect(cart.single.quantity, 2);
     expect(cartCleared, isFalse);
     expect(tester.takeException(), isNull);

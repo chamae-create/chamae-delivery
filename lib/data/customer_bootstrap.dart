@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
-/// Logs only access context in debug builds; never tokens or document contents.
+/// Logs only operation/collection/error code, without UID or document paths.
 Future<T> customerAccess<T>(String operation, String path, String uid,
     Future<T> Function() action) async {
   final active = FirebaseAuth.instance.currentUser;
@@ -10,8 +10,8 @@ Future<T> customerAccess<T>(String operation, String path, String uid,
     throw StateError('Sua sessão mudou. Entre novamente.');
   }
   if (kDebugMode) {
-    debugPrint('[customer-bootstrap] operation=$operation path=$path '
-        'authUid=${active!.uid} pathUid=$uid anonymous=${active.isAnonymous}');
+    debugPrint('[customer-bootstrap] operation=$operation '
+        'collection=${path.split('/').first}');
   }
   try {
     final result = await action();
@@ -21,8 +21,8 @@ Future<T> customerAccess<T>(String operation, String path, String uid,
     return result;
   } on FirebaseException catch (error) {
     if (kDebugMode) {
-      debugPrint('[customer-bootstrap] operation=$operation path=$path '
-          'authUid=${FirebaseAuth.instance.currentUser?.uid} code=${error.code}');
+      debugPrint('[customer-bootstrap] operation=$operation '
+          'collection=${path.split('/').first} code=${error.code}');
     }
     rethrow;
   }

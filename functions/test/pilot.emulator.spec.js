@@ -1,6 +1,4 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
 const {randomUUID} = require("node:crypto");
 const {before, after, test} = require("node:test");
 const {initializeApp, deleteApp} = require("firebase-admin/app");
@@ -12,6 +10,8 @@ const {doc, getDoc, getDocs, collection, query, where,
   setDoc, updateDoc, serverTimestamp, GeoPoint: ClientGeoPoint} =
     require("firebase/firestore");
 const {loadBackend} = require("./backend-fixture");
+const {rulesAt} = require("./operational-fixture");
+const {deliveryFixture} = require("./delivery-fixture");
 const {changeCourier} = require("../courier-assignment");
 const {customerPolicyFixture, customerProfileFixture} =
     require("./customer-policy-fixture");
@@ -32,6 +32,8 @@ const act = (id, operation, extra = {}) => backend.functions[
   operation === "separate" ? "chamaeIniciarSeparacao" : "chamaeConcluirEntrega"
 ](request({orderId: id, ...(operation === "complete" ? {
   contingencyReason: "Falha do aparelho do motoboy",
+  deliveryConfirmed: true, collectionConfirmed: true,
+  expectedDeliveryRevision: 0,
   confirmation: `CONFIRMAR ${id}`} : {}),
 ...extra}, operation === "complete" ? "superadmin" : "operations_admin"));
 const settle = (ids, extra = {}, role = "finance") =>
@@ -51,14 +53,10 @@ before(async () => {
   assert.ok(["localhost", "127.0.0.1", "[::1]"].includes(address.hostname));
   env = await initializeTestEnvironment({projectId: "demo-chamae-rules",
     firestore: {host: address.hostname, port: Number(address.port),
-      rules: fs.readFileSync(path.join(__dirname, "../../firestore.rules"),
-          "utf8")}});
+      rules: rulesAt()}});
   await env.clearFirestore();
   app = initializeApp({projectId: "demo-chamae-rules"});
   db = getFirestore(app);
-  // TEST ONLY: this pilot asserts the supported legacy delivery fee below.
-  // Seed after clearFirestore; no real origin, pricing table or Routes secret.
-  await db.doc("deliveryConfiguration/current").set({mode: "legacy"});
   const policy = customerPolicyFixture();
   await db.doc("customerPolicies/current").set(policy);
   await db.doc("customerProfiles/buyer").set(
@@ -81,11 +79,17 @@ after(async () => {
 async function createOrder() {
   const id = `pilot-${++n}`;
   const productId = `pilot-product-${n}`;
+  // Explicit private server quote per order; no production tariff fallback.
+  const delivery = deliveryFixture({quoteId: n.toString(16).padStart(64, "0")});
+  for (const [documentPath, data] of delivery.documents) {
+    await db.doc(documentPath).set(data);
+  }
   await db.doc(`products/${productId}`).set({priceBRL: 20, isActive: true,
     stock: 20, reservedStock: 0, salesCount: 0});
   await assertSucceeds(setDoc(doc(client("buyer"), "orders", id), {
     id: "#PILOT", customerUid: "buyer", customerName: "Ana",
     customerFlowVersion: 2,
+    deliveryQuoteId: delivery.quoteId,
     customerPhone: "PRIVATE_PHONE", address: "Rua das Flores, 123",
     deliveryAddress: {latitude: -22.5, longitude: -55.7,
       street: "Rua das Flores",

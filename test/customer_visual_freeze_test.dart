@@ -132,17 +132,17 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const ValueKey('category-Cervejas')));
         await tester.pumpAndSettle();
-        await tester.scrollUntilVisible(find.text('BEBIDA DE TESTE'), 250,
+        await tester.scrollUntilVisible(find.text('Bebida de teste'), 250,
             scrollable: find
                 .descendant(
                     of: find.byType(CustomScrollView),
                     matching: find.byType(Scrollable))
                 .first);
         await Scrollable.ensureVisible(
-            tester.element(find.text('BEBIDA DE TESTE')),
+            tester.element(find.text('Bebida de teste')),
             alignment: .3);
         await tester.pumpAndSettle();
-        await tester.tap(find.text('BEBIDA DE TESTE'));
+        await tester.tap(find.text('Bebida de teste'));
         await tester.pumpAndSettle();
         expect(find.text('Descrição do catálogo de teste.'), findsOneWidget);
         expect(tester.takeException(), isNull);

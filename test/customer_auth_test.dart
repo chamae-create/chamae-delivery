@@ -11,7 +11,11 @@ class ProviderInfo extends Fake implements UserInfo {
   ProviderInfo(this.providerId);
 }
 
-class CredentialResult extends Fake implements UserCredential {}
+class CredentialResult extends Fake implements UserCredential {
+  @override
+  final User? user;
+  CredentialResult(this.user);
+}
 
 class SdkUser extends Fake implements User {
   @override
@@ -36,7 +40,7 @@ class SdkUser extends Fake implements User {
     links++;
     provider = name;
     isAnonymous = false;
-    return CredentialResult();
+    return CredentialResult(this);
   }
 
   @override
@@ -71,7 +75,7 @@ class SdkAuth extends Fake implements FirebaseAuth {
     }
     signIns++;
     currentUser = SdkUser('new-customer', provider: provider);
-    return CredentialResult();
+    return CredentialResult(currentUser);
   }
 
   @override

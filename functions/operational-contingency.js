@@ -39,6 +39,13 @@ function auditContingency(tx, ref, request, operation, before, patch) {
     reason: request.data.contingencyReason.trim(), operation,
     previous: state(before), next: state({...before, ...patch}),
     createdAt: FieldValue.serverTimestamp(), source: "superadmin_contingency"});
+  if (operation === "complete") {
+    tx.update(ref, {deliveryConfirmed: true,
+      collectionConfirmed: request.data.collectionConfirmed === true,
+      paymentStatusBefore: before.paymentStatus || null,
+      stockAction: before.stockReservationStatus === "reserved" ?
+        "commit" : "none"});
+  }
 }
 
 module.exports = {requireContingency, auditContingency};

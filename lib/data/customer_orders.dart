@@ -49,22 +49,27 @@ class CustomerOrders {
                   .where('customerUid', isEqualTo: uid)
                   .where(field, isEqualTo: id)
                   .limit(1)
-                  .snapshots()
+                  .snapshots(includeMetadataChanges: true)
                   .listen(
-                    (snapshot) {
-                      if (!isCurrent(version, uid)) return;
-                      final data = snapshot.docs.isEmpty
-                          ? null
-                          : {...snapshot.docs.first.data(), '_documentId': snapshot.docs.first.id};
-                      // Defesa adicional: não entregar dados de outro proprietário à UI.
-                      controller.add(data?['customerUid'] == uid ? data : null);
-                    },
-                    onError: (Object error, StackTrace stack) {
-                      if (!isCurrent(version, uid)) return;
-                      controller.add(null);
-                      controller.addError(error, stack);
-                    },
-                  );
+                (snapshot) {
+                  if (!isCurrent(version, uid)) return;
+                  final data = snapshot.docs.isEmpty
+                      ? null
+                      : {
+                          ...snapshot.docs.first.data(),
+                          '_documentId': snapshot.docs.first.id,
+                          '_hasPendingWrites':
+                              snapshot.metadata.hasPendingWrites
+                        };
+                  // Defesa adicional: não entregar dados de outro proprietário à UI.
+                  controller.add(data?['customerUid'] == uid ? data : null);
+                },
+                onError: (Object error, StackTrace stack) {
+                  if (!isCurrent(version, uid)) return;
+                  controller.add(null);
+                  controller.addError(error, stack);
+                },
+              );
             } catch (error, stack) {
               if (isCurrent(version, uid)) controller.addError(error, stack);
             }

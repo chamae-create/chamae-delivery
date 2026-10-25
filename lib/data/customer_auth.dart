@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../core/models.dart';
 
 enum CustomerProvider { google, apple }
 
@@ -53,12 +54,11 @@ class FirebaseCustomerAuth implements CustomerAuth {
   @override
   Future<void> signIn(CustomerProvider kind,
       {bool useExistingAccount = false}) async {
+    final old = auth.currentUser;
     try {
-      final old = auth.currentUser;
       final link = old != null && !useExistingAccount;
       if (kDebugMode) {
-        debugPrint('[customer-auth] start provider=${kind.name} '
-            'previousUid=${old?.uid} anonymous=${old?.isAnonymous} link=$link');
+        debugPrint('[customer-auth] provider=${kind.name} link=$link');
       }
       final AuthProvider provider;
       if (kind == CustomerProvider.google) {
@@ -68,17 +68,18 @@ class FirebaseCustomerAuth implements CustomerAuth {
           ..addScope('email')
           ..addScope('name');
       }
+      final UserCredential result;
       if (kIsWeb) {
         if (link) {
-          await old.linkWithPopup(provider);
+          result = await old.linkWithPopup(provider);
         } else {
-          await auth.signInWithPopup(provider);
+          result = await auth.signInWithPopup(provider);
         }
       } else if (kind == CustomerProvider.apple) {
         if (link) {
-          await old.linkWithProvider(provider);
+          result = await old.linkWithProvider(provider);
         } else {
-          await auth.signInWithProvider(provider);
+          result = await auth.signInWithProvider(provider);
         }
       } else {
         if (defaultTargetPlatform != TargetPlatform.android &&
@@ -88,23 +89,21 @@ class FirebaseCustomerAuth implements CustomerAuth {
         }
         final credential = await _nativeGoogleCredential();
         if (link) {
-          await old.linkWithCredential(credential);
+          result = await old.linkWithCredential(credential);
         } else {
-          await auth.signInWithCredential(credential);
+          result = await auth.signInWithCredential(credential);
         }
       }
-      if (link && auth.currentUser?.uid != old.uid) {
-        throw const CustomerAuthFailure(
-            'Sua sessão mudou. Entre novamente para continuar.');
+      final expectedUid = link ? old.uid : result.user?.uid;
+      if (expectedUid == null || result.user?.uid != expectedUid) {
+        await signOut();
+        throw const CustomerAuthFailure('Sua sessão mudou. Entre novamente.');
       }
-      await auth.currentUser?.reload();
-      await auth.currentUser?.getIdToken(true);
-      if (kDebugMode) {
-        debugPrint('[customer-auth] complete previousUid=${old?.uid} '
-            'activeUid=${auth.currentUser?.uid} link=$link '
-            'uidPreserved=${old?.uid == auth.currentUser?.uid} '
-            'anonymous=${auth.currentUser?.isAnonymous}');
-      }
+      await _checkUid(expectedUid);
+      await auth.currentUser!.reload();
+      await _checkUid(expectedUid);
+      await auth.currentUser!.getIdToken(true);
+      await _checkUid(expectedUid);
     } on FirebaseAuthException catch (e) {
       if ([
         'credential-already-in-use',
@@ -115,18 +114,29 @@ class FirebaseCustomerAuth implements CustomerAuth {
             'Esta identidade já está vinculada a uma conta. Você pode entrar nela para recuperar os dados dessa conta. Os dados da sessão atual não serão mesclados automaticamente.',
             existingAccount: true);
       }
-      if (e.code == 'provider-already-linked') return;
+      if (e.code == 'provider-already-linked' && old != null) {
+        await _checkUid(old.uid);
+        await refresh();
+        await _checkUid(old.uid);
+        return;
+      }
       if ([
         'popup-closed-by-user',
         'cancelled-popup-request',
-        'web-context-cancelled'
+        'web-context-cancelled',
+        'web-context-canceled',
+        'user-cancelled'
       ].contains(e.code)) {
         throw const CustomerAuthFailure(
             'Entrada cancelada. Você pode tentar novamente quando quiser.');
       }
-      if (['user-disabled', 'user-token-expired', 'invalid-user-token']
-          .contains(e.code)) {
-        await auth.signOut();
+      if ([
+        'user-disabled',
+        'user-not-found',
+        'user-token-expired',
+        'invalid-user-token'
+      ].contains(e.code)) {
+        await signOut();
         throw const CustomerAuthFailure(
             'Sua sessão não está disponível. Entre novamente.');
       }
@@ -142,6 +152,12 @@ class FirebaseCustomerAuth implements CustomerAuth {
           ? 'Entrada cancelada. Você pode tentar novamente.'
           : 'Não foi possível entrar com Google agora. Tente novamente mais tarde.');
     }
+  }
+
+  Future<void> _checkUid(String expected) async {
+    if (auth.currentUser?.uid == expected) return;
+    await signOut();
+    throw const CustomerAuthFailure('Sua sessão mudou. Entre novamente.');
   }
 
   Future<AuthCredential> _nativeGoogleCredential() async {
@@ -171,6 +187,7 @@ class FirebaseCustomerAuth implements CustomerAuth {
           'Entre novamente para confirmar sua identidade.');
     }
     final token = await user.getIdTokenResult();
+    await _checkUid(user.uid);
     final firebase = token.claims?['firebase'];
     final apple =
         firebase is Map && firebase['sign_in_provider'] == 'apple.com';
@@ -183,19 +200,20 @@ class FirebaseCustomerAuth implements CustomerAuth {
     } else {
       await user.reauthenticateWithCredential(await _nativeGoogleCredential());
     }
-    if (auth.currentUser?.uid != user.uid) {
-      throw const CustomerAuthFailure('Sua sessão mudou. Entre novamente.');
-    }
+    await _checkUid(user.uid);
     await user.getIdToken(true);
+    await _checkUid(user.uid);
   }
 
   @override
   Future<void> refresh() async {
+    final user = auth.currentUser;
     try {
-      await auth.currentUser?.reload().timeout(const Duration(seconds: 12));
-      await auth.currentUser
-          ?.getIdToken(true)
-          .timeout(const Duration(seconds: 12));
+      if (user == null) return;
+      await user.reload().timeout(const Duration(seconds: 12));
+      await _checkUid(user.uid);
+      await user.getIdToken(true).timeout(const Duration(seconds: 12));
+      await _checkUid(user.uid);
     } on FirebaseAuthException catch (e) {
       if ([
         'user-disabled',
@@ -203,7 +221,7 @@ class FirebaseCustomerAuth implements CustomerAuth {
         'user-token-expired',
         'invalid-user-token'
       ].contains(e.code)) {
-        await auth.signOut();
+        await signOut();
         throw const CustomerAuthFailure(
             'Sua sessão expirou. Entre novamente para continuar.');
       }
@@ -215,6 +233,7 @@ class FirebaseCustomerAuth implements CustomerAuth {
   @override
   Future<void> signOut() async {
     await auth.signOut();
+    UserSession.clearPersonalData();
     if (!kIsWeb && _googleInitialization != null) {
       try {
         await GoogleSignIn.instance.signOut();

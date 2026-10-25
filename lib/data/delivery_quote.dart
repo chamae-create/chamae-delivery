@@ -21,6 +21,41 @@ class DeliveryQuote {
       this.routingProvider,
       this.quotedAtMs,
       this.expiresAtMs});
+
+  factory DeliveryQuote.fromMap(dynamic data) {
+    if (data is! Map) throw StateError('Cotação de entrega incompleta.');
+    final fee = data['deliveryFee'];
+    final distance = data['distanceMeters'];
+    final created = data['quotedAtMs'], expires = data['expiresAtMs'];
+    if (data['mode'] != 'routeBands' ||
+        fee is! num ||
+        !fee.isFinite ||
+        fee < 0 ||
+        distance is! num ||
+        !distance.isFinite ||
+        distance < 0 ||
+        distance > 30000 ||
+        data['quoteId'] is! String ||
+        !RegExp(r'^[a-f0-9]{64}$').hasMatch(data['quoteId']) ||
+        data['version'] is! String ||
+        (data['version'] as String).isEmpty ||
+        data['distanceUnit'] != 'm' ||
+        data['distanceSource'] != 'route' ||
+        data['routingProvider'] is! String ||
+        (data['routingProvider'] as String).isEmpty ||
+        created is! int ||
+        expires is! int ||
+        expires <= created ||
+        expires <= DateTime.now().millisecondsSinceEpoch) {
+      throw StateError('Cotação de entrega inválida ou expirada.');
+    }
+    return DeliveryQuote(fee.toDouble(), data['quoteId'], 'routeBands',
+        distanceMeters: distance.toDouble(),
+        version: data['version'],
+        routingProvider: data['routingProvider'],
+        quotedAtMs: created,
+        expiresAtMs: expires);
+  }
 }
 
 abstract class DeliveryQuoter {
@@ -49,27 +84,7 @@ class FirebaseDeliveryQuoter implements DeliveryQuoter {
       }
       rethrow;
     }
-    final data = result.data;
-    final fee = data['deliveryFee'];
-    if (fee is! num || !fee.isFinite || fee < 0) {
-      throw StateError('Entrega indisponível. Tente novamente.');
-    }
-    final mode = data['mode'];
-    if (mode != 'legacy' && mode != 'routeBands') {
-      throw StateError('Configuração de entrega indisponível.');
-    }
-    if (mode == 'routeBands' &&
-        (data['quoteId'] is! String ||
-            data['version'] is! String ||
-            data['distanceMeters'] is! num)) {
-      throw StateError('Cotação de entrega incompleta.');
-    }
-    return DeliveryQuote(fee.toDouble(), data['quoteId'] as String?, mode,
-        distanceMeters: (data['distanceMeters'] as num?)?.toDouble(),
-        version: data['version'] as String?,
-        routingProvider: data['routingProvider'] as String?,
-        quotedAtMs: (data['quotedAtMs'] as num?)?.toInt(),
-        expiresAtMs: (data['expiresAtMs'] as num?)?.toInt());
+    return DeliveryQuote.fromMap(result.data);
   }
 }
 

@@ -3,9 +3,13 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
 const {GoogleRoutesProvider} = require("./google-routes-provider");
 const routesApiKey = defineSecret("CHAMAE_ROUTES_API_KEY");
+const countryApiKey = defineSecret("CHAMAE_GEOCODING_API_KEY");
+const {GoogleDestinationCountry} = require("./destination-country");
+const {verifiedQuoteCountry} = require("./order-acceptance");
 const {FieldValue} = require("firebase-admin/firestore");
 const {verifiedCustomerToken} = require("./customer-identity");
-const {validateTable, canonicalTable, priceForDistance, buildQuote, validateQuote, RoutingProvider,
+const {assertCustomerAccountActive} = require("./customer-account-state");
+const {validateTable, canonicalTable, bandForDistance, buildQuote, validateQuote, RoutingProvider,
   fingerprint, point} = require("./delivery-pricing");
 const options = {region: "southamerica-east1", enforceAppCheck: false};
 const denied = () => {
@@ -37,6 +41,28 @@ function safeError(error) {
     "Este endereço está fora da área de entrega disponível no momento." :
     "Não foi possível calcular a entrega agora. Tente novamente.",
   {reason: error.code || "DELIVERY_UNAVAILABLE"});
+}
+
+// Compatible with published versions predating the optional status field.
+// An explicit inactive/draft status never authorizes new financials.
+function activeTable(config, versionDoc) {
+  if (!versionDoc.exists || versionDoc.data().published !== true ||
+      ![undefined, "published"].includes(versionDoc.data().status) ||
+      (versionDoc.data().version != null && versionDoc.data().version !== config.activeVersion)) {
+    throw new Error("DELIVERY_CONFIGURATION_INVALID");
+  }
+  const table = versionDoc.data().table;
+  validateTable(table);
+  if (!point(table.origin)) throw new Error("INVALID_COORDINATES");
+  return table;
+}
+
+function requireRouteConfiguration(config) {
+  if (!config) throw new Error("DELIVERY_CONFIGURATION_MISSING");
+  if (config.mode !== "routeBands" ||
+      !/^[A-Za-z0-9_-]{1,100}$/.test(config.activeVersion || "")) {
+    throw new Error("DELIVERY_CONFIGURATION_INVALID");
+  }
 }
 
 async function saveVersion(db, request) {
@@ -102,25 +128,31 @@ async function saveVersion(db, request) {
   });
 }
 
-async function quoteDelivery(db, request, provider = new RoutingProvider()) {
+async function quoteDelivery(db, request, provider = new RoutingProvider(), countryVerifier = null) {
   const uid = customer(request);
+  await assertCustomerAccountActive(db, uid);
   if ((await db.collection("couriers").doc(uid).get()).exists) denied();
   const id = requestKey(request, uid);
   const config = (await db.collection("deliveryConfiguration").doc("current").get()).data();
-  if (!config) safeError({code: "DELIVERY_CONFIGURATION_MISSING"});
-  if (config.mode === "legacy") return {mode: "legacy", deliveryFee: 10};
-  if (config.mode !== "routeBands") throw new HttpsError("failed-precondition", "Entrega indisponível.");
+  try {
+    requireRouteConfiguration(config);
+  } catch (e) {
+    safeError({code: e.message});
+  }
   const supplied = request.data.destination;
   const destination = supplied && {latitude: supplied.latitude, longitude: supplied.longitude,
     countryCode: supplied.countryCode, confirmed: supplied.confirmed};
   if (!point(destination) || destination.confirmed !== true || !["BR", "PY"].includes(destination.countryCode)) {
-    throw new HttpsError("invalid-argument", "Confirme o destino da entrega.");
+    throw new HttpsError("invalid-argument", "Confirme o destino da entrega.",
+        {reason: "DESTINATION_COUNTRY_UNVERIFIED"});
   }
   const doc = await db.collection("deliveryPricingVersions").doc(config.activeVersion).get();
-  if (!doc.exists || !doc.data().published) throw new HttpsError("failed-precondition", "Entrega indisponível.");
-  const table = doc.data().table;
-  // Historical floor tables may be read for old finance, never quoted for new deliveries.
-  if (!table || table.minimumPolicy !== "replace") safeError({code: "LEGACY_MINIMUM_NOT_ALLOWED"});
+  let table;
+  try {
+    table = activeTable(config, doc);
+  } catch (e) {
+    safeError({code: e.code || e.message});
+  }
   if (provider == null) {
     provider = new GoogleRoutesProvider({apiKey: routesApiKey.value(),
       travelMode: config.travelMode});
@@ -130,21 +162,29 @@ async function quoteDelivery(db, request, provider = new RoutingProvider()) {
   const previous = await ref.get();
   if (previous.exists) {
     const value = previous.data();
-    if (value.fingerprint !== hash || value.expiresAtMs <= Date.now()) {
+    verifiedQuoteCountry(value, destination);
+    if (value.fingerprint !== hash || value.expiresAtMs <= Date.now() ||
+        value.distanceUnit !== "m" || value.distanceSource !== "route") {
       throw new HttpsError("failed-precondition", "Atualize a cotação de entrega.");
     }
     return {mode: "routeBands", quoteId: id, deliveryFee: value.feeCents / 100,
       distanceMeters: value.distanceMeters, version: value.version,
+      distanceUnit: "m", distanceSource: "route",
       routingProvider: value.provider, quotedAtMs: value.createdAtMs, expiresAtMs: value.expiresAtMs};
   }
   let quote;
   try {
+    const verifier = countryVerifier || new GoogleDestinationCountry({apiKey: countryApiKey.value()});
+    const destinationVerification = await verifier.verify(destination);
     quote = await buildQuote({table, provider, origin: table.origin,
       destination, uid, version: config.activeVersion});
+    quote.destinationVerification = destinationVerification;
+    verifiedQuoteCountry(quote, destination);
   } catch (e) {
     safeError(e);
   }
   await db.runTransaction(async (tx) => {
+    await assertCustomerAccountActive(db, uid, tx);
     const active = (await tx.get(db.collection("deliveryConfiguration").doc("current"))).data();
     if (active?.mode !== "routeBands" || active.activeVersion !== config.activeVersion) {
       throw new HttpsError("failed-precondition", "Atualize a cotação de entrega.");
@@ -152,45 +192,44 @@ async function quoteDelivery(db, request, provider = new RoutingProvider()) {
     const current = await tx.get(ref);
     if (current.exists) {
       if (current.data().fingerprint !== hash) throw new HttpsError("already-exists", "Tentativa já utilizada.");
+      verifiedQuoteCountry(current.data(), destination);
       quote = current.data();
     } else tx.set(ref, {...quote, fingerprint: hash});
   });
   return {mode: "routeBands", quoteId: id, deliveryFee: quote.feeCents / 100,
     distanceMeters: quote.distanceMeters, version: quote.version,
+    distanceUnit: "m", distanceSource: "route",
     routingProvider: quote.provider, quotedAtMs: quote.createdAtMs, expiresAtMs: quote.expiresAtMs};
 }
 
-async function prepareDelivery(tx, db, orderRef, order, legacyFeeCents = 1000) {
+async function prepareDelivery(tx, db, orderRef, order) {
   const configDoc = await tx.get(db.collection("deliveryConfiguration").doc("current"));
   const config = configDoc.exists ? configDoc.data() : null;
-  if (!config && order.customerFlowVersion === 2) throw new Error("DELIVERY_CONFIGURATION_MISSING");
-  if (!config || config.mode === "legacy") return {feeCents: legacyFeeCents};
-  if (config.mode !== "routeBands" || !/^[a-f0-9]{64}$/.test(order.deliveryQuoteId || "")) {
+  requireRouteConfiguration(config);
+  if (!/^[a-f0-9]{64}$/.test(order.deliveryQuoteId || "")) {
     throw new Error("DELIVERY_QUOTE_REQUIRED");
   }
   const ref = db.collection("deliveryQuotes").doc(order.deliveryQuoteId);
   const quote = (await tx.get(ref)).data();
   const snapshot = validateQuote(quote, order, orderRef.id);
   const active = await tx.get(db.collection("deliveryPricingVersions").doc(config.activeVersion));
-  const table = active.data()?.table;
-  if (!active.exists || !active.data().published || table?.minimumPolicy !== "replace") {
-    throw new Error("DELIVERY_CONFIGURATION_INVALID");
-  }
+  const table = activeTable(config, active);
   // Revalidate the private server quote against the active published table.
   // A changed table/origin requires a fresh route; client prices/distances never count.
-  const feeCents = priceForDistance(table, quote.distanceMeters);
+  const appliedBand = bandForDistance(table, quote.distanceMeters);
+  const feeCents = appliedBand.priceCents;
   if (quote.version !== config.activeVersion || feeCents !== quote.feeCents ||
       quote.origin.latitude !== table.origin?.latitude || quote.origin.longitude !== table.origin?.longitude) {
     throw new Error("DELIVERY_QUOTE_REFRESH_REQUIRED");
   }
-  return {feeCents, snapshot, quoteRef: ref};
+  return {feeCents, snapshot: {...snapshot, appliedBand}, quoteRef: ref};
 }
 
 function createDeliveryFunctions(db) {
   return {
     chamaeDescartarPropostaPedido: onCall(options, (r) => discardProposal(db, r)),
     chamaeSalvarConfiguracaoEntrega: onCall(options, (r) => saveVersion(db, r)),
-    chamaeCotarEntrega: onCall({...options, secrets: [routesApiKey]}, (r) => quoteDelivery(db, r, null)),
+    chamaeCotarEntrega: onCall({...options, secrets: [routesApiKey, countryApiKey]}, (r) => quoteDelivery(db, r, null)),
     chamaeAtivarConfiguracaoEntrega: onCall(options, (r) => {
       administrator(r);
       throw new HttpsError("failed-precondition",
@@ -209,6 +248,7 @@ async function discardProposal(db, request) {
   const workspace = db.collection("customerWorkspaces").doc(uid);
   const cancelled = db.collection(`customerOrderCancellations/${uid}/orders`).doc(id);
   return db.runTransaction(async (tx) => {
+    await assertCustomerAccountActive(db, uid, tx);
     const order = await tx.get(orderRef);
     const state = await tx.get(workspace);
     const lock = await tx.get(cancelled);

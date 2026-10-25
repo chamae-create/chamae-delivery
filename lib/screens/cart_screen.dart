@@ -4,7 +4,8 @@ import '../widgets/delivery_quote_summary.dart';
 import 'package:flutter/material.dart';
 import '../core/models.dart';
 import '../core/theme.dart';
-import '../core/store_hours.dart';
+import '../widgets/store_hours_builder.dart';
+import '../widgets/customer_feedback.dart';
 import '../widgets/product_image.dart';
 
 class CartScreen extends StatefulWidget {
@@ -58,137 +59,163 @@ class _CartScreenState extends State<CartScreen> {
   String money(double value) =>
       'R\$ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
   @override
-  Widget build(BuildContext context) {
-    final items = widget.items();
-    final subtotal = items.fold(0.0, (sum, item) => sum + item.totalPrice);
-    return Scaffold(
-      appBar: AppBar(title: const Text('Seu carrinho')),
-      body: items.isEmpty
-          ? const Center(
-              child: Padding(
-                  padding: EdgeInsets.all(AppSpace.lg),
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.shopping_bag_outlined,
-                        size: 56, color: AppColors.textSecondary),
-                    SizedBox(height: 16),
-                    Text('Seu carrinho está vazio.'),
-                    Text('Escolha suas bebidas e conveniência.'),
-                  ])))
-          : SingleChildScrollView(
-              padding: CustomerVisual.pagePadding(context),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const CustomerSectionTitle(
-                        title: 'Confira seu pedido',
-                        subtitle: 'Revise seus itens antes de continuar.',
-                        icon: Icons.shopping_bag_outlined),
-                    if (widget.notice != null)
-                      Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Text(widget.notice!,
-                              style: const TextStyle(color: AppColors.error))),
-                    for (final item in items)
-                      Card(
-                          elevation: 0,
-                          child: Padding(
-                              padding: const EdgeInsets.all(AppSpace.md),
-                              child: Column(children: [
-                                Row(children: [
-                                  SizedBox(
-                                      width: 84,
-                                      height: 100,
-                                      child: ProductImage(url: item.imageUrl)),
-                                  const SizedBox(width: 12),
-                                  Expanded(
+  Widget build(BuildContext context) =>
+      StoreHoursBuilder(builder: (context, open, hoursLabel) {
+        final items = widget.items();
+        final subtotal = items.fold(0.0, (sum, item) => sum + item.totalPrice);
+        return Scaffold(
+          appBar: AppBar(title: const Text('Seu carrinho')),
+          body: SafeArea(
+              top: false,
+              child: items.isEmpty
+                  ? const Center(
+                      child: SingleChildScrollView(
+                          child: CustomerFeedback(
+                              title: 'Seu carrinho está vazio.',
+                              message: 'Escolha suas bebidas e conveniência.',
+                              icon: Icons.shopping_bag_outlined)))
+                  : CustomScrollView(slivers: [
+                      SliverPadding(
+                          padding: CustomerVisual.pagePadding(context),
+                          sliver: SliverMainAxisGroup(slivers: [
+                            SliverToBoxAdapter(
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                  const CustomerSectionTitle(
+                                      title: 'Confira seu pedido',
+                                      subtitle:
+                                          'Revise seus itens antes de continuar.',
+                                      icon: Icons.shopping_bag_outlined),
+                                  if (widget.notice != null)
+                                    Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
+                                        child: Text(widget.notice!,
+                                            style: const TextStyle(
+                                                color: AppColors.error))),
+                                ])),
+                            SliverList.builder(
+                                itemCount: items.length,
+                                itemBuilder: (context, index) =>
+                                    _cartItem(items[index])),
+                            SliverToBoxAdapter(
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                  const SizedBox(height: 16),
+                                  const CustomerSectionTitle(
+                                      title: 'Resumo do pedido',
+                                      icon: Icons.receipt_long_outlined),
+                                  Container(
+                                      decoration: CustomerVisual.panel(),
+                                      padding: const EdgeInsets.all(20),
                                       child: Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                              CrossAxisAlignment.stretch,
                                           children: [
-                                        Text(item.name,
+                                            if (widget.destination != null)
+                                              DeliveryQuoteSummary(
+                                                  controller: _delivery,
+                                                  subtotal: subtotal)
+                                            else ...[
+                                              _line(
+                                                  'Produtos', money(subtotal)),
+                                              _line(
+                                                  'Taxa de serviço',
+                                                  money((subtotal * .01 * 100)
+                                                          .round() /
+                                                      100)),
+                                              _line(
+                                                  'Produtos e serviço',
+                                                  money(subtotal +
+                                                      (subtotal * .01 * 100)
+                                                              .round() /
+                                                          100)),
+                                              _line('Entrega',
+                                                  'A calcular após confirmar o endereço'),
+                                            ],
+                                          ])),
+                                  const SizedBox(height: 24),
+                                  if (!open)
+                                    Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
+                                        child: Text(hoursLabel,
                                             style: const TextStyle(
-                                                fontWeight: FontWeight.w700)),
-                                        Text('${money(item.price)} por unidade',
-                                            style: const TextStyle(
-                                                color:
-                                                    AppColors.textSecondary)),
-                                        Text(money(item.totalPrice),
-                                            style: const TextStyle(
-                                                color: AppColors.darkGold,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w900)),
-                                      ])),
-                                ]),
-                                Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      IconButton(
-                                          tooltip: 'Remover ${item.name}',
-                                          icon:
-                                              const Icon(Icons.delete_outline),
-                                          onPressed: () => setState(() =>
-                                              widget.change(
-                                                  item.id, -item.quantity))),
-                                      IconButton(
-                                          tooltip: 'Diminuir quantidade',
-                                          icon: const Icon(Icons.remove),
-                                          onPressed: () => setState(() =>
-                                              widget.change(item.id, -1))),
-                                      Text('${item.quantity}',
-                                          semanticsLabel:
-                                              '${item.quantity} unidades'),
-                                      IconButton(
-                                          tooltip: 'Aumentar quantidade',
-                                          icon: const Icon(Icons.add),
-                                          onPressed: () => setState(
-                                              () => widget.change(item.id, 1))),
-                                    ]),
-                              ]))),
-                    const SizedBox(height: 16),
-                    const CustomerSectionTitle(
-                        title: 'Resumo do pedido',
-                        icon: Icons.receipt_long_outlined),
-                    Container(
-                        decoration: CustomerVisual.panel(),
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              if (widget.destination != null)
-                                DeliveryQuoteSummary(
-                                    controller: _delivery, subtotal: subtotal)
-                              else ...[
-                                _line('Produtos', money(subtotal)),
-                                _line(
-                                    'Taxa de serviço',
-                                    money(
-                                        (subtotal * .01 * 100).round() / 100)),
-                                _line(
-                                    'Produtos e serviço',
-                                    money(subtotal +
-                                        (subtotal * .01 * 100).round() / 100)),
-                                _line('Entrega',
-                                    'A calcular após confirmar o endereço'),
-                              ],
-                            ])),
-                    const SizedBox(height: 24),
-                    if (!isStoreOpen())
-                      Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Text(storeHoursLabel(),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w700))),
-                    ElevatedButton(
-                        onPressed: isStoreOpen() &&
-                                (widget.destination == null ||
-                                    (!_delivery.loading &&
-                                        _delivery.value != null))
-                            ? widget.checkout
-                            : null,
-                        child: const Text('Continuar para entrega')),
+                                                fontWeight: FontWeight.w700))),
+                                  ElevatedButton(
+                                      onPressed: open &&
+                                              (widget.destination == null ||
+                                                  (!_delivery.loading &&
+                                                      _delivery.value != null))
+                                          ? widget.checkout
+                                          : null,
+                                      child:
+                                          const Text('Continuar para entrega')),
+                                  const SizedBox(height: 12),
+                                  const Text(
+                                      'O total será conferido ao confirmar o pedido.',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: AppColors.textSecondary)),
+                                  if (!open)
+                                    const Padding(
+                                        padding: EdgeInsets.only(top: 12),
+                                        child: Text(
+                                            'O catálogo continua disponível. Os pedidos voltam às 08:00 (MS).')),
+                                ])),
+                          ])),
+                    ])),
+        );
+      });
+
+  Widget _cartItem(CartItem item) => Card(
+      elevation: 0,
+      child: Padding(
+          padding: const EdgeInsets.all(AppSpace.md),
+          child: Column(children: [
+            Row(children: [
+              SizedBox(
+                  width: 84,
+                  height: 100,
+                  child: ProductImage(url: item.imageUrl)),
+              const SizedBox(width: 12),
+              Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    Text(item.name,
+                        style: const TextStyle(fontWeight: FontWeight.w700)),
+                    Text('${money(item.price)} por unidade',
+                        style: const TextStyle(color: AppColors.textSecondary)),
+                    Text(money(item.totalPrice),
+                        style: const TextStyle(
+                            color: AppColors.darkGold,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900)),
                   ])),
-    );
-  }
+            ]),
+            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              IconButton(
+                  tooltip: 'Remover ${item.name}',
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () =>
+                      setState(() => widget.change(item.id, -item.quantity))),
+              IconButton(
+                  tooltip: 'Diminuir quantidade',
+                  icon: const Icon(Icons.remove),
+                  onPressed: () => setState(() => widget.change(item.id, -1))),
+              Text('${item.quantity}',
+                  semanticsLabel: '${item.quantity} unidades'),
+              IconButton(
+                  tooltip: 'Aumentar quantidade',
+                  icon: const Icon(Icons.add),
+                  onPressed: () => setState(() => widget.change(item.id, 1))),
+            ]),
+          ])));
 
   Widget _line(String label, String value) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),

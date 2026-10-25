@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "registeredOn": "2026-10-21",
+  "authority": "Owner-provided OFFICIAL VISUAL SCREENS of Chamaê Delivery",
+  "acceptance": "Maximum visual fidelity / 100% goal; near is not acceptance",
+  "exceptions": "Only unavoidable responsiveness/accessibility, real dynamic data or missing real functionality; each exception explicitly reviewed",
+  "scope": "Documentation and Home audit only; other six screens not to be changed",
+  "sequence": [
+    "home",
+    "categories",
+    "cart",
+    "checkout",
+    "tracking",
+    "product",
+    "profile"
+  ],
+  "screens": [
+    {
+      "id": "home",
+      "approvalOrder": 1,
+      "name": "Home",
+      "image": "design/references/customer_app/official/02_home_reference.jpeg",
+      "widthPx": 900,
+      "heightPx": 1600,
+      "sha256": "07629e2c7059536415059d65474e7e8d1ebde995799c6a1ee7f649f107c6bcf9",
+      "flutter": [
+        {
+          "file": "lib/screens/home_screen.dart",
+          "widget": "DeliveryHomeScreen",
+          "members": [
+            "_buildHeader",
+            "_buildCatalogContent",
+            "_buildProductCard",
+            "_buildBottomNavigation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "categories",
+      "approvalOrder": 2,
+      "name": "Categorias",
+      "image": "design/references/customer_app/official/01_categories_reference.jpeg",
+      "widthPx": 900,
+      "heightPx": 1600,
+      "sha256": "71b4cb5b895f6d86080403c69fafc62f32467fd3c78797c9fc8aabdf12a73fc0",
+      "flutter": [
+        {
+          "file": "lib/screens/home_screen.dart",
+          "widget": "DeliveryHomeScreen",
+          "members": [
+            "_categoryOverview",
+            "_buildCategoryOverview",
+            "_buildCategories"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cart",
+      "approvalOrder": 3,
+      "name": "Carrinho",
+      "image": "design/references/customer_app/official/03_cart_reference.jpeg",
+      "widthPx": 900,
+      "heightPx": 1600,
+      "sha256": "96ba919d266645d6a56b5e5d3d841dbb4693f1a1d45dd93808f4cc193abf5574",
+      "flutter": [
+        {
+          "file": "lib/screens/cart_screen.dart",
+          "widget": "CartScreen"
+        }
+      ]
+    },
+    {
+      "id": "checkout",
+      "approvalOrder": 4,
+      "name": "Finalizar pedido / checkout",
+      "image": "design/references/customer_app/official/04_checkout_reference.jpeg",
+      "widthPx": 900,
+      "heightPx": 1600,
+      "sha256": "80f8ce8d0ffa647316bd7feff00438e6bdd4b1f585f1e710383b285b95ee6bde",
+      "flutter": [
+        {
+          "file": "lib/screens/checkout_screen.dart",
+          "widget": "CheckoutScreen"
+        }
+      ]
+    },
+    {
+      "id": "tracking",
+      "approvalOrder": 5,
+      "name": "Acompanhar pedido",
+      "image": "design/references/customer_app/official/05_tracking_reference.jpeg",
+      "widthPx": 900,
+      "heightPx": 1600,
+      "sha256": "bd120031d4e4e9279bf6a2ae71293c6da6416c3666298bcf8e25279abfba8c5b",
+      "flutter": [
+        {
+          "file": "lib/screens/tracking_screen.dart",
+          "widget": "TrackingScreen"
+        },
+        {
+          "file": "lib/screens/tracking_view.dart",
+          "widget": "TrackingView"
+        }
+      ]
+    },
+    {
+      "id": "product",
+      "approvalOrder": 6,
+      "name": "Detalhe de produto/combo",
+      "image": "design/references/customer_app/official/06_product_reference.jpeg",
+      "widthPx": 900,
+      "heightPx": 1600,
+      "sha256": "e02a9bf6234d4466ff00492db27959d290ded971a40f2a410d5af5bd10a9e8e5",
+      "flutter": [
+        {
+          "file": "lib/screens/home_screen.dart",
+          "widget": "DeliveryHomeScreen",
+          "members": [
+            "_showProduct"
+          ],
+          "presentation": "modal bottom sheet, not separate screen"
+        }
+      ]
+    },
+    {
+      "id": "profile",
+      "approvalOrder": 7,
+      "name": "Perfil",
+      "image": "design/references/customer_app/official/07_profile_reference.jpeg",
+      "widthPx": 900,
+      "heightPx": 1600,
+      "sha256": "a22008ee5aec82bdc43d89c93970f28ae40c3e341da09b9c203fdcac152d8f29",
+      "flutter": [
+        {
+          "file": "lib/screens/customer_profile_screen.dart",
+          "widget": "CustomerProfileScreen"
+        }
+      ]
+    }
+  ]
+}

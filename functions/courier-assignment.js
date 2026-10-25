@@ -51,6 +51,8 @@ function orderId(id) {
 function readyForDispatch(order) {
   const financial = order.financialValidationStatus === "validated";
   if (!financial ||
+      order.deliveryIncidentStatus != null &&
+      order.deliveryIncidentStatus !== "resolved" ||
       ["requires_review", "error", "released"].includes(
           order.stockReservationStatus) ||
       order.stockProcessingStatus === "requires_review" ||
@@ -129,6 +131,11 @@ async function changeCourier(db, request, operation = "assign") {
       throw new HttpsError("not-found", "Pedido não existe.");
     }
     const source = snapshot.data();
+    if (source.deliveryIncidentStatus != null &&
+        source.deliveryIncidentStatus !== "resolved") {
+      throw new HttpsError("failed-precondition",
+          "DELIVERY_INCIDENT_PENDING");
+    }
     if (source.financialValidationStatus !== "validated") {
       throw new HttpsError("failed-precondition",
           "Pedido sem validação financeira oficial. Histórico não operável.");

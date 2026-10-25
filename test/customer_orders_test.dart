@@ -53,6 +53,13 @@ class TestSnapshot extends Fake implements QuerySnapshot<Map<String, dynamic>> {
   @override
   final List<QueryDocumentSnapshot<Map<String, dynamic>>> docs;
   TestSnapshot(this.docs);
+  @override
+  SnapshotMetadata get metadata => TestMetadata();
+}
+
+class TestMetadata extends Fake implements SnapshotMetadata {
+  @override
+  bool get hasPendingWrites => false;
 }
 
 class TestStore extends Fake implements FirebaseFirestore {
@@ -304,7 +311,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('STATUS DO PEDIDO'), findsOneWidget);
     expect(find.text('Destino: Rua própria'), findsOneWidget);
-    expect(find.text('Total: R\$ 20.00'), findsOneWidget);
+    expect(find.text('Total: R\$ 20,00'), findsOneWidget);
     auth.change(null);
     await tester.pumpAndSettle();
     expect(find.text('STATUS DO PEDIDO'), findsNothing);

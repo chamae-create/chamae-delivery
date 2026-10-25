@@ -4,6 +4,7 @@ import '../core/models.dart';
 import '../data/customer_auth.dart';
 import '../data/customer_onboarding.dart';
 import '../data/customer_workspace.dart';
+import '../data/customer_local_privacy.dart';
 import 'customer_login_screen.dart';
 import 'customer_onboarding_screen.dart';
 import 'address_destination_screen.dart';
@@ -117,7 +118,51 @@ class _CustomerSessionGateState extends State<CustomerSessionGate>
   }
 
   @override
-  Widget build(BuildContext context) => StreamBuilder<CustomerIdentity?>(
+  Widget build(BuildContext context) => ValueListenableBuilder<
+          LocalClosureCleanup>(
+      valueListenable: CustomerLocalPrivacy.state,
+      builder: (context, cleanup, _) {
+        if (cleanup == LocalClosureCleanup.idle) return _sessionView(context);
+        _generation++;
+        _last = null;
+        _future = null;
+        _repository = null;
+        _workspace = null;
+        _chosenAddress = null;
+        _sessionKey = null;
+        _developmentPolicy = null;
+        _enteredCatalog = false;
+        return Scaffold(
+            body: SafeArea(
+                child: Center(
+                    child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child:
+                            Column(mainAxisSize: MainAxisSize.min, children: [
+                          const Text('Conta excluída'),
+                          if (cleanup == LocalClosureCleanup.cleaning) ...[
+                            const CircularProgressIndicator(),
+                            const Text(
+                                'Encerrando sessão e limpando os dados deste aparelho…'),
+                          ] else if (cleanup == LocalClosureCleanup.failed) ...[
+                            const Text(
+                                'A exclusão no serviço foi concluída, mas a limpeza deste aparelho está pendente.'),
+                            TextButton(
+                                onPressed: () async {
+                                  try {
+                                    await CustomerLocalPrivacy.retry();
+                                  } catch (_) {
+                                    /* State already reports the pending cleanup. */
+                                  }
+                                },
+                                child: const Text('Tentar limpeza novamente')),
+                          ] else
+                            const Text(
+                                'Limpeza local concluída. Feche e abra o app (ou recarregue a página) para continuar.'),
+                        ])))));
+      });
+
+  Widget _sessionView(BuildContext context) => StreamBuilder<CustomerIdentity?>(
       stream: _session,
       initialData: _auth.current,
       builder: (context, snapshot) {
@@ -134,8 +179,10 @@ class _CustomerSessionGateState extends State<CustomerSessionGate>
           _sessionKey = null;
           _last = null;
           _generation++;
-          UserSession.fullName = '';
-          UserSession.whatsapp = '';
+          _future = null;
+          _workspace = null;
+          _repository = null;
+          UserSession.clearPersonalData();
           return CustomerLoginScreen(auth: _auth);
         }
         if (_sessionKey != user.uid) {
@@ -145,8 +192,8 @@ class _CustomerSessionGateState extends State<CustomerSessionGate>
           _sessionKey = user.uid;
           _generation++;
           _last = null;
+          UserSession.clearPersonalData();
           UserSession.fullName = user.name;
-          UserSession.whatsapp = '';
           _repository =
               widget.onboarding?.call(user.uid) ?? FirebaseCustomerOnboarding();
           _workspace =

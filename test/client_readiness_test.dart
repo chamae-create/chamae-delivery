@@ -103,7 +103,7 @@ void main() {
     expect(address.copyWith(complement: 'Casa').toMap()['countryCode'], 'PY');
     expect(DeliveryAddress.fromMap({}).countryCode, isNull);
   });
-  testWidgets('splash avança assim que sessão pronta, sem espera estética',
+  testWidgets('splash completes visual sequence once session is ready',
       (tester) async {
     final ready = Completer<void>();
     await tester.pumpWidget(MaterialApp(
@@ -112,11 +112,14 @@ void main() {
             destination: const Scaffold(body: Text('Home pronta')))));
     expect(tester.widget<Image>(find.byType(Image)).semanticLabel,
         'Chamaê Delivery. Bebidas e conveniência.');
+    await tester.pump();
     ready.complete();
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 200));
-    expect(find.text('Home pronta'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 2500));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
     await tester.pumpAndSettle();
+    expect(find.text('Home pronta'), findsOneWidget);
   });
   testWidgets('splash mostra erro e permite nova tentativa', (tester) async {
     var attempts = 0;
@@ -152,7 +155,11 @@ void main() {
   testWidgets('país desconhecido usa confirmação excepcional', (tester) async {
     await tester.pumpWidget(checkout(null));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Confirmar país da entrega'));
+    final confirmCountry = find.text('Confirmar país da entrega');
+    await tester.ensureVisible(confirmCountry);
+    await tester.pumpAndSettle();
+    expect(confirmCountry.hitTestable(), findsOneWidget);
+    await tester.tap(confirmCountry);
     await tester.pumpAndSettle();
     expect(find.text('Esta entrega é no Brasil ou Paraguai?'), findsOneWidget);
     await tester.tap(find.text('Paraguai'));
@@ -220,21 +227,21 @@ void main() {
           theme: AppTheme.lightTheme,
           home: DeliveryHomeScreen(products: Stream.value([product()]))));
       await tester.pump(const Duration(seconds: 1));
-      await tester.scrollUntilVisible(find.text('BEBIDA 350 ML'), 300,
+      await tester.scrollUntilVisible(find.text('Bebida 350 ml').first, 300,
           scrollable: find
               .descendant(
                   of: find.byType(CustomScrollView),
                   matching: find.byType(Scrollable))
               .first);
-      await Scrollable.ensureVisible(tester.element(find.text('BEBIDA 350 ML')),
+      await Scrollable.ensureVisible(tester.element(find.text('Bebida 350 ml').first),
           alignment: .3);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('BEBIDA 350 ML'));
+      await tester.tap(find.text('Bebida 350 ml').first);
       await tester.pumpAndSettle();
       expect(find.text('Lata 350 ml'), findsOneWidget);
       await tester.tap(find.text('Adicionar ao carrinho'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Carrinho'));
+      await tester.tap(find.byTooltip('Carrinho').last);
       await tester.pumpAndSettle();
       expect(find.text('Seu carrinho'), findsOneWidget);
       expect(tester.takeException(), isNull);

@@ -1,4 +1,10 @@
 const {prepareDelivery} = require("./delivery-service");
+const {prepareOrderAcceptance, assertStoreOpen} = require("./order-acceptance");
+const {assertPurchasable, assertPixCanStart, updateActiveOrder,
+  savePixCreation, isCancelled, recordCancelledPayment} =
+    require("./order-cancellation-state");
+const {createOrderCancellation, cancelFromProvider} =
+    require("./order-cancellation");
 const {prepareCustomerEligibility, checkProductEligibility} =
     require("./customer-onboarding");
 const {isCommerciallyBlocked} = require("./catalog-commercial-policy");
@@ -85,7 +91,6 @@ function agruparItensEstoque(itemsList) {
   return Array.from(quantidades, ([id, quantity]) => ({id, quantity}));
 }
 
-const FRETE_PEDIDO_CENTAVOS = 1000;
 const PYG_POR_BRL = 1500;
 const BRL_POR_USD = 5;
 
@@ -126,6 +131,11 @@ function conferirItensFinanceiros(pedido, dados) {
  * @return {Promise<Object>} Financeiro e referência para persistência.
  */
 async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
+  try {
+    assertPurchasable(pedido);
+  } catch (error) {
+    throw erroFinanceiro(error.acceptanceCode);
+  }
   const itens = agruparItensEstoque(pedido.itemsList);
   if (!itens || itens.length === 0) {
     throw erroFinanceiro(itens ? "PEDIDO_SEM_ITENS" : "ITEM_PEDIDO_INVALIDO");
@@ -134,6 +144,13 @@ async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
   // Esta coleção deve permitir escrita somente pelo backend (Admin SDK).
   const ref = db.collection("orderFinancials").doc(orderRef.id);
   const snapshot = await transaction.get(ref);
+  try {
+    // Even a frozen financial is not permission to start a new PIX/reservation
+    // after closing. Reconciliation of already-issued effects uses other paths.
+    await prepareOrderAcceptance(transaction, db, orderRef, pedido);
+  } catch (error) {
+    throw erroFinanceiro(error.acceptanceCode || error.message);
+  }
   if (snapshot.exists) {
     const dados = snapshot.data();
     conferirItensFinanceiros(pedido, dados);
@@ -143,8 +160,7 @@ async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
   let delivery;
   const eligibility = await prepareCustomerEligibility(transaction, db, pedido);
   try {
-    delivery = await prepareDelivery(transaction, db, orderRef, pedido,
-        FRETE_PEDIDO_CENTAVOS);
+    delivery = await prepareDelivery(transaction, db, orderRef, pedido);
   } catch (error) {
     throw erroFinanceiro(error.code || error.message || "DELIVERY_UNAVAILABLE");
   }
@@ -209,6 +225,9 @@ async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
     deliveryFee: delivery.feeCents / 100,
     ...(delivery.snapshot ? {deliverySnapshot: delivery.snapshot,
       deliveryDistanceMeters: delivery.snapshot.distanceMeters,
+      deliveryDistanceUnit: delivery.snapshot.distanceUnit,
+      deliveryDistanceSource: delivery.snapshot.distanceSource,
+      deliveryAppliedBand: delivery.snapshot.appliedBand,
       deliveryPricingVersion: delivery.snapshot.configurationVersion,
       routingProvider: delivery.snapshot.routingProvider,
       deliveryQuotedAtMs: delivery.snapshot.quotedAtMs} : {}),
@@ -251,6 +270,11 @@ function camposFinanceirosPedido(pedido, dados) {
     ...(dados.deliverySnapshot ?
       {deliverySnapshot: dados.deliverySnapshot,
         deliveryDistanceMeters: dados.deliverySnapshot.distanceMeters,
+        ...(dados.deliverySnapshot.distanceUnit ? {
+          deliveryDistanceUnit: dados.deliverySnapshot.distanceUnit,
+          deliveryDistanceSource: dados.deliverySnapshot.distanceSource,
+          deliveryAppliedBand: dados.deliverySnapshot.appliedBand,
+        } : {}),
         deliveryPricingVersion: dados.deliverySnapshot.configurationVersion,
         routingProvider: dados.deliverySnapshot.routingProvider,
         deliveryQuotedAtMs: dados.deliverySnapshot.quotedAtMs} : {}),
@@ -1493,6 +1517,24 @@ exports.chamaeMercadoPagoWebhook = onRequest(
             // ==============================================
 
 
+            if (status === "canceled" &&
+                ["canceled", "expired"].includes(statusDetail) ||
+                status === "failed" && statusDetail === "expired") {
+              try {
+                await cancelFromProvider(db, externalReference,
+                    {orderId, amount: totalAmount,
+                      status, detail: statusDetail},
+                    {release: resolverReservaNaTransacao,
+                      checkFinancial: conferirItensFinanceiros});
+              } catch (error) {
+                console.error("PIX terminal requires reconciliation",
+                    {orderId, code: error.code});
+                response.status(500).send("Reconciliation required");
+                return;
+              }
+              response.status(200).send("OK");
+              return;
+            }
             if (
 
               status !== "processed" ||
@@ -1884,6 +1926,21 @@ exports.chamaeMercadoPagoWebhook = onRequest(
 
                     // ======================================
 
+                    if (isCancelled(pedido)) {
+                      await recordCancelledPayment(
+                          transaction, db, orderRef, pedido, {
+                            mercadoPagoOrderId: orderId,
+                            mercadoPagoPaymentId: pagamento.id || null,
+                            mercadoPagoStatus: status,
+                            mercadoPagoStatusDetail: statusDetail,
+                            mercadoPagoPaymentStatus: paymentStatus,
+                            paidAt: FieldValue.serverTimestamp(),
+                            mercadoPagoConfirmedAt:
+                              FieldValue.serverTimestamp(),
+                            paymentConfirmedBy: origemValidacao,
+                          }, financeiroSalvo);
+                      return;
+                    }
                     const itens =
                         agruparItensEstoque(pedido.itemsList);
 
@@ -2685,6 +2742,8 @@ exports.chamaeCriarPix = onRequest(
 
 
       try {
+        assertStoreOpen();
+        await assertPixCanStart(db, orderRef);
         const resultado =
 
             await fetch(
@@ -2813,7 +2872,7 @@ exports.chamaeCriarPix = onRequest(
             {};
 
 
-        await orderRef.update({
+        await savePixCreation(db, orderRef, {
 
           externalReference:
 
@@ -2922,6 +2981,11 @@ exports.chamaeCriarPix = onRequest(
             error.message,
 
         );
+
+        if (error.acceptanceCode) {
+          response.status(400).json({erro: error.acceptanceCode});
+          return;
+        }
 
 
         response.status(502).json({
@@ -3055,6 +3119,9 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
             },
         );
       } catch (error) {
+        if (["ORDER_CANCELLED", "ORDER_FINALIZED"].includes(error.message)) {
+          return;
+        }
         console.error(
             "Erro ao preparar PIX automático.",
             {
@@ -3064,7 +3131,7 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
         );
 
         try {
-          await orderRef.update({
+          await updateActiveOrder(db, orderRef, {
             mercadoPagoCreateStatus: "error",
             mercadoPagoLastErrorCode:
                 error.financeiro ? error.message : "PREPARATION_ERROR",
@@ -3124,6 +3191,8 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
       };
 
       try {
+        assertStoreOpen();
+        await assertPixCanStart(db, orderRef);
         const resultado = await fetch(
             "https://api.mercadopago.com/v1/orders",
             {
@@ -3152,7 +3221,7 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
               },
           );
 
-          await orderRef.update({
+          await updateActiveOrder(db, orderRef, {
             mercadoPagoCreateStatus: "error",
             mercadoPagoLastErrorCode:
                 "INVALID_API_RESPONSE",
@@ -3173,7 +3242,7 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
               },
           );
 
-          await orderRef.update({
+          await updateActiveOrder(db, orderRef, {
             mercadoPagoCreateStatus: "error",
             mercadoPagoLastErrorCode:
                 "MERCADO_PAGO_REJECTED",
@@ -3220,7 +3289,7 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
               },
           );
 
-          await orderRef.update({
+          await updateActiveOrder(db, orderRef, {
             mercadoPagoCreateStatus: "error",
             mercadoPagoLastErrorCode:
                 "MISSING_PIX_DATA",
@@ -3230,7 +3299,7 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
           return;
         }
 
-        await orderRef.update({
+        await savePixCreation(db, orderRef, {
           externalReference: orderDocumentId,
           mercadoPagoOrderId:
               mercadoPagoOrderId,
@@ -3279,10 +3348,10 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
         );
 
         try {
-          await orderRef.update({
+          await updateActiveOrder(db, orderRef, {
             mercadoPagoCreateStatus: "error",
             mercadoPagoLastErrorCode:
-                "COMMUNICATION_ERROR",
+                error.acceptanceCode || "COMMUNICATION_ERROR",
             mercadoPagoLastErrorAt:
                 FieldValue.serverTimestamp(),
           });
@@ -3351,7 +3420,7 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
           partes.length === 0 ||
           partes.some((parte) => parte.method !== "Dinheiro")
         ) {
-          await orderRef.update({
+          await updateActiveOrder(db, orderRef, {
             stockReservationStatus: "requires_review",
             stockReservationError: "SPLIT_PAYMENT_INVALIDO",
             status: "Revisão de estoque",
@@ -3371,6 +3440,7 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
               }
 
               const pedido = atual.data() || {};
+              if (isCancelled(pedido)) return;
 
               if (
                 pedido.stockReservationStatus === "reserved" ||
@@ -3498,7 +3568,7 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
         );
 
         try {
-          await orderRef.update({
+          await updateActiveOrder(db, orderRef, {
             ...(error.financeiro ? {
               financialValidationStatus: "rejected",
               financialValidationError: error.message,
@@ -3535,10 +3605,11 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
  * @param {Object} orderRef Order reference.
  * @param {string} orderId Order ID.
  * @param {boolean} complete Fail closed and finalize for completion.
+ * @param {boolean} cancel Strict local release in an authorized cancellation.
  * @return {Promise<void>} Effects inside caller transaction.
  */
 async function resolverReservaNaTransacao(
-    transaction, orderRef, orderId, complete = false) {
+    transaction, orderRef, orderId, complete = false, cancel = false) {
   const atual = await transaction.get(orderRef);
 
   if (!atual.exists) {
@@ -3546,10 +3617,30 @@ async function resolverReservaNaTransacao(
   }
 
   const pedido = atual.data() || {};
+  if (complete && isCancelled(pedido) ||
+      cancel && pedido.status === "Concluído") {
+    throw new HttpsError("failed-precondition",
+        "Pedido encerrado. Revise a compensação.");
+  }
   if (complete) pedido.status = "Concluído";
+  if (cancel) pedido.status = "Cancelado";
 
   if (pedido.stockReservationStatus !== "reserved") {
     return;
+  }
+  const deliveryState = require("./delivery-contingency-state");
+  if (pedido.status === "Concluído" && !complete &&
+      (!pedido.deliveryConfirmedAt || pedido.paymentStatus !== "Pago" &&
+       !pedido.deliveryCollectionConfirmedAt)) {
+    deliveryState.fail("DELIVERY_AND_COLLECTION_CONFIRMATION_REQUIRED");
+  }
+  if (typeof pedido.status === "string" &&
+      pedido.status.toLowerCase().includes("cancel") &&
+      deliveryState.needsReturnProof(atual.data())) {
+    const physicalReturn = await transaction.get(
+        db.doc(`orderDeliveryIncidents/${orderId}`));
+    deliveryState.assertReturnProof(atual.data(),
+        physicalReturn.exists ? physicalReturn.data() : null);
   }
 
   // Decide pelo estado atual, inclusive em retries da transação.
@@ -3582,7 +3673,7 @@ async function resolverReservaNaTransacao(
       agruparItensEstoque(pedido.itemsList);
 
   if (!itens || itens.length === 0) {
-    if (complete) {
+    if (complete || cancel) {
       throw new HttpsError("failed-precondition",
           "Itens inválidos. Revise a reserva antes de concluir.");
     }
@@ -3613,6 +3704,11 @@ async function resolverReservaNaTransacao(
     }
 
     const product = productSnapshot.data() || {};
+    if (deveLiberar && product.PRO_CODIGO != null) {
+      throw new HttpsError("failed-precondition",
+          "Integração física não disponível para compensação.",
+          {reason: "INTEGRATED_STOCK_COMPENSATION_UNAVAILABLE"});
+    }
     const stockAtual = Number(product.stock);
     const reservadoAtual = Number(
         product.reservedStock || 0,
@@ -3644,7 +3740,7 @@ async function resolverReservaNaTransacao(
   }
 
   if (erro) {
-    if (complete) {
+    if (complete || cancel) {
       throw new HttpsError("failed-precondition",
           "Reserva inconsistente. Revise o estoque antes de concluir.");
     }
@@ -3821,3 +3917,12 @@ Object.assign(exports, require("./customer-security")
     .createCustomerSecurity(db));
 Object.assign(exports, require("./customer-onboarding")
     .createCustomerOnboarding(db));
+
+Object.assign(exports, require("./customer-account")
+    .createCustomerAccountFunctions(db));
+
+Object.assign(exports, createOrderCancellation(db, {
+  release: resolverReservaNaTransacao, checkFinancial: conferirItensFinanceiros,
+}));
+Object.assign(exports, require("./delivery-contingency")
+    .createDeliveryContingency(db));

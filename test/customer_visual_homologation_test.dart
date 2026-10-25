@@ -71,6 +71,9 @@ void main() {
           CartScreen(items: () => items, change: (_, __) {}, checkout: () {}),
           scale));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('R\$ 40,40'), 200,
+          scrollable: find.byType(Scrollable).first);
+      await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('R\$ 40,40'));
       await tester.pumpAndSettle();
       final feeRight = tester.getRect(find.text('R\$ 0,40')).right;

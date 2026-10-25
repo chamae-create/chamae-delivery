@@ -4,6 +4,7 @@ const {randomUUID} = require("node:crypto");
 const {initializeApp, deleteApp} = require("firebase-admin/app");
 const {getFirestore, Timestamp, GeoPoint} = require("firebase-admin/firestore");
 const {loadBackend} = require("./backend-fixture");
+const {deliveryFixture} = require("./delivery-fixture");
 let app; let db; let backend; let n = 0;
 const actor = (role = "operations_admin") => ({uid: `actor-${role}`,
   token: {roles: [role]}});
@@ -27,10 +28,15 @@ after(async () => {
  */
 async function seed() {
   const id = `final-${++n}`;
+  const delivery = deliveryFixture({quoteId: n.toString(16).padStart(64, "c")});
+  for (const [documentPath, data] of delivery.documents) {
+    await db.doc(documentPath).set(data);
+  }
   await db.doc(`products/${id}`).set({priceBRL: 20, stock: 20,
     reservedStock: 0, isActive: true});
   const ref = db.doc(`orders/${id}`);
   await ref.set({id: `#FINAL-${n}`, customerUid: "buyer",
+    deliveryAddress: delivery.destination, deliveryQuoteId: delivery.quoteId,
     customerName: "Cliente teste",
     address: "Rua de teste", deliveryLocation: new GeoPoint(-22.5, -55.7),
     itemsList: [{id, quantity: 1, price: 20}], totalBRL: 30.2,
@@ -110,7 +116,8 @@ test("contingency is explicit, atomic and audited", async () => {
   await assert.rejects(backend.chamaeConcluirEntrega(request(id,
       "operations_admin", {
         event: "delivered"})), (e) => e.code === "permission-denied");
-  await backend.chamaeConcluirEntrega(exceptional(id));
+  await backend.chamaeConcluirEntrega(exceptional(id, {deliveryConfirmed: true,
+    collectionConfirmed: true, expectedDeliveryRevision: 0}));
   order = (await ref.get()).data();
   assert.equal(order.status, "Concluído");
   const trail = await db.collection("operationalContingencyAudit")
@@ -120,7 +127,8 @@ test("contingency is explicit, atomic and audited", async () => {
     assert.ok(trail.docs.some((d) => d.data().operation === action));
   }
   const completedAt = order.completedAt;
-  await backend.chamaeConcluirEntrega(exceptional(id));
+  await backend.chamaeConcluirEntrega(exceptional(id, {deliveryConfirmed: true,
+    collectionConfirmed: true, expectedDeliveryRevision: 0}));
   const all = await db.collection("operationalContingencyAudit")
       .where("orderId", "==", id).get();
   assert.equal(all.size, 4, "confirmed no-op also leaves an audit trail");

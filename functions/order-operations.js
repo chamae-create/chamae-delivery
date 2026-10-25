@@ -1,5 +1,6 @@
 const {requireContingency, auditContingency} =
     require("./operational-contingency");
+const {assertCompletion} = require("./delivery-contingency-state");
 const {prepareCourierDispatch} = require("./courier-dispatch-contract");
 const {createHash} = require("node:crypto");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
@@ -54,7 +55,8 @@ async function moveOrder(db, request, operation, resolveReservation,
   const actorUid = authorize(request);
   const reason = operation === "complete" ? requireContingency(request) : null;
   const data = payload(request, operation === "complete" ?
-    ["orderId", "requestId", "contingencyReason", "confirmation"] :
+    ["orderId", "requestId", "contingencyReason", "confirmation",
+      "deliveryConfirmed", "collectionConfirmed", "expectedDeliveryRevision"] :
     ["orderId", "requestId"]);
   if (!validId(data.orderId)) {
     throw new HttpsError("invalid-argument", "Pedido inválido.");
@@ -65,7 +67,9 @@ async function moveOrder(db, request, operation, resolveReservation,
   const auditRef = db.collection("courierDeliveryAudit").doc();
   const ledgerRef = db.doc(`orderOperationRequests/${digest(
       `${actorUid}:${data.requestId}`)}`);
-  const fingerprint = digest(reason ? `${operation}:${id}:${reason}` :
+  const fingerprint = digest(reason ? JSON.stringify([operation, id, reason,
+    data.deliveryConfirmed, data.collectionConfirmed,
+    data.expectedDeliveryRevision]) :
     `${operation}:${id}`);
   const contingencyRef = db.collection("operationalContingencyAudit").doc();
   const next = operation === "separate" ? "Em Separação" : "Concluído";
@@ -73,7 +77,12 @@ async function moveOrder(db, request, operation, resolveReservation,
   return db.runTransaction(async (tx) => {
     const receipt = await tx.get(ledgerRef);
     if (receipt.exists) {
-      if (receipt.data().fingerprint !== fingerprint) {
+      const legacyReplay = operation === "complete" &&
+        data.deliveryConfirmed === undefined &&
+        data.collectionConfirmed === undefined &&
+        data.expectedDeliveryRevision === undefined &&
+        receipt.data().fingerprint === digest(`${operation}:${id}:${reason}`);
+      if (receipt.data().fingerprint !== fingerprint && !legacyReplay) {
         throw new HttpsError("already-exists", "Tentativa já utilizada.");
       }
       return {orderId: id, status: next, replayed: true};
@@ -85,6 +94,19 @@ async function moveOrder(db, request, operation, resolveReservation,
     const order = snapshot.data();
     if (order.status !== before && order.status !== next) {
       reject("O pedido mudou. Confira a etapa atual.");
+    }
+    let incident;
+    const incidentRef = db.doc(`orderDeliveryIncidents/${id}`);
+    if (operation === "complete") {
+      assertCompletion(order, data);
+      if (order.deliveryIncidentRevision != null) {
+        incident = await tx.get(incidentRef);
+        if (!incident.exists || incident.data().revision !==
+            order.deliveryIncidentRevision || incident.data().phase !==
+            order.deliveryIncidentStatus) {
+          reject("DELIVERY_INCIDENT_REVIEW_REQUIRED");
+        }
+      }
     }
     // Legacy absence never implies approval. Only backend-frozen finance.
     const financial = await tx.get(db.doc(`orderFinancials/${id}`));
@@ -107,7 +129,9 @@ async function moveOrder(db, request, operation, resolveReservation,
         !(order.completedAt instanceof Timestamp)) {
       reject("Conclusão legada sem timestamp exige revisão administrativa.");
     }
-    if (!readyForDispatch(order) ||
+    const readiness = operation === "complete" ?
+      {...order, deliveryIncidentStatus: "resolved"} : order;
+    if (!readyForDispatch(readiness) ||
         order.stockProcessingStatus === "processed" &&
         order.stockReservationStatus === "reserved") {
       reject("Confira pagamento, validação e reserva de estoque.");
@@ -117,6 +141,10 @@ async function moveOrder(db, request, operation, resolveReservation,
         order.stockReservationStatus !== "finalized" &&
         order.stockProcessingStatus !== "processed") {
       reject("Estoque ainda não está pronto para conclusão.");
+    }
+    if (operation === "complete" && order.paymentStatus !== "Pago" &&
+        order.stockReservationStatus !== "reserved") {
+      reject("COLLECTION_STATE_REVIEW_REQUIRED");
     }
     const plan = planCourierDelivery({orderId: id, order,
       previous: previous.exists ? previous.data() : {},
@@ -133,6 +161,23 @@ async function moveOrder(db, request, operation, resolveReservation,
     if (operation === "complete") {
       auditContingency(tx, contingencyRef, request, "complete", order,
           {status: next});
+      if (incident && order.deliveryIncidentStatus !== "resolved") {
+        const version = order.deliveryIncidentRevision + 1;
+        tx.update(incidentRef, {phase: "resolved", revision: version,
+          resolutionRequired: false, refundReviewRequired: false,
+          resolvedAt: FieldValue.serverTimestamp(), resolvedBy: actorUid});
+        tx.update(ref, {deliveryIncidentStatus: "resolved",
+          deliveryIncidentRevision: version});
+        tx.create(incidentRef.collection("events").doc(
+            `complete-${ledgerRef.id}`), {orderId: id, actorUid,
+          action: "complete", phase: "resolved", revision: version,
+          previousStatus: order.status, nextStatus: next,
+          reason, createdAt: FieldValue.serverTimestamp(),
+          paymentStatus: order.paymentStatus, stockAction:
+            order.stockReservationStatus === "reserved" ? "commit" : "none",
+          deliveryConfirmed: true,
+          collectionConfirmed: data.collectionConfirmed === true});
+      }
     }
     if (order.status !== next) {
       if (operation === "separate") {
@@ -141,6 +186,10 @@ async function moveOrder(db, request, operation, resolveReservation,
       tx.update(ref, {status: next, updatedAt: FieldValue.serverTimestamp(),
         ...(operation === "complete" ? {
           completedAt: FieldValue.serverTimestamp(), completedBy: actorUid,
+          deliveryConfirmedAt: FieldValue.serverTimestamp(),
+          ...(data.collectionConfirmed === true ? {
+            deliveryCollectionConfirmedAt: FieldValue.serverTimestamp(),
+          } : {}),
         } : {separationStartedAt: FieldValue.serverTimestamp(),
           courierDispatchState: "awaiting_integration"})});
     }

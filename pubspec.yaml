@@ -35,3 +35,5 @@ flutter:
     - assets/images/logo.png
     - assets/images/splash_bg.png
     - assets/images/pitstop_promo.mp4
+    - assets/images/home/
+    - assets/images/splash/

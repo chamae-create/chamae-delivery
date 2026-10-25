@@ -1,0 +1,8 @@
+# TEMPLATE ONLY. Copy to android/key.properties on an authorized machine.
+# All values are deliberately empty. Never commit the populated local file.
+# storeFile: absolute path with forward slashes, or relative to android/app.
+# Recover/confirm the legitimate upload key before considering key creation.
+storeFile=
+storePassword=
+keyAlias=
+keyPassword=
