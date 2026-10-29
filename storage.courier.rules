@@ -1,0 +1,15 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /courier-photos/{uid}/{photoId} {
+      function identified() { return request.auth != null && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && !firestore.exists(/databases/(default)/documents/courierAccountClosures/$(request.auth.uid)); }
+      function admin() { return identified() && request.auth.token.get('roles', []).hasAny(['operations_admin', 'superadmin']); }
+      allow read: if identified() && (request.auth.uid == uid || admin());
+      allow create: if identified() && request.auth.uid == uid && request.resource.size <= 512 * 1024
+        && request.resource.contentType in ['image/jpeg', 'image/png'];
+      allow update, delete: if false;
+    }
+    match /{path=**} { allow read, write: if false; }
+  }
+}

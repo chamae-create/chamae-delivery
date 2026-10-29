@@ -64,6 +64,7 @@ before(async () => {
   backend = loadBackend(db);
   for (const uid of ["pilot-rider", "other-rider"]) {
     await db.doc(`couriers/${uid}`).set({name: `Oficial ${uid}`,
+      role: "courier", approvalStatus: "approved",
       administrativeState: "active"});
   }
 });
@@ -134,8 +135,9 @@ test("pilot E2E: create, official finance, operate, privacy, stock and cashier",
       await act(id, "separate");
       await assign(id);
       const rider = client("pilot-rider");
-      const own = await assertSucceeds(getDoc(doc(rider,
+      await assertFails(getDoc(doc(rider,
           "courierDeliveries", id)));
+      const own = await db.doc(`courierDeliveries/${id}`).get();
       const safe = own.data();
       assert.equal(safe.customerName, "Ana");
       assert.equal(safe.address, "Rua das Flores, 123");
@@ -279,7 +281,7 @@ test("suspension immediately revokes reads before trigger",
       const id = await createOrder();
       await assign(id);
       const rider = client("pilot-rider");
-      await assertSucceeds(getDoc(doc(rider, "courierDeliveries", id)));
+      await assertFails(getDoc(doc(rider, "courierDeliveries", id)));
       for (const flag of ["enabled", "isActive", "active"]) {
         await db.doc("couriers/pilot-rider").update({[flag]: false});
         await assertFails(getDoc(doc(rider, "courierDeliveries", id)));
@@ -289,6 +291,7 @@ test("suspension immediately revokes reads before trigger",
         administrativeState: "blocked"});
       await assertFails(getDoc(doc(rider, "courierDeliveries", id)));
       await db.doc("couriers/pilot-rider").update({
+        role: "courier", approvalStatus: "approved",
         administrativeState: "active"});
     });
 for (const role of ["operations_admin", "superadmin", "finance"]) {

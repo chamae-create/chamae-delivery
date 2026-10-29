@@ -1,3 +1,4 @@
+const {isApprovedCourierProfile} = require("./courier-authorization");
 const {isDeepStrictEqual} = require("node:util");
 const {GeoPoint, Timestamp, FieldValue} = require("firebase-admin/firestore");
 const {onDocumentWritten} = require("firebase-functions/v2/firestore");
@@ -190,9 +191,7 @@ function unchanged(previous, next) {
  * @return {boolean} Cadastro pode receber atribuição.
  */
 function isAssignableCourier(data) {
-  return !!data && data.administrativeState === "active" &&
-    data.enabled !== false && data.isActive !== false &&
-    data.active !== false &&
+  return isApprovedCourierProfile(data) &&
     typeof data.name === "string" && data.name.trim().length > 0 &&
     data.name.trim().length <= 120;
 }

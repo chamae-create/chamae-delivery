@@ -33,9 +33,12 @@ const compensate = (item, action = "cancel") => backend[action === "cancel" ? "c
 const resolve = async (item) => backend.chamaeResolverReservaEstoque({params: {orderId: item.id},
   data: {after: await item.ref.get()}});
 before(async () => {
-  assert.equal(process.env.FIRESTORE_EMULATOR_HOST, "127.0.0.1:8187", "local demo emulator mandatory");
+  const host = process.env.FIRESTORE_EMULATOR_HOST;
+  assert.ok(host, "Local demo emulator mandatory");
+  const address = new URL(`http://${host}`);
+  assert.ok(["127.0.0.1", "localhost", "[::1]"].includes(address.hostname));
   env = await initializeTestEnvironment({projectId: "demo-chamae-rules", firestore: {
-    host: "127.0.0.1", port: 8187, rules: rulesAt()}}); await env.clearFirestore();
+    host: address.hostname, port: Number(address.port), rules: rulesAt()}}); await env.clearFirestore();
   app = initializeApp({projectId: "demo-chamae-rules"}); db = getFirestore(app);
   backend = loadBackend(db).functions;
   const nativeFetch = global.fetch;
@@ -43,7 +46,8 @@ before(async () => {
     assert.ok(["127.0.0.1", "localhost"].includes(new URL(url).hostname), "external requests prohibited");
     return nativeFetch(url, options);
   });
-  await db.doc("couriers/kb05-rider").set({name: "Entregador de ensaio", administrativeState: "active"});
+  await db.doc("couriers/kb05-rider").set({name: "Entregador de ensaio", role: "courier", approvalStatus: "approved",
+    administrativeState: "active"});
 });
 after(async () => {
   mock.restoreAll(); if (env) await env.cleanup(); if (db) await db.terminate(); if (app) await deleteApp(app);
@@ -276,7 +280,9 @@ test("SDK/direct callers cannot forge incident, collection, return or read inter
   }
   const admin = env.authenticatedContext(auth.uid, {roles: ["superadmin"]}).firestore();
   await assertSucceeds(getDoc(doc(admin, `orderDeliveryIncidents/${item.id}`)));
-  await db.doc(`couriers/${auth.uid}`).set({name: "Operador também entregador", administrativeState: "active"});
+  await db.doc(`couriers/${auth.uid}`).set({name: "Operador também entregador", role: "courier",
+    approvalStatus: "approved",
+    administrativeState: "active"});
   await assert.rejects(apply(await incident(item)), {code: "permission-denied"});
   await assertFails(getDoc(doc(admin, `orderDeliveryIncidents/${item.id}`)));
 });

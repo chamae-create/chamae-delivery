@@ -4,7 +4,7 @@ const path = require("node:path");
 const {before, after, test} = require("node:test");
 const {initializeApp, deleteApp} = require("firebase-admin/app");
 const {getFirestore, GeoPoint} = require("firebase-admin/firestore");
-const {initializeTestEnvironment, assertFails, assertSucceeds} =
+const {initializeTestEnvironment, assertFails} =
     require("@firebase/rules-unit-testing");
 const {getDoc, doc} = require("firebase/firestore");
 const {syncCourierDelivery, createCourierDeliveryTrigger} =
@@ -31,10 +31,12 @@ before(async () => {
   app = initializeApp({projectId: "demo-chamae-rules"}, "courier-test");
   db = getFirestore(app);
   await db.doc("couriers/rider-a").set({
-    name: "Entregador A", administrativeState: "active",
+    name: "Entregador A", role: "courier", approvalStatus: "approved",
+    administrativeState: "active",
   });
   await db.doc("couriers/rider-b").set({
-    name: "Entregador B", administrativeState: "active",
+    name: "Entregador B", role: "courier", approvalStatus: "approved",
+    administrativeState: "active",
   });
 });
 after(async () => {
@@ -102,7 +104,7 @@ test("registered courier receives only sanitized fields; source untouched",
       assert.ok((await f.ref.get()).updateTime.isEqual(beforeOrder.updateTime));
       assert.ok((await db.doc("couriers/rider-a").get()).updateTime.isEqual(
           beforeCourier.updateTime));
-      await assertSucceeds(getDoc(doc(riderDb("rider-a"),
+      await assertFails(getDoc(doc(riderDb("rider-a"),
           "courierDeliveries", f.id)));
       await assertFails(getDoc(doc(riderDb("rider-b"),
           "courierDeliveries", f.id)));
@@ -163,7 +165,7 @@ test("reassignment replaces binding; old courier can no longer get document",
       assert.ok(next.createdAt.isEqual(first.createdAt));
       await assertFails(getDoc(doc(riderDb("rider-a"),
           "courierDeliveries", f.id)));
-      await assertSucceeds(getDoc(doc(riderDb("rider-b"),
+      await assertFails(getDoc(doc(riderDb("rider-b"),
           "courierDeliveries", f.id)));
       const audit = (await f.audit()).find((entry) =>
         entry.previousCourierUid === "rider-a");
@@ -246,7 +248,7 @@ test("full replacement cleans legacy secret fields on unchanged status",
       assert.equal(Object.hasOwn(data, "customerPhone"), false);
       assert.equal(Object.hasOwn(data, "deliveryAddress"), false);
       assert.equal(Object.hasOwn(data, "mercadoPagoOrderId"), false);
-      await assertSucceeds(getDoc(doc(riderDb("rider-a"),
+      await assertFails(getDoc(doc(riderDb("rider-a"),
           "courierDeliveries", f.id)));
     });
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../core/theme.dart';
 import '../data/customer_account.dart';
 import '../widgets/customer_feedback.dart';
@@ -33,7 +34,7 @@ class _CustomerAccountClosureScreenState
         _status = status;
         _error = null;
       });
-      if (status == AccountClosureStatus.completed) unawaited(_finish());
+      if (accountClosureCompleted(status)) unawaited(_finish());
     }, onError: (Object error) {
       if (mounted) setState(() => _error = accountClosureError(error));
     });
@@ -46,8 +47,10 @@ class _CustomerAccountClosureScreenState
     try {
       await widget.repository.finishSession();
       if (messenger?.mounted == true) {
-        messenger!.showSnackBar(
-            const SnackBar(content: Text('Sua conta foi excluída.')));
+        messenger!.showSnackBar(SnackBar(
+            content: Text(_status == AccountClosureStatus.completedManualApple
+                ? 'Conta Chamaê excluída. A autorização Apple ainda exige remoção manual.'
+                : 'Sua conta foi excluída.')));
       }
     } catch (_) {
       if (mounted) {
@@ -67,9 +70,9 @@ class _CustomerAccountClosureScreenState
       await widget.repository.reauthenticate();
       if (!mounted) return;
       final status = await widget.repository.request();
-      if (!mounted || _status == AccountClosureStatus.completed) return;
+      if (!mounted || accountClosureCompleted(_status)) return;
       setState(() => _status = status);
-      if (status == AccountClosureStatus.completed) await _finish();
+      if (accountClosureCompleted(status)) await _finish();
     } catch (error) {
       if (mounted) setState(() => _error = accountClosureError(error));
     } finally {
@@ -86,6 +89,7 @@ class _CustomerAccountClosureScreenState
   @override
   Widget build(BuildContext context) {
     final processing = [
+      AccountClosureStatus.providerRetryPending,
       AccountClosureStatus.requested,
       AccountClosureStatus.processing
     ].contains(_status);
@@ -106,11 +110,35 @@ class _CustomerAccountClosureScreenState
         const Text(
             'A conta do Chamaê será excluída. Sua conta Google ou Apple continuará existindo. '
             'Pedidos e pagamentos em andamento precisam ser resolvidos antes da exclusão.'),
-        if (_status == AccountClosureStatus.completed)
+        const SizedBox(height: 12),
+        const Text(
+            'Se a autorização Apple precisar de uma etapa manual, avisaremos você. '
+            'Nesse caso, a conta Chamaê será excluída e você deverá remover o acesso do Chamaê '
+            'em Conta Apple → Início de sessão e segurança → Iniciar sessão com a Apple.'),
+        const Text('https://account.apple.com'),
+        TextButton.icon(
+            onPressed: () => Clipboard.setData(
+                const ClipboardData(text: 'https://account.apple.com')),
+            icon: const Icon(Icons.copy_outlined),
+            label: const Text('Copiar endereço da Conta Apple')),
+        if (_status == AccountClosureStatus.completedManualApple)
+          const CustomerFeedback(
+              title: 'Conta Chamaê excluída; autorização Apple pendente',
+              message:
+                  'A exclusão no Chamaê foi concluída. A revogação Apple não foi confirmada. '
+                  'Remova o acesso do Chamaê na sua Conta Apple seguindo as instruções acima.',
+              icon: Icons.info_outline)
+        else if (accountClosureCompleted(_status))
           const CustomerFeedback(
               title: 'Conta excluída',
               message: 'A exclusão foi concluída. Sua sessão será encerrada.',
               icon: Icons.check_circle_outline)
+        else if (_status == AccountClosureStatus.providerRetryPending)
+          const CustomerFeedback(
+              title: 'Nova tentativa Apple em andamento',
+              message:
+                  'Houve uma falha temporária. A conta ainda não foi excluída. '
+                  'Tentaremos novamente com segurança; verifique o status.')
         else if (processing)
           const CustomerFeedback(
               title: 'Exclusão em andamento',
@@ -154,7 +182,7 @@ class _CustomerAccountClosureScreenState
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   child: Text(_error!,
                       style: const TextStyle(color: AppColors.error)))),
-        if (_status != AccountClosureStatus.completed)
+        if (!accountClosureCompleted(_status))
           TextButton.icon(
               onPressed: _busy ? null : _watch,
               icon: const Icon(Icons.refresh),

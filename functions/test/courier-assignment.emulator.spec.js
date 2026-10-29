@@ -35,6 +35,7 @@ before(async () => {
   db = getFirestore(app);
   for (const uid of ["rider-a", "rider-b"]) {
     await db.doc(`couriers/${uid}`).set({name: `Oficial ${uid}`,
+      role: "courier", approvalStatus: "approved",
       administrativeState: "active", phone: "PRIVATE_DRIVER_PHONE"});
   }
   for (const state of ["suspended", "blocked", "missing"]) {
@@ -111,7 +112,7 @@ for (const role of ["superadmin"]) {
           "stockProcessingStatus"]) {
           assert.deepEqual(order[field], beforeOrder[field], field);
         }
-        await assertSucceeds(owns("rider-a", f.id));
+        await assertFails(owns("rider-a", f.id));
       });
 }
 
@@ -149,7 +150,7 @@ test("exchange and removal revoke the old reader before any trigger runs",
       await f.call("rider-b", {expectedCourierUid: "rider-a"});
       assert.equal((await f.read()).courierUid, "rider-b");
       await assertFails(owns("rider-a", f.id));
-      await assertSucceeds(owns("rider-b", f.id));
+      await assertFails(owns("rider-b", f.id));
       await f.call("", {expectedCourierUid: "rider-b"});
       const unassigned = await f.read();
       assert.equal(unassigned.courierUid, "");
@@ -245,7 +246,9 @@ test("deactivated courier cannot dispatch or be revived by synchronization",
           (error) => error.code === "failed-precondition");
       await syncCourierDelivery(db, f.id);
       await assertFails(owns("rider-a", f.id));
-      await db.doc("couriers/rider-a").update({administrativeState: "active"});
+      await db.doc("couriers/rider-a").update({role: "courier",
+        approvalStatus: "approved",
+        administrativeState: "active"});
     });
 
 test("operator listing stays sanitized; operations can read couriers",
@@ -266,7 +269,8 @@ test("active courier listing is paginated without losing eligible records",
     async () => {
       for (let i = 0; i < 54; i++) {
         await db.doc(`couriers/page-${String(i).padStart(3, "0")}`).set({
-          name: "Oficial", administrativeState: "active",
+          name: "Oficial", role: "courier", approvalStatus: "approved",
+          administrativeState: "active",
         });
       }
       const first = await listCouriers(db, {auth: auth(), data: {}});

@@ -1,3 +1,5 @@
+const {prepareOperationalId} = require("./operational-order-id");
+const {enqueueNotice} = require("./courier-notifications");
 const {requireContingency, auditContingency} =
     require("./operational-contingency");
 const {createHash, randomUUID} = require("node:crypto");
@@ -149,7 +151,8 @@ async function changeCourier(db, request, operation = "assign") {
     }
     if (operation === "assign" &&
         (!["Novo", "Em Separação"].includes(source.status) ||
-         source.courierPaid === true || source.courierSettlementId != null)) {
+         source.courierPaid === true || source.courierSettlementId != null ||
+    source.courierPickedUpAt)) {
       throw new HttpsError("failed-precondition",
           "Atribuição só pode mudar antes da saída e do acerto.");
     }
@@ -184,9 +187,12 @@ async function changeCourier(db, request, operation = "assign") {
             "Validação financeira oficial ausente ou divergente.");
       }
     }
+    const identityPlan = await prepareOperationalId(transaction, db, id,
+        source);
     const now = Timestamp.now();
     const plan = planCourierDelivery({
-      orderId: id, order: source, previous, exists: projection.exists,
+      orderId: id, order: {...source, displayOrderId:
+    identityPlan.displayOrderId}, previous, exists: projection.exists,
       registered: !!courier, now, binding: {
         courierUid: uid,
         status: operation === "dispatch" ? "Saiu para Entrega" : source.status,
@@ -196,7 +202,8 @@ async function changeCourier(db, request, operation = "assign") {
       throw new HttpsError("failed-precondition",
           "Nome ou rota inválidos. Confira os dados do pedido.");
     }
-    const patch = {};
+    const patch = source.displayOrderId ? {} : {displayOrderId:
+    identityPlan.displayOrderId};
     const name = courier ? courier.name.trim() : "";
     if (source.courierUid !== uid || source.courierName !== name) {
       patch.courierUid = uid;
@@ -215,6 +222,52 @@ async function changeCourier(db, request, operation = "assign") {
       patch.status = "Saiu para Entrega";
       patch.dispatchedAt = FieldValue.serverTimestamp();
     }
+    if (uid && (uid !== oldUid || !source.courierAssignmentId)) {
+      patch.courierAssignmentId = randomUUID();
+      patch.courierPickupState = "assigned";
+      for (const field of ["acceptedAt", "expectedPickupBy",
+        "pickupReminderAt", "pickupConfirmationRequestedAt",
+        "pickupOverdueAt", "pickupExtensionCount",
+        "pickupAdminExtensionCount"]) patch[field] = FieldValue.delete();
+      transaction.create(db.collection("courierPickupAssignments")
+          .doc(patch.courierAssignmentId),
+      {orderId: id, courierUid: uid, status: "active", createdAt: now});
+      if (oldUid && source.courierAssignmentId) {
+        transaction.set(db.collection("courierPickupAssignments")
+            .doc(source.courierAssignmentId),
+        {orderId: id, courierUid: oldUid, status: "revoked", revokedAt:
+    now}, {merge: true});
+        transaction.create(db.collection("courierReliabilityEvents")
+            .doc(`${patch.courierAssignmentId}-old-revoked`),
+        {type: "assignmentRevoked", orderId: id,
+          assignmentId: source.courierAssignmentId, courierUid: oldUid,
+          actorUid, at: now});
+        transaction.create(db.collection("courierReliabilityEvents")
+            .doc(`${patch.courierAssignmentId}-reassigned`),
+        {type: "assignmentReassigned", orderId: id, assignmentId:
+    patch.courierAssignmentId,
+        previousAssignmentId: source.courierAssignmentId, courierUid:
+    uid, actorUid, at: now});
+      }
+      patch.courierAssignmentExpiresAt = Timestamp.fromMillis(
+          now.toMillis() + 8 * 60 * 60 * 1000);
+      enqueueNotice(transaction, db, id, patch.courierAssignmentId, uid,
+          courier);
+    } else if (!uid && oldUid) {
+      if (source.courierAssignmentId) {
+        transaction.set(db.collection("courierPickupAssignments")
+            .doc(source.courierAssignmentId),
+        {orderId: id, courierUid: oldUid, status: "revoked", revokedAt:
+    now}, {merge: true});
+        transaction.set(db.doc(`courierReliabilityEvents/${ledgerId}-revoked`),
+            {type: "assignmentRevoked", orderId: id, assignmentId:
+    source.courierAssignmentId,
+            courierUid: oldUid, actorUid, at: now});
+      }
+      patch.courierAssignmentId = FieldValue.delete();
+      patch.courierAssignmentExpiresAt = FieldValue.delete();
+    }
+    identityPlan.write();
     const changed = Object.keys(patch).length > 0;
     if (changed) {
       patch.updatedAt = FieldValue.serverTimestamp();

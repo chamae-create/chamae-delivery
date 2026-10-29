@@ -112,6 +112,7 @@ class PendingAppleAccount implements CustomerAccountRepository {
 }
 
 void main() {
+  f01ClosureTests();
   late SdkAuth sdk;
   late FirebaseCustomerAuth adapter;
   setUp(() {
@@ -427,5 +428,70 @@ void main() {
     expect(find.text('Conta excluída'), findsOneWidget);
     expect(find.text('Continuar com Google'), findsNothing);
     expect(find.textContaining('recarregue a página'), findsOneWidget);
+  });
+}
+
+class F01ClosureAccount extends PendingAppleAccount {
+  final AccountClosureStatus status;
+  int finishes = 0;
+  F01ClosureAccount(this.status);
+  @override
+  Stream<AccountClosureStatus> watch() => Stream.value(status);
+  @override
+  Future<void> finishSession() async {
+    finishes++;
+  }
+}
+
+void f01ClosureTests() {
+  test('F01 manual account erasure is distinct from confirmed Apple revocation',
+      () {
+    final manual = accountClosureStatus(
+        {'status': 'completed', 'appleRevocationStatus': 'manual_required'});
+    expect(manual, AccountClosureStatus.completedManualApple);
+    expect(accountClosureCompleted(manual), isTrue);
+    expect(
+        accountClosureStatus(
+            {'status': 'completed', 'appleRevocationStatus': 'revoked'}),
+        AccountClosureStatus.completed);
+    expect(
+        accountClosureStatus(
+            {'status': 'requested', 'appleRevocationStatus': 'retry_pending'}),
+        AccountClosureStatus.providerRetryPending);
+    expect(accountClosureCompleted(AccountClosureStatus.providerRetryPending),
+        isFalse);
+  });
+  testWidgets(
+      'F01 legacy completion explains manual Apple step and closes session',
+      (tester) async {
+    debugDefaultTargetPlatformOverride = null;
+    final account =
+        F01ClosureAccount(AccountClosureStatus.completedManualApple);
+    await tester.pumpWidget(
+        MaterialApp(home: CustomerAccountClosureScreen(repository: account)));
+    await tester.pumpAndSettle();
+    final title =
+        find.text('Conta Chamaê excluída; autorização Apple pendente');
+    await tester.scrollUntilVisible(title, 180);
+    expect(title, findsOneWidget);
+    expect(find.text('Conta excluída'), findsNothing);
+    expect(account.finishes, 1);
+    await tester.scrollUntilVisible(
+        find.text('https://account.apple.com'), -120);
+    expect(find.text('https://account.apple.com'), findsOneWidget);
+  });
+  testWidgets('F01 transient Apple state never announces erasure or signs out',
+      (tester) async {
+    debugDefaultTargetPlatformOverride = null;
+    final account =
+        F01ClosureAccount(AccountClosureStatus.providerRetryPending);
+    await tester.pumpWidget(
+        MaterialApp(home: CustomerAccountClosureScreen(repository: account)));
+    await tester.pumpAndSettle();
+    final title = find.text('Nova tentativa Apple em andamento');
+    await tester.scrollUntilVisible(title, 180);
+    expect(title, findsOneWidget);
+    expect(account.finishes, 0);
+    expect(find.text('Conta excluída'), findsNothing);
   });
 }

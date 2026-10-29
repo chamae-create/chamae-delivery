@@ -123,6 +123,14 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
         case "./catalog-commercial-policy":
           return require("../catalog-commercial-policy");
         case "./courier-deliveries": return require("../courier-deliveries");
+        case "./courier-pickup": return require("../courier-pickup");
+        case "./operational-order-id": return require("../operational-order-id");
+        case "./courier-pickup-lifecycle": return require("../courier-pickup-lifecycle");
+        case "firebase-functions/v2/scheduler": return {onSchedule: (_, handler) => handler};
+        case "./courier-approval": return require("../courier-approval");
+        case "./courier-account": return require("../courier-account");
+        case "./courier-events": return require("../courier-events");
+        case "./courier-photo": return require("../courier-photo");
         case "./courier-assignment": return require("../courier-assignment");
         case "./order-operations": return require("../order-operations");
         case "./order-chat": return require("../order-chat");

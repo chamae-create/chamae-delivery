@@ -49,7 +49,9 @@ async function requestClosure(db, request, now = Date.now()) {
     const courier = await tx.get(db.collection("couriers").doc(uid));
     if (courier.exists) throw new HttpsError("permission-denied", "Acesso restrito à conta de cliente.");
     if (previous.exists && previous.data().status !== "blocked") {
-      return {status: previous.data().status};
+      const saved = previous.data();
+      return {status: saved.status, ...(saved.appleRevocationStatus &&
+        saved.appleRevocationStatus !== "not_required" ? {appleRevocationStatus: saved.appleRevocationStatus} : {})};
     }
     const authTime = request.auth.token.auth_time;
     if (!Number.isFinite(authTime) || now / 1000 - authTime > 300 || authTime > now / 1000 + 60) {
@@ -147,24 +149,29 @@ async function processClosure(db, auth, uid, services = {}) {
     await ref.update({status: "blocked", reason: "ACTIVE_ORDER", updatedAt: FieldValue.serverTimestamp()});
     return;
   }
+  let appleOutcome;
   try {
-    // Before processing/redaction/Auth deletion; Google-linked Apple also counts.
-    await ensureAppleRevoked(db, uid, job.data(), user, services);
+    appleOutcome = await ensureAppleRevoked(db, uid, job.data(), user, services);
   } catch (error) {
     if (!/^APPLE_REVOCATION_/.test(error.details?.reason || "")) throw error;
     await db.runTransaction(async (tx) => {
       const current = await tx.get(ref);
       if (!sameClosureAttempt(job.data(), current.data()) ||
           !["requested", "processing"].includes(current.data()?.status)) return;
-      tx.update(ref, {status: "blocked", reason: error.details.reason, updatedAt: FieldValue.serverTimestamp()});
+      const retryable = error.details.reason === "APPLE_REVOCATION_RETRYABLE";
+      tx.update(ref, {status: retryable ? current.data().status : "blocked", reason: error.details.reason,
+        appleRevocationStatus: retryable ? "retry_pending" : "review_required",
+        updatedAt: FieldValue.serverTimestamp()});
     });
+    if (error.details.reason === "APPLE_REVOCATION_RETRYABLE") throw error;
     return;
   }
   const execute = await db.runTransaction(async (tx) => {
     const current = await tx.get(ref);
     if (!sameClosureAttempt(job.data(), current.data()) ||
         !["requested", "processing"].includes(current.data()?.status)) return false;
-    tx.update(ref, {status: "processing", updatedAt: FieldValue.serverTimestamp()});
+    tx.update(ref, {status: "processing", appleRevocationStatus: appleOutcome.status,
+      appleRevocationReason: appleOutcome.reason || null, updatedAt: FieldValue.serverTimestamp()});
     return true;
   });
   if (!execute) return;
@@ -175,6 +182,8 @@ async function processClosure(db, auth, uid, services = {}) {
     "customerConsentEvents", "customerOrderCancellations"]) {
     await db.recursiveDelete(db.collection(collection).doc(uid));
   }
+  // Delete sensitive provider material only AFTER a durable outcome and local erasure.
+  await db.recursiveDelete(db.collection("customerAppleCredentials").doc(uid));
   try {
     await auth.deleteUser(uid);
   } catch (error) {
@@ -182,7 +191,7 @@ async function processClosure(db, auth, uid, services = {}) {
   }
   await db.runTransaction(async (tx) => {
     const current = await tx.get(ref);
-    if (current.data()?.status === "completed") return;
+    if (!sameClosureAttempt(job.data(), current.data()) || current.data()?.status !== "processing") return;
     tx.update(ref, {status: "completed", completedAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp()});
   });
@@ -192,7 +201,8 @@ function createCustomerAccountFunctions(db) {
   return {
     chamaeSolicitarExclusaoConta: onCall(options, (request) => requestClosure(db, request)),
     chamaeProcessarExclusaoConta: onDocumentWritten({...options,
-      document: "customerAccountClosures/{uid}", retry: true, timeoutSeconds: 540}, (event) => {
+      document: "customerAccountClosures/{uid}", retry: true, timeoutSeconds: 540,
+      secrets: ["CHAMAE_APPLE_CLIENT_SECRETS", "CHAMAE_APPLE_CREDENTIAL_KEY"]}, (event) => {
       if (event.data?.after.data()?.status !== "requested" ||
           event.data?.before.data()?.status === "requested") return;
       return processClosure(db, getAuth(), event.params.uid);

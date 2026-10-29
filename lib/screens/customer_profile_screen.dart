@@ -1,3 +1,4 @@
+import '../core/operational_order_id.dart';
 import '../widgets/customer_order_history_card.dart';
 import '../widgets/customer_visual.dart';
 import '../widgets/customer_feedback.dart';
@@ -408,7 +409,7 @@ class _CustomerHistoryScreenState extends State<CustomerHistoryScreen> {
                                 child: const Text('Carregar mais pedidos'));
                           }
                           final doc = docs[index], data = doc.data();
-                          final id = (data['id'] ?? 'Pedido').toString();
+                          final id = customerOrderLabel(data);
                           final date = _date(data).toLocal();
                           final total = (data['totalBRL'] as num? ?? 0)
                               .toStringAsFixed(2);

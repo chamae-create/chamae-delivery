@@ -51,14 +51,20 @@ test("Google deletion: old token cannot recreate PII or read historical orders",
   assert.equal((await job(uid)).status, "completed");
 });
 for (const provider of ["apple.com", "google.com"]) {
-  test(`${provider} + Apple linked: unconfigured revocation blocks before PII/Auth deletion`, async () => {
-    const uid = `kb06-unconfigured-${provider.split(".")[0]}`; await seed(uid);
+  test(`${provider} + Apple linked: legacy account is erased with an honest manual outcome`, async () => {
+    const uid = `f01-legacy-${provider.split(".")[0]}`; await seed(uid);
     await requestClosure(db, request(uid, provider)); await processClosure(db, account(uid), uid);
-    assert.equal((await job(uid)).reason, "APPLE_REVOCATION_NOT_CONFIGURED");
-    assert.equal((await job(uid)).status, "blocked"); assert.ok(await auth.getUser(uid));
-    assert.equal((await read(`customerProfiles/${uid}`)).personal, "TEST_PII");
-    assert.equal((await read(`orders/${uid}`)).address, "TEST_ADDRESS");
-    assert.equal((await db.doc(`customerProviderRevocations/${uid}`).get()).exists, false);
+    assert.equal((await job(uid)).status, "completed");
+    assert.equal((await job(uid)).appleRevocationStatus, "manual_required");
+    await assert.rejects(auth.getUser(uid));
+    assert.equal((await db.doc(`customerProfiles/${uid}`).get()).exists, false);
+    assert.equal((await read(`orders/${uid}`)).address, undefined);
+    assert.equal((await read(`orders/${uid}`)).totalBRL, 12.34);
+    const receipt = await read(`customerProviderRevocations/${uid}`);
+    assert.equal(receipt.status, "manual_required"); assert.equal(receipt.completedAt, undefined);
+    assert.equal(receipt.reason, "LEGACY_CREDENTIAL_MISSING");
+    await processClosure(db, account(uid), uid);
+    assert.deepEqual(await read(`customerProviderRevocations/${uid}`), receipt);
   });
 }
 test("simulated Apple revocation precedes erase; retry reuses server receipt after delete failure", async () => {
@@ -171,4 +177,66 @@ test("concurrent worker retries share a key with the idempotent simulated provid
   const receipt = await read(`customerProviderRevocations/${uid}`);
   await processClosure(db, account(uid), uid, services);
   assert.deepEqual(await read(`customerProviderRevocations/${uid}`), receipt);
+});
+
+const {createAppleCredentialStore, createAppleRevocationServices} = require("../apple-revocation-adapter");
+const appleConfig = {clientSecrets: JSON.stringify({"test.client": "SYNTHETIC_CLIENT_SECRET"}),
+  encryptionKey: "ab".repeat(32)};
+async function credential(uid) {
+  const store = createAppleCredentialStore(db, () => appleConfig);
+  await store.saveVerified(uid, `TEST_APPLE_${uid}`,
+      {clientId: "test.client", tokenType: "refresh_token", token: "SYNTHETIC_REFRESH_TOKEN"});
+}
+
+test("F01 real adapter contract: temporary Apple failure resumes after restart and preserves financials", async () => {
+  const uid = "f01-adapter-restart"; await seed(uid); await credential(uid);
+  await db.doc(`orderFinancials/${uid}`).set({totalCentavos: 1234, commissionCentavos: 100,
+    deliverySnapshot: {destination: {latitude: -20, longitude: -50}, distanceMeters: 1234}});
+  await requestClosure(db, request(uid, "google.com")); const before = await job(uid);
+  const transient = createAppleRevocationServices(db, {getConfig: () => appleConfig,
+    fetch: async () => ({status: 503})});
+  await assert.rejects(processClosure(db, account(uid), uid, transient), {code: "unavailable"});
+  assert.equal((await job(uid)).status, "requested");
+  assert.equal((await job(uid)).appleRevocationStatus, "retry_pending");
+  assert.equal((await read(`customerProfiles/${uid}`)).personal, "TEST_PII");
+  assert.ok(await auth.getUser(uid));
+  let requests = 0;
+  const restarted = createAppleRevocationServices(db, {getConfig: () => appleConfig,
+    fetch: async (_url, options) => {
+      requests++; assert.equal(new URLSearchParams(options.body).get("token"), "SYNTHETIC_REFRESH_TOKEN");
+      return {status: 200};
+    }});
+  await processClosure(db, account(uid), uid, restarted);
+  assert.equal((await job(uid)).status, "completed");
+  assert.ok((await job(uid)).requestedAt.isEqual(before.requestedAt));
+  assert.equal((await job(uid)).appleRevocationStatus, "revoked");
+  assert.equal((await read(`orderFinancials/${uid}`)).totalCentavos, 1234);
+  assert.equal((await read(`orderFinancials/${uid}`)).commissionCentavos, 100);
+  assert.equal((await read(`orderFinancials/${uid}`)).deliverySnapshot.destination, undefined);
+  assert.equal((await db.doc(`customerAppleCredentials/${uid}`).get()).exists, false);
+  const receipt = await read(`customerProviderRevocations/${uid}`);
+  assert.equal(receipt.evidence, "apple_http_200");
+  assert.ok(!JSON.stringify(receipt).includes("SYNTHETIC_"));
+  await processClosure(db, account(uid), uid, restarted); assert.equal(requests, 1);
+});
+
+test("F01 unusable historical token permits deletion but never claims confirmed revocation", async () => {
+  const uid = "f01-expired"; await seed(uid); await credential(uid);
+  await requestClosure(db, request(uid, "apple.com"));
+  const service = createAppleRevocationServices(db, {getConfig: () => appleConfig,
+    fetch: async () => ({status: 400, json: async () => ({error: "invalid_token"})})});
+  await processClosure(db, account(uid), uid, service);
+  assert.equal((await job(uid)).status, "completed");
+  assert.equal((await job(uid)).appleRevocationStatus, "manual_required");
+  assert.equal((await read(`customerProviderRevocations/${uid}`)).completedAt, undefined);
+  await assert.rejects(auth.getUser(uid));
+});
+
+test("F01 provider credential vault remains unreadable and unwritable by SDK users", async () => {
+  const uid = "f01-vault-private"; await seed(uid); await credential(uid);
+  for (const [reader, roles] of [[uid, []], ["stranger", []], ["admin", ["superadmin"]]]) {
+    const client = env.authenticatedContext(reader, {roles, firebase: {sign_in_provider: "google.com"}}).firestore();
+    await assertFails(getDoc(doc(client, `customerAppleCredentials/${uid}`)));
+    await assertFails(setDoc(doc(client, `customerAppleCredentials/${uid}`), {identityVerified: true}));
+  }
 });

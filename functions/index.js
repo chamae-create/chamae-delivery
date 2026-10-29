@@ -3926,3 +3926,28 @@ Object.assign(exports, createOrderCancellation(db, {
 }));
 Object.assign(exports, require("./delivery-contingency")
     .createDeliveryContingency(db));
+
+// Credenciamento v0.2: every callable derives identity from verified Auth.
+Object.assign(exports,
+    require("./courier-approval").createCourierApprovalFunctions(db));
+
+Object.assign(exports,
+    require("./courier-pickup").createCourierPickupFunctions(db));
+
+// Local v0.2 contracts; transports/signing remain explicitly unconfigured.
+exports.chamaeIdentificarPedido =
+    require("./operational-order-id").createOperationalIdTrigger(db);
+Object.assign(exports,
+    require("./courier-pickup-lifecycle").createPickupLifecycleFunctions(db));
+exports.chamaeVerificarPrazosRetirada =
+    require("firebase-functions/v2/scheduler").onSchedule(
+        {schedule: "every 1 minutes", region: "southamerica-east1"},
+        () => require("./courier-pickup-lifecycle").scanPickupDeadlines(db));
+
+Object.assign(exports, require("./courier-account")
+    .createCourierAccountFunctions(db));
+
+Object.assign(exports, require("./courier-events")
+    .createCourierEventFunctions(db));
+Object.assign(exports, require("./courier-photo")
+    .createCourierPhotoFunctions(db));

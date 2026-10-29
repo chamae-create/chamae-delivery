@@ -368,7 +368,8 @@ test(
     });
 
 test("courier cannot bootstrap a customer profile or workspace", async () => {
-  await seed("bootstrap-courier", {administrativeState: "active"}, "couriers");
+  await seed("bootstrap-courier", {role: "courier", approvalStatus: "approved",
+    administrativeState: "active"}, "couriers");
   const db = environment.authenticatedContext("bootstrap-courier", {
     firebase: {sign_in_provider: "google.com"},
   }).firestore();
@@ -438,8 +439,10 @@ for (const name of ["deliveryQuotes", "customerDeliverySecrets",
   "deliveryPinVerifiers", "deliveryPinAudit"]) {
   test(`${name}: customer, courier, admin cannot read/write private data`,
       async () => {
-        await seed("private-rider", {administrativeState: "active"},
-            "couriers");
+        await seed("private-rider", {role: "courier",
+          approvalStatus: "approved",
+          administrativeState: "active"},
+        "couriers");
         await seed("private", {secret: "not-for-clients"}, name);
         const rider = environment.authenticatedContext("private-rider")
             .firestore();
@@ -710,8 +713,10 @@ for (const collectionName of ["couriers", "reviews"]) {
     const access = allowed ? "allowed" : "denied";
     test(`${role}: ${collectionName} get/list ${access}`,
         async () => {
-          await seed(id, {name: "Registro", administrativeState: "active"},
-              collectionName);
+          await seed(id, {name: "Registro", role: "courier",
+            approvalStatus: "approved",
+            administrativeState: "active"},
+          collectionName);
           const db = roleDb(role);
           const check = allowed ? assertSucceeds : assertFails;
           const [read, list] = await Promise.all([
@@ -733,7 +738,8 @@ for (const collectionName of ["couriers", "reviews"]) {
       const db = roleDb(role);
       const ref = doc(db, collectionName, id);
       await assertFails(setDoc(doc(db, collectionName, `new-${role}`), {
-        name: "Forjado", administrativeState: "active"}));
+        name: "Forjado", role: "courier", approvalStatus: "approved",
+        administrativeState: "active"}));
       await assertFails(setDoc(ref, {name: "Substituido"}));
       await assertFails(updateDoc(ref, {name: "Alterado"}));
       await assertFails(deleteDoc(ref));
@@ -748,8 +754,10 @@ for (const collectionName of ["couriers", "reviews"]) {
     test(`${identity}: no administrative access to ${collectionName}`,
         async () => {
           const rider = `administrative-rider-${collectionName}`;
-          await seed(rider, {name: "Entregador", administrativeState: "active"},
-              "couriers");
+          await seed(rider, {name: "Entregador", role: "courier",
+            approvalStatus: "approved",
+            administrativeState: "active"},
+          "couriers");
           let db;
           if (identity === "unauthenticated") {
             db = environment.unauthenticatedContext().firestore();
@@ -789,10 +797,12 @@ test("superadmin retains existing catalog management permission", async () => {
 
 test("courier: own deliveries, never full orders", async () => {
   await seed("rider", {name: "Entregador",
+    role: "courier", approvalStatus: "approved", administrativeState: "active"},
+  "couriers");
+  await seed("rider-other", {name: "Outro", role: "courier",
+    approvalStatus: "approved",
     administrativeState: "active"},
   "couriers");
-  await seed("rider-other", {name: "Outro", administrativeState: "active"},
-      "couriers");
   await seed("rider-own-order", validatedOrder({customerUid: "rider"}));
   const delivery = {orderId: "rider-own-order", courierUid: "rider",
     customerName: "Primeiro nome", address: "Rua, 1",
@@ -801,7 +811,7 @@ test("courier: own deliveries, never full orders", async () => {
   await seed("other", {...delivery, courierUid: "rider-other"},
       "courierDeliveries");
   const db = environment.authenticatedContext("rider").firestore();
-  await assertSucceeds(getDoc(doc(db, "courierDeliveries/assigned")));
+  await assertFails(getDoc(doc(db, "courierDeliveries/assigned")));
   await assertFails(getDocs(query(collection(db, "courierDeliveries"),
       where("courierUid", "==", "rider"))));
   await assertFails(getDoc(doc(db, "courierDeliveries/other")));
@@ -833,6 +843,7 @@ for (const field of ["customerPhone", "whatsapp", "email", "customerHistory",
   test(`courier projection rejects accidental sensitive field ${field}`,
       async () => {
         await seed("rider-safe", {name: "Entregador",
+          role: "courier", approvalStatus: "approved",
           administrativeState: "active"},
         "couriers");
         await seed(`unsafe-${field}`, {orderId: "owner-read",
@@ -848,6 +859,7 @@ for (const field of ["customerPhone", "whatsapp", "email", "customerHistory",
 for (const field of ["orderId", "customerName", "status", "createdAt"]) {
   test(`courier projection: nested data in ${field} denied`, async () => {
     await seed("typed-rider", {name: "Entregador",
+      role: "courier", approvalStatus: "approved",
       administrativeState: "active"},
     "couriers");
     const delivery = {

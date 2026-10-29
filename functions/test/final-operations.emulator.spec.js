@@ -14,10 +14,14 @@ const exceptional = (id, extra = {}) => request(id, "superadmin", {
   contingencyReason: "Aparelho do motoboy com falha física",
   confirmation: `CONFIRMAR ${id}`, ...extra});
 before(async () => {
-  assert.equal(process.env.FIRESTORE_EMULATOR_HOST, "127.0.0.1:8187");
+  const host = process.env.FIRESTORE_EMULATOR_HOST;
+  assert.ok(host, "Local demo emulator mandatory");
+  const address = new URL(`http://${host}`);
+  assert.ok(["127.0.0.1", "localhost", "[::1]"].includes(address.hostname));
   app = initializeApp({projectId: "demo-chamae-rules"}); db = getFirestore(app);
   backend = loadBackend(db).functions;
   await db.doc("couriers/final-rider").set({name: "Motoboy teste",
+    role: "courier", approvalStatus: "approved",
     administrativeState: "active"});
 });
 after(async () => {

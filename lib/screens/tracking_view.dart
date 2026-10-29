@@ -1,3 +1,4 @@
+import '../core/operational_order_id.dart';
 import '../core/theme.dart';
 import '../widgets/customer_visual.dart';
 import '../widgets/customer_feedback.dart';
@@ -47,9 +48,9 @@ class _TrackingViewState extends State<TrackingView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Acompanhar Pedido $orderId',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+        title: const Text(
+          'Acompanhar pedido',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
         ),
         leading: IconButton(
           tooltip: 'Voltar',
@@ -149,7 +150,7 @@ class _TrackingViewState extends State<TrackingView> {
                             : pendingValidation && status == 'Novo'
                                 ? 'Conferindo seu pedido'
                                 : customerStatus(status),
-                        subtitle: 'Pedido $orderId',
+                        subtitle: 'Pedido ${customerOrderLabel(data, orderId)}',
                         icon: status == 'Concluído'
                             ? Icons.check_circle_outline
                             : status == 'Cancelado'

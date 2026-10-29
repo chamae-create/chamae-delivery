@@ -10,8 +10,14 @@ enum AccountClosureStatus {
   processing,
   blocked,
   providerPending,
-  completed
+  completed,
+  completedManualApple,
+  providerRetryPending
 }
+
+bool accountClosureCompleted(AccountClosureStatus status) =>
+    status == AccountClosureStatus.completed ||
+    status == AccountClosureStatus.completedManualApple;
 
 abstract class CustomerAccountRepository {
   Future<void> reauthenticate();
@@ -89,6 +95,14 @@ class FirebaseCustomerAccount implements CustomerAccountRepository {
 
 AccountClosureStatus accountClosureStatus(dynamic data) {
   final status = data is Map ? data['status'] : null;
+  if (status == 'completed' &&
+      data['appleRevocationStatus'] == 'manual_required') {
+    return AccountClosureStatus.completedManualApple;
+  }
+  if (['requested', 'processing'].contains(status) &&
+      data['appleRevocationStatus'] == 'retry_pending') {
+    return AccountClosureStatus.providerRetryPending;
+  }
   if (status == 'blocked' &&
       data['reason'] is String &&
       (data['reason'] as String).startsWith('APPLE_REVOCATION_')) {

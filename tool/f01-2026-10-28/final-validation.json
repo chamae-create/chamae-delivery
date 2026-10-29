@@ -1,0 +1,45 @@
+﻿{
+    "flutterAnalyze":  {
+                           "exit":  0,
+                           "log":  "flutter-analyze.log"
+                       },
+    "stageAdded":  false,
+    "realAppleRevocationExecuted":  false,
+    "emulator":  {
+                     "log":  "emulator-final.log",
+                     "project":  "demo-chamae-rules",
+                     "actualProcessRestart":  true,
+                     "failed":  0,
+                     "passed":  24
+                 },
+    "functionsLint":  {
+                          "exit":  0,
+                          "log":  "functions-lint.log"
+                      },
+    "push":  false,
+    "deploy":  false,
+    "flutterAffected":  {
+                            "log":  "flutter-affected-final.log",
+                            "failed":  0,
+                            "passed":  55
+                        },
+    "diffCheck":  {
+                      "index":  0,
+                      "worktree":  0
+                  },
+    "productionHomologated":  false,
+    "flutterFull":  {
+                        "passed":  209,
+                        "preexistingFailuresReproduced":  true,
+                        "failed":  4,
+                        "total":  213,
+                        "comparison":  "flutter-baseline-comparison-v2.log",
+                        "log":  "flutter-full.log"
+                    },
+    "commit":  false,
+    "functions":  {
+                      "log":  "functions-final.log",
+                      "failed":  0,
+                      "passed":  519
+                  }
+}

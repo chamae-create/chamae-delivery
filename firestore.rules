@@ -4,6 +4,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() {
       return request.auth != null
+        && !exists(/databases/$(database)/documents/courierAccountClosures/$(request.auth.uid))
         && (!exists(/databases/$(database)/documents/customerAccountClosures/$(request.auth.uid))
           || get(/databases/$(database)/documents/customerAccountClosures/$(request.auth.uid)).data.get('status', '') == 'blocked');
     }
@@ -11,6 +12,11 @@ service cloud.firestore {
     // Only the owner can observe deletion progress, including with an existing
     // token while the rest of the account is locked. Never accept client writes.
     match /customerAccountClosures/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, write: if false;
+    }
+
+    match /courierAccountClosures/{uid} {
       allow get: if request.auth != null && request.auth.uid == uid;
       allow list, write: if false;
     }
@@ -30,7 +36,9 @@ service cloud.firestore {
 
     function activeCourier() {
       let profile = get(/databases/$(database)/documents/couriers/$(request.auth.uid)).data;
-      return profile.get('administrativeState', '') == 'active'
+      return profile.get('role', '') == 'courier'
+        && profile.get('approvalStatus', '') == 'approved'
+        && profile.get('administrativeState', '') == 'active'
         && profile.get('enabled', true) != false
         && profile.get('isActive', true) != false
         && profile.get('active', true) != false;
@@ -274,11 +282,23 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    function completedPickup(data) {
+      let grant = get(/databases/$(database)/documents/courierPickupGrants/$(data.orderId)).data;
+      let order = get(/databases/$(database)/documents/orders/$(data.orderId)).data;
+      return grant.get('courierUid', '') == request.auth.uid
+        && grant.get('confirmedAt', null) is timestamp
+        && grant.get('expiresAt', request.time) > request.time
+        && grant.get('assignmentId', '') != ''
+        && grant.assignmentId == order.get('courierAssignmentId', '')
+        && order.get('courierUid', '') == request.auth.uid
+        && !(order.get('status', '') in ['Concluído', 'Cancelado']);
+    }
+
     match /courierDeliveries/{deliveryId} {
       // Somente projeção sanitizada pelo backend. Nenhuma escrita de cliente.
       allow get: if namedAccount() && isCourierAccount()
         && resource.data.courierUid == request.auth.uid
-        && activeCourier()
+        && activeCourier() && completedPickup(resource.data)
         && resource.data.keys().hasAll(['orderId', 'courierUid', 'customerName', 'status'])
         && resource.data.keys().hasOnly(['orderId', 'courierUid', 'customerName',
           'deliveryLocation', 'address', 'complement', 'reference', 'status',

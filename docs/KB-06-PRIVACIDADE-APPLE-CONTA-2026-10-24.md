@@ -1,6 +1,7 @@
 # KB-06 — Privacidade, Apple e ciclo da conta
 
 Data-base solicitada: 24/10/2026. Auditoria e validação local: 25/10/2026.
+> **Atualização F01 — 28/10/2026:** o bloqueio histórico por ausência de credencial Apple foi revisto. A implementação local agora distingue revogação confirmada, exclusão com revogação manual pendente para legado e falhas que exigem retry/revisão. Ver [F01-EXCLUSAO-APPLE-2026-10-28.md](F01-EXCLUSAO-APPLE-2026-10-28.md). As evidências e o inventário históricos abaixo foram preservados. **Sem homologação Apple real ou liberação para produção.**
 
 ## Inventário anterior às alterações
 

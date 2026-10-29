@@ -34,16 +34,20 @@ for (const role of ["operations_admin", "superadmin"]) {
 for (const profile of [{name: "Nome"},
   {name: "Nome", administrativeState: "suspended"},
   {name: "Nome", administrativeState: "blocked"},
-  {name: "Nome", administrativeState: "active", enabled: false},
-  {name: "Nome", administrativeState: "active", isActive: false},
-  {name: "", administrativeState: "active"}]) {
+  {name: "Nome", role: "courier", approvalStatus: "approved",
+    administrativeState: "active", enabled: false},
+  {name: "Nome", role: "courier", approvalStatus: "approved",
+    administrativeState: "active", isActive: false},
+  {name: "", role: "courier", approvalStatus: "approved",
+    administrativeState: "active"}]) {
   test(`profile is not assignable: ${JSON.stringify(profile)}`, () => {
     assert.equal(isAssignableCourier(profile), false);
   });
 }
 test("explicit active profile is assignable", () => {
   assert.equal(isAssignableCourier({
-    name: "Nome", administrativeState: "active",
+    name: "Nome", role: "courier", approvalStatus: "approved",
+    administrativeState: "active",
   }),
   true);
 });
