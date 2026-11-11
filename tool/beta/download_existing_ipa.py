@@ -1,5 +1,6 @@
 """Private reuse of one approved Codemagic IPA. Never publishes or creates public URLs."""
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -9,8 +10,9 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 from urllib.error import HTTPError
-from urllib.parse import unquote, urlsplit
+from urllib.parse import parse_qsl, unquote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 import zipfile
 
@@ -21,10 +23,63 @@ BUNDLE_ID = "br.com.loumak.chamae.staging"
 APPLE_ID = "6833594439"
 
 
+# Pins derived from the browser origin metadata of the approved original IPA.
+# Store only hashes, never the object URL, signer identity, or signed query.
+STORAGE_PATH_SHA256 = "a8effcb704dce32a9aac2669cb111464332dbed76aac068119e06217a58843c9"
+STORAGE_SIGNER_SHA256 = "63b10d88d6f6d25927ada816c9f21f4d01ed2abe31e81ce0c1a1f36f66f9d440"
+MAX_SIGNED_URL_REMAINING_SECONDS = 300
+
+
+def trusted_storage_redirect(url):
+    if any(ord(c) < 33 or ord(c) == 127 for c in url):
+        raise ValueError("UNTRUSTED_ARTIFACT_REDIRECT")
+    p = urlsplit(url)
+    if (p.scheme != "https" or p.netloc != "storage.googleapis.com" or
+            p.username or p.password or p.fragment or
+            not p.path.startswith("/codemagic-build-artifacts/") or
+            hashlib.sha256(p.path.encode()).hexdigest() != STORAGE_PATH_SHA256):
+        raise ValueError("UNTRUSTED_ARTIFACT_REDIRECT")
+    pairs = parse_qsl(p.query, keep_blank_values=True, strict_parsing=True, max_num_fields=3)
+    query = dict(pairs)
+    if len(pairs) != 3 or set(query) != {"Expires", "GoogleAccessId", "Signature"}:
+        raise ValueError("SIGNED_ARTIFACT_URL_REQUIRED")
+    if (hashlib.sha256(query["GoogleAccessId"].encode()).hexdigest() != STORAGE_SIGNER_SHA256 or
+            not re.fullmatch(r"[0-9]{1,12}", query["Expires"])):
+        raise ValueError("SIGNED_ARTIFACT_URL_REQUIRED")
+    remaining = int(query["Expires"]) - time.time()
+    if not 0 < remaining <= MAX_SIGNED_URL_REMAINING_SECONDS:
+        raise ValueError("SIGNED_ARTIFACT_URL_EXPIRY_INVALID")
+    signature = base64.b64decode(query["Signature"], validate=True)
+    if not 128 <= len(signature) <= 512:
+        raise ValueError("SIGNED_ARTIFACT_URL_REQUIRED")
+    # Google authenticates this short-lived signature; no Codemagic header is used.
+    return url
+
+
 class BlockRedirects(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        # Never forward a token to a different host or accept open download links.
-        raise ValueError("PRIVATE_API_REDIRECT_REFUSED")
+        origin = urlsplit(req.full_url)
+        stage = "metadata" if origin.path.startswith("/builds/") else "artifact"
+        if origin.hostname == "storage.googleapis.com":
+            stage = "artifact_storage"
+        try:
+            hostname = urlsplit(newurl).hostname or "invalid"
+        except ValueError:
+            hostname = "invalid"
+        token = req.get_header("X-auth-token", "")
+        if not re.fullmatch(r"[a-zA-Z0-9.-]{1,253}", hostname) or (token and token in hostname):
+            hostname = "redacted"
+        # Diagnostic never includes a path, query, Location header, or credential.
+        print(json.dumps({"stage": stage, "httpStatus": code, "destinationHost": hostname}), file=sys.stderr)
+        if stage == "metadata":
+            raise ValueError("METADATA_REDIRECT_REFUSED")
+        if code not in (301, 302, 303, 307, 308):
+            raise ValueError("UNTRUSTED_ARTIFACT_REDIRECT")
+        private_url(req.full_url)  # Only an authenticated Codemagic artifact request may redirect.
+        target = trusted_storage_redirect(newurl)
+        # Fresh request: no x-auth-token, Authorization, Cookie, Referer, or copied headers.
+        # A second redirect from storage is refused by private_url above.
+        return Request(target, headers={"Accept": "application/octet-stream"}, method="GET")
 
 
 def private_url(url):
