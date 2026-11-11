@@ -71,3 +71,34 @@ workflows:
       - build/ios/archive/*.xcarchive
       - /tmp/xcodebuild_logs/*.log
       - ios/Podfile.lock
+
+  ios-beta-upload-existing:
+    name: Chamae client - upload existing IPA only (manual)
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+    integrations:
+      app_store_connect: chamae_app_store_connect
+    environment:
+      xcode: latest
+      groups:
+        - chamae_beta_ios_client_upload
+      vars:
+        SOURCE_CODEMAGIC_BUILD_ID: 6af4b8c89679c85ac0aec251
+        EXPECTED_IPA_SHA256: 1a6f35785143dfd4b63e50153ddfa0b005dd47e1c6f409b39b1734762764d10a
+        EXPECTED_BUNDLE_ID: br.com.loumak.chamae.staging
+        EXPECTED_APP_STORE_APPLE_ID: "6833594439"
+    # No automatic triggers. Running this workflow authorizes an Apple upload.
+    scripts:
+      - name: Download private artifact and validate existing signed IPA
+        script: |
+          set -euo pipefail
+          set +x
+          umask 077
+          python3 tool/beta/download_existing_ipa.py
+    artifacts:
+      - .private-upload/chamae_delivery.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
+        submit_to_app_store: false
