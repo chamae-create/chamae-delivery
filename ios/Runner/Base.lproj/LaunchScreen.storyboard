@@ -16,13 +16,16 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" image="LaunchImage" translatesAutoresizingMaskIntoConstraints="NO" id="YRO-k0-Ey4">
+                            <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" image="LaunchImage" translatesAutoresizingMaskIntoConstraints="NO" id="YRO-k0-Ey4">
                             </imageView>
                         </subviews>
-                        <color key="backgroundColor" red="0.917647" green="0.694118" blue="0.141176" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0" green="0" blue="0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <viewLayoutGuide key="safeArea" id="premium-safe-area"/>
                         <constraints>
-                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="1a2-6s-vTC"/>
-                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="4X2-HB-R7a"/>
+                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="leading" secondItem="premium-safe-area" secondAttribute="leading" id="premium-leading"/>
+                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="trailing" secondItem="premium-safe-area" secondAttribute="trailing" id="premium-trailing"/>
+                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="top" secondItem="premium-safe-area" secondAttribute="top" id="premium-top"/>
+                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="bottom" secondItem="premium-safe-area" secondAttribute="bottom" id="premium-bottom"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -32,6 +35,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="LaunchImage" width="168" height="185"/>
+        <image name="LaunchImage" width="941" height="1672"/>
     </resources>
 </document>

@@ -9,3 +9,11 @@ bool isStoreOpen([DateTime? instant]) =>
 String storeHoursLabel([DateTime? instant]) => isStoreOpen(instant)
     ? 'Delivery até 00:00'
     : 'Loja fechada • abre às 08:00 (MS)';
+
+/// Confirmed daily delivery notice; availability remains governed by isStoreOpen.
+const deliveryHoursTimeZone = 'America/Campo_Grande';
+const deliveryHoursNotice = 'Delivery todos os dias • 08h às 00h';
+
+String storeHoursNotice([DateTime? instant]) => isStoreOpen(instant)
+    ? deliveryHoursNotice
+    : '$deliveryHoursNotice\n${storeHoursLabel(instant)}';

@@ -1,3 +1,4 @@
+import '../l10n/customer_localizations.dart';
 import 'package:flutter/material.dart';
 import '../core/theme.dart';
 import '../data/customer_onboarding.dart';
@@ -92,7 +93,9 @@ class _CustomerOnboardingScreenState extends State<CustomerOnboardingScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(title: const Text('Vamos começar')),
+      appBar: AppBar(
+          title: const LocalizedText('Vamos começar'),
+          actions: const [LanguagePicker()]),
       body: SafeArea(
           child:
               ListView(padding: const EdgeInsets.all(AppSpace.lg), children: [
@@ -102,20 +105,20 @@ class _CustomerOnboardingScreenState extends State<CustomerOnboardingScreen> {
               color: Color(0xFFFFF3CD),
               child: Padding(
                   padding: EdgeInsets.all(16),
-                  child: Text(
+                  child: LocalizedText(
                       'AMBIENTE DE DESENVOLVIMENTO — documentos jurídicos ainda não são os oficiais.',
                       style: TextStyle(
                           color: Color(0xFF664D03),
                           fontWeight: FontWeight.bold)))),
-          const Text(
+          const LocalizedText(
               'A passagem vale somente nesta sessão de homologação e não registra aceite jurídico oficial.'),
         ],
         const Icon(Icons.verified_user_outlined, size: 44),
         const SizedBox(height: 24),
-        Text('Uma experiência feita para você',
+        LocalizedText('Uma experiência feita para você',
             style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 12),
-        const Text(
+        const LocalizedText(
             'Precisamos da sua data de nascimento e da confirmação dos documentos para continuar.'),
         const SizedBox(height: 24),
         TextField(
@@ -123,59 +126,62 @@ class _CustomerOnboardingScreenState extends State<CustomerOnboardingScreen> {
             enabled: !_busy && widget.state.profile['birthDate'] == null,
             keyboardType: TextInputType.datetime,
             autofillHints: const [AutofillHints.birthday],
-            decoration: const InputDecoration(
-                labelText: 'Data de nascimento', hintText: 'DD/MM/AAAA')),
+            decoration: localizedDecoration(
+                context,
+                InputDecoration(
+                    labelText: 'Data de nascimento', hintText: 'DD/MM/AAAA'))),
         const SizedBox(height: 12),
-        const Text(
+        const LocalizedText(
             'A data informada não comprova sua identidade. Conforme o produto e o destino, um documento poderá ser solicitado no recebimento.'),
         const SizedBox(height: 16),
         CheckboxListTile(
             value: _terms,
             onChanged: _busy ? null : (v) => setState(() => _terms = v!),
             contentPadding: EdgeInsets.zero,
-            title: const Text('Li e aceito os Termos de Uso')),
+            title: const LocalizedText('Li e aceito os Termos de Uso')),
         TextButton(
             onPressed: () => _document(false),
-            child: const Text('Termos de Uso')),
+            child: const LocalizedText('Termos de Uso')),
         CheckboxListTile(
             value: _privacy,
             onChanged: _busy ? null : (v) => setState(() => _privacy = v!),
             contentPadding: EdgeInsets.zero,
-            title: const Text('Li e estou ciente da Política de Privacidade')),
+            title: const LocalizedText(
+                'Li e estou ciente da Política de Privacidade')),
         TextButton(
             onPressed: () => _document(true),
-            child: const Text('Política de Privacidade')),
+            child: const LocalizedText('Política de Privacidade')),
         CheckboxListTile(
             value: _alcohol,
             onChanged: _busy ? null : (v) => setState(() => _alcohol = v!),
             contentPadding: EdgeInsets.zero,
-            title:
-                const Text('Estou ciente das regras para bebidas alcoólicas')),
-        Text(widget.state.policy.alcoholNotice),
+            title: const LocalizedText(
+                'Estou ciente das regras para bebidas alcoólicas')),
+        LocalizedText(widget.state.policy.alcoholNotice),
         if (!widget.state.policy.canContinueOnboarding()) ...[
           const SizedBox(height: 16),
-          const Text(
+          const LocalizedText(
               'Documentos DRAFT de desenvolvimento. O primeiro acesso será liberado quando os documentos oficiais estiverem disponíveis.',
               style: TextStyle(color: AppColors.error)),
         ],
         if (_error != null)
           Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Text(_error!,
+              child: LocalizedText(_error!,
                   style: const TextStyle(color: AppColors.error))),
         const SizedBox(height: 24),
         ElevatedButton(
             onPressed: _busy || !widget.state.policy.canContinueOnboarding()
                 ? null
                 : _submit,
-            child: Text(_busy ? 'Registrando…' : 'Continuar')),
+            child: LocalizedText(_busy ? 'Registrando…' : 'Continuar')),
         if (widget.onRetry != null)
           TextButton(
               onPressed: _busy ? null : widget.onRetry,
-              child: const Text('Atualizar documentos')),
+              child: const LocalizedText('Atualizar documentos')),
         if (widget.onSignOut != null)
           TextButton(
               onPressed: _busy ? null : widget.onSignOut,
-              child: const Text('Sair da conta')),
+              child: const LocalizedText('Sair da conta')),
       ])));
 }

@@ -8,6 +8,8 @@ class Product {
   final int stock;
   final bool isActive;
   final bool commercialBlocked;
+  final bool isAlcoholic;
+  final bool requiresAgeCheck;
   final String imageUrl;
   final String description;
   final bool isOffer;
@@ -22,6 +24,8 @@ class Product {
     required this.stock,
     required this.isActive,
     this.commercialBlocked = false,
+    this.isAlcoholic = false,
+    this.requiresAgeCheck = false,
     required this.imageUrl,
     required this.description,
     required this.isOffer,
@@ -41,7 +45,10 @@ class Product {
               ((data['reservedStock'] ?? 0) as num).toInt())
           .clamp(0, 1 << 30),
       isActive: (data['isActive'] ?? true) as bool,
-      commercialBlocked: data['commercialBlocked'] == true,
+      commercialBlocked:
+          data['PRO_CODIGO'] != null || data['commercialBlocked'] == true,
+      isAlcoholic: data['isAlcoholic'] == true,
+      requiresAgeCheck: data['requiresAgeCheck'] == true,
       imageUrl: (data['imageUrl'] ?? '').toString(),
       description: (data['description'] ?? '').toString(),
       isOffer: (data['isOffer'] ?? false) as bool,
@@ -54,6 +61,7 @@ class Product {
 class CartItem {
   final String category;
   final bool commercialBlocked;
+  final bool isAlcoholic, requiresAgeCheck;
   final String id;
   final String name;
   final double price;
@@ -68,6 +76,8 @@ class CartItem {
     this.quantity = 1,
     this.category = '',
     this.commercialBlocked = false,
+    this.isAlcoholic = false,
+    this.requiresAgeCheck = false,
   });
 
   double get totalPrice => price * quantity;

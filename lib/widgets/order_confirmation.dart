@@ -1,3 +1,4 @@
+import '../core/operational_order_id.dart';
 import 'package:flutter/material.dart';
 import '../core/theme.dart';
 import '../core/order_confirmation_policy.dart';
@@ -107,7 +108,8 @@ class OrderConfirmationView extends StatelessWidget {
                 liveRegion: true,
                 child: CustomerHero(
                     title: 'Pedido confirmado!',
-                    subtitle: 'Agora é com a Pit Stop V8.\nPedido $orderId',
+                    subtitle:
+                        'Agora é com a Pit Stop V8.\nPedido ${customerOrderLabel(data, orderId)}',
                     icon: Icons.check_circle_outline_rounded)),
             const SizedBox(height: 20),
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

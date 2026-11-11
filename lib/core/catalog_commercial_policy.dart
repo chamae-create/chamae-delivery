@@ -12,11 +12,14 @@ String _commercialText(Object? value) => (value ?? '')
     .trim();
 
 bool isCommerciallyBlocked(Map<String, dynamic> product) {
-  if (product['commercialBlocked'] == true) return true;
+  // GranCheff price and physical reconciliation remain unconfirmed.
+  if (product['PRO_CODIGO'] != null || product['commercialBlocked'] == true) {
+    return true;
+  }
   final text =
       '${_commercialText(product['name'])} ${_commercialText(product['category'])}';
   return RegExp(
-              r'\b(pods?|vapes?|vaping|cigarros?|cigarrilhos?|tabaco|tabacos|tabacaria|nicotina|nicotine|narguile|narguiles)\b')
+              r'\b(pods?|vapes?|vaping|cigarros?|cigarrilhos?|tabaco|tabacos|tabacaria|nicotina|nicotine|narguile|narguiles|head ?shop)\b')
           .hasMatch(text) ||
       RegExp(r'\b(marlboro|dunhill|rothmans|pall mall|lucky strike|gudang garam|elf bar|elfbar|lost mary)\b')
           .hasMatch(text) ||

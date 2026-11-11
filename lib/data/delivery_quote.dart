@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'dart:math';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -21,6 +22,23 @@ class DeliveryQuote {
       this.routingProvider,
       this.quotedAtMs,
       this.expiresAtMs});
+
+  bool isFresh({int? nowMs}) =>
+      mode == 'routeBands' &&
+      id != null &&
+      RegExp(r'^[a-f0-9]{64}$').hasMatch(id!) &&
+      version?.isNotEmpty == true &&
+      routingProvider?.isNotEmpty == true &&
+      fee.isFinite &&
+      fee >= 0 &&
+      distanceMeters != null &&
+      distanceMeters!.isFinite &&
+      distanceMeters! >= 0 &&
+      distanceMeters! <= 30000 &&
+      quotedAtMs != null &&
+      expiresAtMs != null &&
+      expiresAtMs! > quotedAtMs! &&
+      expiresAtMs! > (nowMs ?? DateTime.now().millisecondsSinceEpoch);
 
   factory DeliveryQuote.fromMap(dynamic data) {
     if (data is! Map) throw StateError('Cotação de entrega incompleta.');
@@ -58,6 +76,36 @@ class DeliveryQuote {
   }
 }
 
+// Widget-lifetime reuse only; never a financial authority or offline quote.
+class DeliveryQuoteCache {
+  DeliveryQuote? _value;
+  DeliveryAddress? _destination;
+  DeliveryQuote? forDestination(DeliveryAddress address, {int? nowMs}) {
+    final previous = _destination;
+    if (previous == null ||
+        !address.confirmed ||
+        !address.hasCoordinates ||
+        !['BR', 'PY'].contains(address.countryCode) ||
+        previous.latitude != address.latitude ||
+        previous.longitude != address.longitude ||
+        previous.countryCode != address.countryCode ||
+        _value?.isFresh(nowMs: nowMs) != true) {
+      return null;
+    }
+    return _value;
+  }
+
+  void remember(DeliveryAddress address, DeliveryQuote quote) {
+    _destination = address;
+    _value = quote;
+  }
+
+  void clear() {
+    _value = null;
+    _destination = null;
+  }
+}
+
 abstract class DeliveryQuoter {
   Future<DeliveryQuote> quote(DeliveryAddress destination);
 }
@@ -75,7 +123,7 @@ class FirebaseDeliveryQuoter implements DeliveryQuoter {
           .call({
         'destination': destination.toMap(),
         'requestId': requestId
-      }).timeout(const Duration(seconds: 15));
+      }).timeout(const Duration(seconds: 40));
     } on FirebaseFunctionsException catch (error) {
       final details = error.details;
       if (details is Map && details['reason'] == 'OUT_OF_RANGE') {
@@ -98,10 +146,12 @@ class DeliveryQuoteController extends ChangeNotifier {
   String? error;
   bool loading = false, _disposed = false;
   int _generation = 0;
+  Timer? _expiry;
 
   Future<void> refresh(DeliveryAddress address) async {
     if (_disposed) return;
     final generation = ++_generation;
+    _expiry?.cancel();
     destination = address;
     value = null;
     error = null;
@@ -115,7 +165,20 @@ class DeliveryQuoteController extends ChangeNotifier {
       }
       final result = await quoter.quote(address);
       if (_disposed || generation != _generation) return;
+      if (!result.isFresh()) {
+        throw const DeliveryQuoteException(
+            'Cotacao expirada. Calcule a entrega novamente.');
+      }
       value = result;
+      _expiry = Timer(
+          Duration(
+              milliseconds: result.expiresAtMs! -
+                  DateTime.now().millisecondsSinceEpoch), () {
+        if (generation != _generation) return;
+        value = null;
+        error = 'Cotacao expirada. Calcule a entrega novamente.';
+        notifyListeners();
+      });
     } catch (e) {
       if (_disposed || generation != _generation) return;
       error = e is DeliveryQuoteException
@@ -132,6 +195,7 @@ class DeliveryQuoteController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _expiry?.cancel();
     _generation++;
     super.dispose();
   }

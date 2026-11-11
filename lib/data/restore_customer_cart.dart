@@ -67,7 +67,9 @@ Future<RestoredCustomerCart> restoreCustomerCart(List rawItems,
             raw['category']?.toString() ??
             '',
         commercialBlocked: product?['commercialBlocked'] == true ||
-            raw['commercialBlocked'] == true);
+            raw['commercialBlocked'] == true,
+        isAlcoholic: product?['isAlcoholic'] == true || raw['isAlcoholic'] == true,
+        requiresAgeCheck: product?['requiresAgeCheck'] == true || raw['requiresAgeCheck'] == true);
   }
   return RestoredCustomerCart(items, notices);
 }

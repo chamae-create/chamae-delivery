@@ -40,7 +40,9 @@ class CustomerPolicy {
   // This override exists only to test the build-mode matrix. Runtime callers
   // always use the compile-time kDebugMode default (profile also stays blocked).
   bool allowsDevelopmentOnboarding({bool debugMode = kDebugMode}) =>
-      debugMode && draft;
+      debugMode &&
+      draft &&
+      const String.fromEnvironment('CHAMAE_ENV') != 'STAGING';
 
   bool canContinueOnboarding({bool debugMode = kDebugMode}) =>
       available || allowsDevelopmentOnboarding(debugMode: debugMode);

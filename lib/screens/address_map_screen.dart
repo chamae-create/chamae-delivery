@@ -1,3 +1,4 @@
+import '../l10n/customer_localizations.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../data/customer_location.dart';
@@ -315,7 +316,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            LocalizedText(
               'Local de entrega',
               style: TextStyle(
                 color: Colors.white,
@@ -323,7 +324,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                 fontWeight: FontWeight.w900,
               ),
             ),
-            Text(
+            LocalizedText(
               'Ajuste o marcador para o local exato da entrega',
               style: TextStyle(
                 color: Colors.white60,
@@ -342,26 +343,28 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                 controller: _searchController,
                 textInputAction: TextInputAction.search,
                 onSubmitted: (_) => _searchAddress(),
-                decoration: InputDecoration(
-                    labelText: 'Buscar endereço e número',
-                    suffixIcon: _searching
-                        ? const Padding(
-                            padding: EdgeInsets.all(12),
-                            child: SizedBox(
-                                width: 20,
-                                height: 20,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2)))
-                        : IconButton(
-                            tooltip: 'Buscar endereço',
-                            onPressed: _searchAddress,
-                            icon: const Icon(Icons.search))),
+                decoration: localizedDecoration(
+                    context,
+                    InputDecoration(
+                        labelText: 'Buscar endereço e número',
+                        suffixIcon: _searching
+                            ? const Padding(
+                                padding: EdgeInsets.all(12),
+                                child: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2)))
+                            : IconButton(
+                                tooltip: 'Buscar endereço',
+                                onPressed: _searchAddress,
+                                icon: const Icon(Icons.search)))),
               )),
           if (_locationError != null)
             TextButton.icon(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.edit_location_alt_outlined),
-                label: const Text('Digitar endereço')),
+                label: const LocalizedText('Digitar endereço')),
           if (_locationError != null)
             Container(
               width: double.infinity,
@@ -380,7 +383,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
+                    child: LocalizedText(
                       _locationError!,
                       style: const TextStyle(
                         fontSize: 11,
@@ -508,7 +511,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                                 ),
                               ),
                               SizedBox(width: 12),
-                              Text(
+                              LocalizedText(
                                 'Localizando você...',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w800,
@@ -548,7 +551,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                             color: Colors.black87,
                           ),
                           const SizedBox(width: 6),
-                          Text(
+                          LocalizedText(
                             _movingMap ? 'Posicionando...' : 'Arraste o mapa',
                             style: const TextStyle(
                               fontSize: 10,
@@ -603,7 +606,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                       ),
                       SizedBox(width: 8),
                       Expanded(
-                        child: Text(
+                        child: LocalizedText(
                           'Arraste o mapa até o pino ficar exatamente sobre o local da entrega.',
                           style: TextStyle(
                             color: Color(
@@ -635,7 +638,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: Text(
+                          child: LocalizedText(
                             _loadingAddress
                                 ? 'Localizando endereço...'
                                 : _addressText,
@@ -671,42 +674,46 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                     maxLines: 2,
                     minLines: 1,
                     textInputAction: TextInputAction.done,
-                    decoration: InputDecoration(
-                      labelText: 'Complemento / referência (opcional)',
-                      hintText: 'Ex.: Casa 2, ap. 51, portão vermelho...',
-                      counterText: '',
-                      prefixIcon: const Icon(
-                        Icons.home_outlined,
-                        color: Color(0xFF111111),
-                      ),
-                      filled: true,
-                      fillColor: const Color(0xFFF4F5F7),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 13,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFE1E4E8)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFE1E4E8)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Color(0xFFFFCC00),
-                          width: 2,
-                        ),
-                      ),
-                    ),
+                    decoration: localizedDecoration(
+                        context,
+                        InputDecoration(
+                          labelText: 'Complemento / referência (opcional)',
+                          hintText: 'Ex.: Casa 2, ap. 51, portão vermelho...',
+                          counterText: '',
+                          prefixIcon: const Icon(
+                            Icons.home_outlined,
+                            color: Color(0xFF111111),
+                          ),
+                          filled: true,
+                          fillColor: const Color(0xFFF4F5F7),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 13,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFE1E4E8)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFE1E4E8)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFFFCC00),
+                              width: 2,
+                            ),
+                          ),
+                        )),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                       controller: _referenceController,
-                      decoration: const InputDecoration(
-                          labelText: 'Referência (opcional)')),
+                      decoration: localizedDecoration(context,
+                          InputDecoration(labelText: 'Referência (opcional)'))),
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 50,
@@ -734,7 +741,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                       icon: const Icon(
                         Icons.check_circle_rounded,
                       ),
-                      label: const Text(
+                      label: const LocalizedText(
                         'Confirmar localização',
                         style: TextStyle(
                           fontWeight: FontWeight.w900,

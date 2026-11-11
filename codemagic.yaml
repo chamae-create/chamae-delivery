@@ -27,3 +27,47 @@ workflows:
       - build/ios/iphoneos/*.app
       - /tmp/xcodebuild_logs/*.log
       - ios/Podfile.lock
+
+  ios-beta-build: &ios_beta_client
+    name: Chamae client - STAGING IPA (manual, sem upload)
+    instance_type: mac_mini_m2
+    max_build_duration: 90
+    integrations:
+      app_store_connect: chamae_app_store_connect
+    environment:
+      flutter: 3.47.5
+      xcode: latest
+      cocoapods: default
+      groups:
+        - chamae_beta_ios_client
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: br.com.loumak.chamae.staging
+      vars:
+        BETA_APP_ROLE: client
+        BETA_BUNDLE_ID: br.com.loumak.chamae.staging
+    # No push/PR triggers. Start only after the owner authorizes this build.
+    scripts:
+      - name: Validate STAGING native configuration and unique build number
+        script: python3 tool/beta/prepare_ios_beta.py
+      - name: Resolve locked Flutter dependencies
+        script: flutter pub get --enforce-lockfile
+      - name: Analyze active code (warnings and errors remain fatal)
+        script: flutter analyze --no-pub --no-fatal-infos lib
+      - name: Prepare CocoaPods
+        script: |
+          set -euo pipefail
+          flutter build ios --config-only --release --no-codesign --no-pub -t lib/main_staging.dart --dart-define-from-file=.beta-build/ios-defines.json
+          cd ios
+          pod install
+      - name: Configure authorized App Store signing profiles
+        script: xcode-project use-profiles
+      - name: Build signed beta IPA
+        script: |
+          set -euo pipefail
+          flutter build ipa --release --no-pub -t lib/main_staging.dart --build-number="$BETA_BUILD_NUMBER" --dart-define-from-file=.beta-build/ios-defines.json --export-options-plist="$HOME/export_options.plist"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - build/ios/archive/*.xcarchive
+      - /tmp/xcodebuild_logs/*.log
+      - ios/Podfile.lock
