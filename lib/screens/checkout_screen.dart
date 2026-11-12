@@ -242,8 +242,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   // Zero is only an internal placeholder; pending totals cannot be displayed
   // or submitted until the server supplies a quote.
   double get _deliveryFee => _quote?.fee ?? 0;
-  double get _customerFee =>
-      (_subtotal * .01 * 100).round() / 100; // Taxa de 1% do cliente
+  // Launch v1.0: customer fee suspended; existing orders stay unchanged.
+  double get _customerFee => 0;
   double get _totalFinal => _subtotal + _deliveryFee + _customerFee;
   double _convertFromBRL(double valueBRL) {
     switch (_selectedCurrency) {
@@ -736,7 +736,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     required String customerUid,
     required bool aguardandoPix,
   }) {
-    final double merchantFee = _subtotal * 0.03;
+    // The 3% commission is a future rule pending formalization.
+    const double merchantFee = 0;
     final double merchantNet = _subtotal - merchantFee;
     final double platformFee = _customerFee + merchantFee;
     final List<Map<String, dynamic>> itemsList = widget.cartItems.map((item) {
