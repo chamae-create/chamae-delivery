@@ -16,16 +16,16 @@ from urllib.parse import parse_qsl, unquote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 import zipfile
 
-BUILD_ID = "6af4b8c89679c85ac0aec251"
-IPA_HASH = "1a6f35785143dfd4b63e50153ddfa0b005dd47e1c6f409b39b1734762764d10a"
-IPA_BYTES = 50165930
+BUILD_ID = "6af5c4f59679c85ac0af190e"
+IPA_HASH = "d9810249ad3ff94ce33fd58625e2b754cdc287bed45406b13c225b163b6d26b2"
+IPA_BYTES = 54207086
 BUNDLE_ID = "br.com.loumak.chamae.staging"
 APPLE_ID = "6833594439"
 
 
 # Pins derived from the browser origin metadata of the approved original IPA.
 # Store only hashes, never the object URL, signer identity, or signed query.
-STORAGE_PATH_SHA256 = "a8effcb704dce32a9aac2669cb111464332dbed76aac068119e06217a58843c9"
+STORAGE_PATH_SHA256 = "b6f9afbda54091a32747362c0bec19f77ba8dc92583ad2c38a95bd52edad6355"
 STORAGE_SIGNER_SHA256 = "63b10d88d6f6d25927ada816c9f21f4d01ed2abe31e81ce0c1a1f36f66f9d440"
 MAX_SIGNED_URL_REMAINING_SECONDS = 300
 

@@ -83,8 +83,8 @@ workflows:
       groups:
         - chamae_beta_ios_client_upload
       vars:
-        SOURCE_CODEMAGIC_BUILD_ID: 6af4b8c89679c85ac0aec251
-        EXPECTED_IPA_SHA256: 1a6f35785143dfd4b63e50153ddfa0b005dd47e1c6f409b39b1734762764d10a
+        SOURCE_CODEMAGIC_BUILD_ID: 6af5c4f59679c85ac0af190e
+        EXPECTED_IPA_SHA256: d9810249ad3ff94ce33fd58625e2b754cdc287bed45406b13c225b163b6d26b2
         EXPECTED_BUNDLE_ID: br.com.loumak.chamae.staging
         EXPECTED_APP_STORE_APPLE_ID: "6833594439"
     # No automatic triggers. Running this workflow authorizes an Apple upload.
