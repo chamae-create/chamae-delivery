@@ -16,16 +16,16 @@ from urllib.parse import parse_qsl, unquote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 import zipfile
 
-BUILD_ID = "6af5c4f59679c85ac0af190e"
-IPA_HASH = "d9810249ad3ff94ce33fd58625e2b754cdc287bed45406b13c225b163b6d26b2"
-IPA_BYTES = 54207086
+BUILD_ID = "6af5f44a9679c85ac0af2ce2"
+IPA_HASH = "94ab3d6b864316339b2c4518b80c94f767f06e10277ec3b7399919c2947fcf6f"
+IPA_BYTES = 54209545
 BUNDLE_ID = "br.com.loumak.chamae.staging"
 APPLE_ID = "6833594439"
 
 
 # Pins derived from the browser origin metadata of the approved original IPA.
 # Store only hashes, never the object URL, signer identity, or signed query.
-STORAGE_PATH_SHA256 = "b6f9afbda54091a32747362c0bec19f77ba8dc92583ad2c38a95bd52edad6355"
+STORAGE_PATH_SHA256 = "602be1f7c303dea77398adefaa4631936e9c837d20101c95ecf92560eb748378"
 STORAGE_SIGNER_SHA256 = "63b10d88d6f6d25927ada816c9f21f4d01ed2abe31e81ce0c1a1f36f66f9d440"
 MAX_SIGNED_URL_REMAINING_SECONDS = 300
 
@@ -115,7 +115,7 @@ def inspect_ipa(path, verify_signature=False):
         firebase = plistlib.loads(archive.read(prefix + "GoogleService-Info.plist"))
         if (info.get("CFBundleIdentifier") != BUNDLE_ID or
                 str(info.get("CFBundleShortVersionString")) != "1.0.0" or
-                str(info.get("CFBundleVersion")) != "2" or
+                str(info.get("CFBundleVersion")) != "3" or
                 firebase.get("PROJECT_ID") != "chamae-delivery-staging" or
                 firebase.get("BUNDLE_ID") != BUNDLE_ID):
             raise ValueError("STAGING_IPA_IDENTITY_MISMATCH")
@@ -139,7 +139,7 @@ def inspect_ipa(path, verify_signature=False):
                                      stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
             if checked.returncode:
                 raise ValueError("APPLE_CODE_SIGNATURE_INVALID")
-    return {"bundleId": BUNDLE_ID, "version": "1.0.0", "buildNumber": "2", "sha256": digest,
+    return {"bundleId": BUNDLE_ID, "version": "1.0.0", "buildNumber": "3", "sha256": digest,
             "firebaseProject": "chamae-delivery-staging", "macCodeSignatureVerified": verify_signature}
 
 
