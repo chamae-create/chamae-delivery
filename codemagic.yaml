@@ -45,9 +45,21 @@ workflows:
         bundle_identifier: br.com.loumak.chamae.staging
       vars:
         BETA_APP_ROLE: client
+        BETA_BUILD_NUMBER: "3"
+        APP_STORE_APPLE_ID: "6833594439"
         BETA_BUNDLE_ID: br.com.loumak.chamae.staging
     # No push/PR triggers. Start only after the owner authorizes this build.
     scripts:
+      - name: Select unused TestFlight build number (read only)
+        script: |
+          set -euo pipefail
+          set +x
+          test "$APP_STORE_APPLE_ID" = "6833594439"
+          latest="$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" --platform IOS --all-versions)"
+          BETA_BUILD_NUMBER="$(python3 tool/beta/prepare_ios_beta.py --select-build-number "$latest")"
+          export BETA_BUILD_NUMBER
+          printf 'BETA_BUILD_NUMBER=%s\n' "$BETA_BUILD_NUMBER" >> "$CM_ENV"
+          printf 'Selected iOS build number: %s\n' "$BETA_BUILD_NUMBER"
       - name: Validate STAGING native configuration and unique build number
         script: python3 tool/beta/prepare_ios_beta.py
       - name: Resolve locked Flutter dependencies
@@ -57,7 +69,8 @@ workflows:
       - name: Prepare CocoaPods
         script: |
           set -euo pipefail
-          flutter build ios --config-only --release --no-codesign --no-pub -t lib/main_staging.dart --dart-define-from-file=.beta-build/ios-defines.json
+          flutter build ios --config-only --release --no-codesign --no-pub -t lib/main_staging.dart --build-name=1.0.0 --build-number="$BETA_BUILD_NUMBER" --dart-define-from-file=.beta-build/ios-defines.json
+          python3 tool/beta/prepare_ios_beta.py --verify-generated
           cd ios
           pod install
       - name: Configure authorized App Store signing profiles
@@ -65,7 +78,8 @@ workflows:
       - name: Build signed beta IPA
         script: |
           set -euo pipefail
-          flutter build ipa --release --no-pub -t lib/main_staging.dart --build-number="$BETA_BUILD_NUMBER" --dart-define-from-file=.beta-build/ios-defines.json --export-options-plist="$HOME/export_options.plist"
+          flutter build ipa --release --no-pub -t lib/main_staging.dart --build-name=1.0.0 --build-number="$BETA_BUILD_NUMBER" --dart-define-from-file=.beta-build/ios-defines.json --export-options-plist="$HOME/export_options.plist"
+          python3 tool/beta/prepare_ios_beta.py --verify-ipa
     artifacts:
       - build/ios/ipa/*.ipa
       - build/ios/archive/*.xcarchive

@@ -1,6 +1,5 @@
 import '../l10n/customer_localizations.dart';
 import '../data/binational_identity.dart';
-import 'customer_identification_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../core/models.dart';
@@ -228,14 +227,7 @@ class _CustomerSessionGateState extends State<CustomerSessionGate>
                               onRetry: _reload,
                               onSignOut: () => _auth.signOut());
                         }
-                        if (data.onboarding
-                                .profile["identificationSchemaVersion"] !=
-                            1) {
-                          return CustomerIdentificationScreen(
-                              profile: data.onboarding.profile,
-                              repository: widget.identification?.call(user.uid) ?? FirebaseIdentificationRepository(),
-                              onComplete: _reload);
-                        }
+                        // Identification/contact are requested only by their operational flow.
                         UserSession.fullName =
                             data.onboarding.profile["fullName"] as String? ??
                                 user.name;
@@ -292,7 +284,8 @@ class _Journey {
     if (saved is! Map) return null;
     try {
       final address = DeliveryAddress.fromMap(Map<String, dynamic>.from(saved));
-      return address.confirmed &&
+      return address.label != 'Não salvar' &&
+              address.confirmed &&
               address.hasCoordinates &&
               ['BR', 'PY'].contains(address.countryCode)
           ? address

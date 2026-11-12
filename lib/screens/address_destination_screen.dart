@@ -40,7 +40,16 @@ class _AddressDestinationScreenState extends State<AddressDestinationScreen> {
     });
     try {
       final data = await _workspace.read();
-      if (mounted) setState(() => _data = data);
+      if (mounted) {
+        setState(() {
+          _data = Map<String, dynamic>.from(data);
+          for (final key in ['lastAddress', 'defaultAddress']) {
+            if (_data[key] is Map && _data[key]['label'] == 'Não salvar') {
+              _data.remove(key);
+            }
+          }
+        });
+      }
     } catch (_) {
       if (mounted) {
         setState(() => _error =
@@ -123,6 +132,11 @@ class _AddressDestinationScreenState extends State<AddressDestinationScreen> {
       addresses.removeWhere((e) =>
           e['label'] == reviewed.label || (edit && e['label'] == saved?.label));
       addresses.add(reviewed.toMap());
+    }
+    // An unsaved destination belongs only to this authenticated session.
+    if (reviewed.label == 'Não salvar') {
+      if (mounted) _finish(reviewed);
+      return;
     }
     try {
       final updates = <String, dynamic>{
@@ -431,7 +445,7 @@ class _AddressReviewScreenState extends State<AddressReviewScreen> {
             DropdownButtonFormField<String>(
                 initialValue: _label,
                 decoration: localizedDecoration(context,
-                    InputDecoration(labelText: 'Salvar endereço como')),
+                    const InputDecoration(labelText: 'Salvar endereço como')),
                 items: ['Não salvar', 'Casa', 'Trabalho', 'Outro']
                     .map((s) =>
                         DropdownMenuItem(value: s, child: LocalizedText(s)))

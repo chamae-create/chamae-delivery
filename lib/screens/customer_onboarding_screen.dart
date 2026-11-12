@@ -22,7 +22,8 @@ class CustomerOnboardingScreen extends StatefulWidget {
 }
 
 class _CustomerOnboardingScreenState extends State<CustomerOnboardingScreen> {
-  final _birth = TextEditingController();
+  String _country = 'BR';
+  bool _ageDeclared = false;
   bool _terms = false, _privacy = false, _alcohol = false, _busy = false;
   String? _error;
   @override
@@ -33,17 +34,11 @@ class _CustomerOnboardingScreenState extends State<CustomerOnboardingScreen> {
     _terms = accepted && profile['termsVersion'] == policy.termsVersion;
     _privacy = accepted && profile['privacyVersion'] == policy.privacyVersion;
     _alcohol = accepted && profile['alcoholVersion'] == policy.alcoholVersion;
-    final value = widget.state.profile['birthDate'];
-    if (value is String && parseBirthDate(value) != null) {
-      final parts = value.split('-');
-      _birth.text = '${parts[2]}/${parts[1]}/${parts[0]}';
+    final declaration = profile['navigationAgeDeclaration'];
+    if (declaration is Map &&
+        ['BR', 'PY'].contains(declaration['countryCode'])) {
+      _country = declaration['countryCode'];
     }
-  }
-
-  @override
-  void dispose() {
-    _birth.dispose();
-    super.dispose();
   }
 
   void _document(bool privacy) {
@@ -60,13 +55,12 @@ class _CustomerOnboardingScreenState extends State<CustomerOnboardingScreen> {
   }
 
   Future<void> _submit() async {
-    final parts = _birth.text.trim().split('/');
-    final iso = parts.length == 3
-        ? '${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}'
-        : '';
-    if (parseBirthDate(iso) == null || !_terms || !_privacy || !_alcohol) {
+    final minimum = widget.state.policy.navigationMinimum(_country);
+    if (!_ageDeclared || minimum == null || !_terms || !_privacy || !_alcohol) {
       setState(() => _error =
-          'Informe uma data de nascimento válida e confira os três aceites.');
+          Localizations.localeOf(context).languageCode == 'es'
+              ? 'Confirme la edad mínima y revise las tres manifestaciones.'
+              : 'Confirme a idade mínima e confira as três manifestações.');
       return;
     }
     if (!widget.state.policy.canContinueOnboarding()) return;
@@ -78,7 +72,8 @@ class _CustomerOnboardingScreenState extends State<CustomerOnboardingScreen> {
       // DRAFT is a local development passage, never a legal acceptance.
       // Do not call the repository or persist DOB, versions or consent events.
       if (!widget.state.policy.allowsDevelopmentOnboarding()) {
-        await widget.repository.accept(widget.state.policy, iso);
+        await widget.repository.acceptForNavigation(
+            widget.state.policy, NavigationAgeDeclaration(_country, minimum));
       }
       if (mounted) widget.onComplete();
     } catch (_) {
@@ -227,11 +222,14 @@ class _CustomerOnboardingScreenState extends State<CustomerOnboardingScreen> {
                                       fontWeight: FontWeight.w900,
                                       color: Colors.black))),
                           const SizedBox(height: 10),
-                          const LocalizedText(
-                              'Precisamos da sua data de nascimento e da confirmação dos documentos para continuar.',
+                          LocalizedText(
+                              Localizations.localeOf(context).languageCode ==
+                                      'es'
+                                  ? 'Confirme la edad mínima y los documentos para continuar.'
+                                  : 'Confirme a idade mínima e os documentos para continuar.',
                               textAlign: TextAlign.center,
-                              style:
-                                  TextStyle(fontSize: 15, color: Colors.black)),
+                              style: const TextStyle(
+                                  fontSize: 15, color: Colors.black)),
                           const SizedBox(height: 18),
                           if (widget.state.policy
                               .allowsDevelopmentOnboarding()) ...[
@@ -245,32 +243,43 @@ class _CustomerOnboardingScreenState extends State<CustomerOnboardingScreen> {
                                 'A passagem vale somente nesta sessão de homologação e não registra aceite jurídico oficial.'),
                             const SizedBox(height: 12),
                           ],
-                          TextField(
-                            controller: _birth,
-                            enabled: !_busy &&
-                                widget.state.profile['birthDate'] == null,
-                            keyboardType: TextInputType.datetime,
-                            autofillHints: const [AutofillHints.birthday],
-                            style: const TextStyle(color: Colors.black),
-                            decoration: localizedDecoration(
-                                context,
-                                InputDecoration(
-                                  labelText: 'Data de nascimento',
-                                  hintText: 'DD/MM/AAAA',
-                                  prefixIcon: const Icon(
-                                      Icons.calendar_month_outlined,
-                                      color: Colors.black),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 16),
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                      borderSide: BorderSide.none),
-                                  enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                      borderSide: BorderSide.none),
-                                )),
+                          DropdownButtonFormField<String>(
+                            initialValue: _country,
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                                labelText: Localizations.localeOf(context)
+                                            .languageCode ==
+                                        'es'
+                                    ? 'Jurisdicción'
+                                    : 'Jurisdição'),
+                            items: const [
+                              DropdownMenuItem(
+                                  value: 'BR', child: Text('Brasil')),
+                              DropdownMenuItem(
+                                  value: 'PY', child: Text('Paraguay'))
+                            ],
+                            onChanged: _busy
+                                ? null
+                                : (value) => setState(() {
+                                      _country = value!;
+                                      _ageDeclared = false;
+                                    }),
+                          ),
+                          CheckboxListTile(
+                            key: const Key('navigation-age-declaration'),
+                            value: _ageDeclared,
+                            onChanged: _busy ||
+                                    widget.state.policy
+                                            .navigationMinimum(_country) ==
+                                        null
+                                ? null
+                                : (value) => setState(
+                                    () => _ageDeclared = value == true),
+                            title: Text(Localizations.localeOf(context)
+                                        .languageCode ==
+                                    'es'
+                                ? 'Declaro tener al menos ${widget.state.policy.navigationMinimum(_country) ?? "—"} años.'
+                                : 'Declaro ter pelo menos ${widget.state.policy.navigationMinimum(_country) ?? "—"} anos.'),
                           ),
                           const SizedBox(height: 10),
                           Container(
@@ -278,16 +287,20 @@ class _CustomerOnboardingScreenState extends State<CustomerOnboardingScreen> {
                               decoration: BoxDecoration(
                                   color: const Color(0xFFFFF2BF),
                                   borderRadius: BorderRadius.circular(20)),
-                              child: const Row(
+                              child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Icon(Icons.info_outline,
+                                    const Icon(Icons.info_outline,
                                         color: Colors.black),
-                                    SizedBox(width: 10),
+                                    const SizedBox(width: 10),
                                     Expanded(
                                         child: LocalizedText(
-                                            'A data informada não comprova sua identidade. Conforme o produto e o destino, um documento poderá ser solicitado no recebimento.',
-                                            style: TextStyle(
+                                            Localizations.localeOf(context)
+                                                        .languageCode ==
+                                                    'es'
+                                                ? 'Esta declaración no comprueba identidad ni edad y no habilita compras restringidas ni operaciones en Paraguay.'
+                                                : 'Esta declaração não comprova identidade ou idade e não habilita compras restritas nem operação no Paraguai.',
+                                            style: const TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 13))),
                                   ])),
@@ -309,7 +322,11 @@ class _CustomerOnboardingScreenState extends State<CustomerOnboardingScreen> {
                           _consent(
                               label:
                                   'Estou ciente das regras para bebidas alcoólicas',
-                              document: Localizations.localeOf(context).languageCode == 'es' ? 'Ver reglas' : 'Ver regras',
+                              document: Localizations.localeOf(context)
+                                          .languageCode ==
+                                      'es'
+                                  ? 'Ver reglas'
+                                  : 'Ver regras',
                               icon: Icons.no_drinks_outlined,
                               value: _alcohol,
                               changed: (v) => setState(() => _alcohol = v!),

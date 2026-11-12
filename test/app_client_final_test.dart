@@ -46,6 +46,9 @@ class PendingProfile implements CustomerOnboardingRepository {
   @override
   Future<CustomerOnboardingState> load() => result.future;
   @override
+  Future<void> acceptForNavigation(
+      CustomerPolicy policy, NavigationAgeDeclaration declaration) async {}
+  @override
   Future<void> accept(CustomerPolicy policy, String birthDate) async {}
 }
 
@@ -92,14 +95,16 @@ void main() {
       expect(find.textContaining('#TEST-24'), findsWidgets);
       expect(find.text('Pagamento confirmado'), findsOneWidget);
       expect(find.text('R\$ 47,65'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('Acompanhar pedido'), 180,
+      await tester.scrollUntilVisible(
+          find.widgetWithText(ElevatedButton, 'Acompanhar pedido'), 180,
           scrollable: find.byType(Scrollable).first);
       expect(
           tester
               .getSize(find.widgetWithText(ElevatedButton, 'Acompanhar pedido'))
               .height,
           greaterThanOrEqualTo(48));
-      await tester.tap(find.text('Acompanhar pedido'));
+      await tester
+          .tap(find.widgetWithText(ElevatedButton, 'Acompanhar pedido'));
       await tester.pumpAndSettle();
       expect(find.text('Pedido confirmado!'), findsNothing);
       await tester.scrollUntilVisible(find.text('STATUS DO PEDIDO'), 180,
@@ -131,9 +136,10 @@ void main() {
     orders.add(confirmedOrder(pix: true));
     await tester.pumpAndSettle();
     expect(find.text('Pedido confirmado!'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('Acompanhar pedido'), 200,
+    await tester.scrollUntilVisible(
+        find.widgetWithText(ElevatedButton, 'Acompanhar pedido'), 200,
         scrollable: find.byType(Scrollable).first);
-    await tester.tap(find.text('Acompanhar pedido'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Acompanhar pedido'));
     await tester.pumpAndSettle();
     orders.add({...confirmedOrder(pix: true), 'status': 'Em Separação'});
     await tester.pumpAndSettle();

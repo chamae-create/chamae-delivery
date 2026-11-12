@@ -81,11 +81,17 @@ class FlowOnboarding implements CustomerOnboardingRepository {
   CustomerPolicy policy;
   Map<String, dynamic> profile = {};
   int acceptCalls = 0, loads = 0;
-  FlowOnboarding({this.policy = testCustomerPolicy, bool accepted = false}) {
+  FlowOnboarding(
+      {this.policy = testCustomerPolicy,
+      bool accepted = false,
+      bool identified = true}) {
+    // Existing identity fixture, separate from consent and all age evidence.
+    if (identified) profile = {'identificationSchemaVersion': 1};
     if (accepted) _accept('2000-01-01');
   }
   void _accept(String birthDate) {
     profile = {
+      ...profile,
       'birthDate': birthDate,
       'termsVersion': policy.termsVersion,
       'privacyVersion': policy.privacyVersion,
@@ -100,6 +106,25 @@ class FlowOnboarding implements CustomerOnboardingRepository {
   Future<CustomerOnboardingState> load() async {
     loads++;
     return CustomerOnboardingState(policy, profile);
+  }
+
+  @override
+  Future<void> acceptForNavigation(
+      CustomerPolicy policy, NavigationAgeDeclaration declaration) async {
+    if (!policy.validDeclaration(declaration.toMap())) {
+      throw StateError('AGE_DECLARATION_INVALID');
+    }
+    acceptCalls++;
+    profile = {
+      ...profile,
+      'navigationAgeDeclaration': declaration.toMap(),
+      'termsVersion': policy.termsVersion,
+      'privacyVersion': policy.privacyVersion,
+      'alcoholVersion': policy.alcoholVersion,
+      'policyRevision': policy.revision,
+      'policyHash': policy.contentHash,
+      'acceptedAt': DateTime.now()
+    };
   }
 
   @override
