@@ -331,13 +331,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   bool get _cashAmountIsEnough {
     final amount = _cashPaidAmount;
-    if (amount == null) return false;
+    if (amount == null || !amount.isFinite || amount < 0) return false;
+    if (_selectedCurrency == 'BRL') {
+      return LaunchFinancialPolicy.toCentavos(amount, name: 'cashTendered') >=
+          _launchAmounts.totalCentavos;
+    }
     return amount >= _displayAmountForCurrency(_totalFinal, _selectedCurrency);
   }
 
   double get _cashChangeBRL {
     final amount = _cashPaidAmount;
-    if (amount == null) return 0;
+    if (amount == null || !amount.isFinite || amount < 0) return 0;
     final displayedTotal = _displayAmountForCurrency(
       _totalFinal,
       _selectedCurrency,
@@ -352,8 +356,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         if (surplusPYG <= 0) return 0;
         return surplusPYG / _pygChangePerBrl;
       default:
-        final surplusBRL = amount - displayedTotal;
-        return surplusBRL > 0 ? surplusBRL : 0;
+        final surplusCentavos =
+            LaunchFinancialPolicy.toCentavos(amount, name: 'cashTendered') -
+                _launchAmounts.totalCentavos;
+        return surplusCentavos > 0
+            ? LaunchFinancialPolicy.fromCentavos(surplusCentavos)
+            : 0;
     }
   }
 
