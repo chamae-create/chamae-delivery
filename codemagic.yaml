@@ -62,10 +62,22 @@ workflows:
           pod install
       - name: Configure authorized App Store signing profiles
         script: xcode-project use-profiles
+      - name: Select unused TestFlight build number
+        script: |
+          set -euo pipefail
+          LATEST=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" || echo 0)
+          if ! [[ "$LATEST" =~ ^[0-9]+$ ]]; then LATEST=0; fi
+          CANDIDATE=$((LATEST + 1))
+          BASE=${BETA_BUILD_NUMBER:-4}
+          if ! [[ "$BASE" =~ ^[0-9]+$ ]]; then BASE=4; fi
+          NEW_BUILD_NUMBER=$(( CANDIDATE > BASE ? CANDIDATE : BASE ))
+          if [ "$NEW_BUILD_NUMBER" -lt 4 ]; then NEW_BUILD_NUMBER=4; fi
+          echo "NEW_BUILD_NUMBER=$NEW_BUILD_NUMBER" >> "$CM_ENV"
+          echo "Using TestFlight build number: $NEW_BUILD_NUMBER (latest=$LATEST, group_var=$BASE)"
       - name: Build signed beta IPA
         script: |
           set -euo pipefail
-          flutter build ipa --release --no-pub -t lib/main_staging.dart --build-number="$BETA_BUILD_NUMBER" --dart-define-from-file=.beta-build/ios-defines.json --export-options-plist="$HOME/export_options.plist"
+          flutter build ipa --release --no-pub -t lib/main_staging.dart --build-number="$NEW_BUILD_NUMBER" --dart-define-from-file=.beta-build/ios-defines.json --export-options-plist="$HOME/export_options.plist"
     artifacts:
       - build/ios/ipa/*.ipa
       - build/ios/archive/*.xcarchive
