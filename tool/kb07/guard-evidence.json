@@ -1,0 +1,14 @@
+{
+  "preflight": {
+    "PreflightExit": 1,
+    "MissingSigningRejected": true
+  },
+  "guardInReleaseGraph": true,
+  "releaseTasksAfterGuard": true,
+  "releaseGraphTasks": 61,
+  "guardAbsentFromDebugGraph": true,
+  "releaseTasksSkipped": true,
+  "actualKeyPropertiesCreated": false,
+  "aabExists": false,
+  "releaseApkExists": false
+}

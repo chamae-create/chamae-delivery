@@ -119,6 +119,8 @@ void main() {
         findsOneWidget);
     expect(cartItem.quantity, 2);
     quoter.fail = false;
+    await tester.ensureVisible(find.text('Tentar novamente'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Tentar novamente'));
     await tester.pumpAndSettle();
     expect(quoter.calls, 2);

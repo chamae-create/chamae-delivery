@@ -174,9 +174,9 @@ test("all new financials without configuration fail closed, including legacy cli
     await assert.rejects(quoteDelivery(db, req(), router()));
   }
 });
-test("callable binds dedicated Routes secret; missing credential and Google error never fall back", async () => {
+test("OAuth runtime declares no legacy Routes secret; missing credential and Google error never fall back", async () => {
   const f = createDeliveryFunctions(memory().db);
-  assert.ok(f.chamaeCotarEntrega.__endpoint.secretEnvironmentVariables.some((s) => s.key === "CHAMAE_ROUTES_API_KEY"));
+  assert.equal((f.chamaeCotarEntrega.__endpoint.secretEnvironmentVariables || []).some((s) => s.key === "CHAMAE_ROUTES_API_KEY"), false);
   for (const response of [{ok: false}, {ok: true, json: async () => ({routes: []})},
     {ok: true, json: async () => ({fallbackInfo: {}, routes: [{distanceMeters: 100}]})}]) {
     const p = new GoogleRoutesProvider({apiKey: "TEST-ONLY", travelMode: "DRIVE", fetchImpl: async () => response});

@@ -111,7 +111,20 @@ for (const [instant, allowed] of [["2026-10-24T11:59:00Z", false], ["2026-10-24T
   });
 }
 
-test("verified PY permits PIX/cash; invalid method/country/attestation cause no effects", async () => {
+test("frozen PY gate rejects PIX, cash and card without financial, stock or provider effects", async () => {
+  for (const method of ["PIX", "Dinheiro", "Maquininha"]) {
+    const item = await seed(method, "PY");
+    const initial = (await db.doc("products/kb03").get()).data();
+    const beforePosts = posts.length;
+    await invoke(item, method === "PIX" ? "auto" : "reserve");
+    assert.equal((await db.doc(`orderFinancials/${item.id}`).get()).exists, false);
+    assert.deepEqual((await db.doc("products/kb03").get()).data(), initial);
+    assert.equal(posts.length, beforePosts);
+    assert.equal((await item.ref.get()).data().financialValidationError, "CROSS_BORDER_OPERATION_NOT_AUTHORIZED");
+  }
+});
+
+test("invalid destination metadata never creates PY financials or stock effects", async () => {
   for (const invalid of ["card", "missing", "invalid", "forged", "oldquote", "projection", "alias", "topalias"]) {
     const item = await seed(invalid === "card" ? "Maquininha" : "Dinheiro", "PY");
     const initial = (await db.doc("products/kb03").get()).data();
@@ -129,13 +142,8 @@ test("verified PY permits PIX/cash; invalid method/country/attestation cause no 
     assert.equal((await db.doc(`orderFinancials/${item.id}`).get()).exists, false);
     assert.deepEqual((await db.doc("products/kb03").get()).data(), initial);
     assert.equal((await item.ref.get()).data().financialValidationError,
-        invalid === "card" ? "PAYMENT_METHOD_NOT_ALLOWED_FOR_COUNTRY" : "DESTINATION_COUNTRY_UNVERIFIED");
+        invalid === "card" ? "CROSS_BORDER_OPERATION_NOT_AUTHORIZED" : "DESTINATION_COUNTRY_UNVERIFIED");
   }
-  const cash = await seed("Dinheiro", "PY"); await invoke(cash, "reserve");
-  assert.equal((await cash.ref.get()).data().stockReservationStatus, "reserved");
-  const pix = await seed("PIX", "PY"); await invoke(pix, "auto");
-  assert.equal((await db.doc(`orderFinancials/${pix.id}`).get()).exists, true);
-  assert.equal(posts.length, 1);
 });
 
 test("frozen financial does not allow a new PIX at closing; accepted cash retry leaves stock unchanged", async () => {

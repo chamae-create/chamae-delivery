@@ -7,7 +7,7 @@ String? cartItemIssue(CartItem item, Map<String, dynamic>? data) {
   if (item.quantity < 1 ||
       data == null ||
       data['isActive'] == false ||
-      isCommerciallyBlocked(data)) {
+      isCommerciallyBlocked({...data, 'id': item.id}) || categoryReviewRequired(data)) {
     return 'Um produto não está mais disponível. Revise seu carrinho.';
   }
   final available = ((data['stock'] as num?)?.toInt() ?? 0) -

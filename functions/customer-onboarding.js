@@ -1,55 +1,17 @@
 const {createHash} = require("node:crypto");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {FieldValue} = require("firebase-admin/firestore");
+const {assertAgeEvidence, requiredAge} = require("./age-eligibility");
+const {assertDestinationOperation, assertSinglePayment} = require("./checkout-policy");
 const {verifiedCustomerToken} = require("./customer-identity");
 const {assertCustomerAccountActive} = require("./customer-account-state");
 
-const policyFields = ["revision", "termsVersion", "privacyVersion", "alcoholVersion",
-  "termsText", "privacyText", "alcoholNotice", "termsUrl", "privacyUrl", "minimumAgeByCountry"];
-function policyFingerprint(policy) {
-  const stableValue = (key) => {
-    const value = policy[key] ?? null;
-    return key === "minimumAgeByCountry" && value && typeof value === "object" && !Array.isArray(value) ?
-      Object.fromEntries(Object.keys(value).sort().map((country) => [country, value[country]])) : value;
-  };
-  return createHash("sha256").update(JSON.stringify(
-      policyFields.map((key) => [key, stableValue(key)]))).digest("hex");
-}
-function validPolicy(policy) {
-  const text = ["revision", "termsVersion", "privacyVersion", "alcoholVersion",
-    "termsText", "privacyText", "alcoholNotice"];
-  const urls = [policy?.termsUrl, policy?.privacyUrl];
-  if (!policy || policy.published !== true || policy.draft !== false ||
-      text.some((k) => typeof policy[k] !== "string" || !policy[k].trim()) ||
-      [policy.termsVersion, policy.privacyVersion, policy.alcoholVersion].some((v) => /draft/i.test(v)) ||
-      urls.some((value) => {
-        try {
-          return new URL(value).protocol !== "https:";
-        } catch (_) {
-          return true;
-        }
-      }) ||
-      policy.contentHash !== policyFingerprint(policy)) {
-    throw new HttpsError("failed-precondition", "Os documentos oficiais ainda não estão disponíveis.");
-  }
-  return policy;
-}
-function birthDate(value, now = new Date()) {
-  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-  const date = new Date(`${value}T00:00:00.000Z`);
-  if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== value ||
-      date.getUTCFullYear() < 1900 || date > now) return null;
-  return date;
-}
-function profileCurrent(profile, policy) {
-  return Boolean(profile && birthDate(profile.birthDate) && profile.acceptedAt &&
-    profile.termsVersion === policy.termsVersion && profile.privacyVersion === policy.privacyVersion &&
-    profile.alcoholVersion === policy.alcoholVersion && profile.policyRevision === policy.revision &&
-    profile.policyHash === policy.contentHash);
-}
+const {policyFingerprint, validPolicy, birthDate, profileCurrent} = require("./customer-policy-contract");
+const {assertNavigationDeclaration} = require("./navigation-age");
 function customerUid(request) {
   if (!request.auth || !verifiedCustomerToken(request.auth.token) ||
-      (request.auth.token.roles || []).length) {
+      (!Array.isArray(request.auth.token.roles || []) ||
+        (request.auth.token.roles || []).length || request.auth.token.superadmin === true)) {
     throw new HttpsError("permission-denied", "Entre com sua conta para continuar.");
   }
   return request.auth.uid;
@@ -59,7 +21,8 @@ async function acceptDocuments(db, request) {
   if (data.acceptTerms !== true || data.acknowledgePrivacy !== true || data.acknowledgeAlcohol !== true) {
     throw new HttpsError("invalid-argument", "Confira os três aceites antes de continuar.");
   }
-  if (!birthDate(data.birthDate)) throw new HttpsError("invalid-argument", "Informe uma data de nascimento válida.");
+  const modern = Object.hasOwn(data, "navigationAgeDeclaration");
+  if ((modern && Object.hasOwn(data, "birthDate")) || (!modern && !birthDate(data.birthDate))) throw new HttpsError("invalid-argument", "Informe uma data de nascimento válida.");
   const profileRef = db.collection("customerProfiles").doc(uid);
   return db.runTransaction(async (tx) => {
     await assertCustomerAccountActive(db, uid, tx);
@@ -72,18 +35,22 @@ async function acceptDocuments(db, request) {
         data.policyRevision !== policy.revision || data.policyHash !== policy.contentHash) {
       throw new HttpsError("failed-precondition", "Os documentos foram atualizados. Confira a nova versão.");
     }
-    if (old.exists && old.data().birthDate != null && old.data().birthDate !== data.birthDate) {
+    const declaration = modern ? assertNavigationDeclaration(data.navigationAgeDeclaration, policy, old.data() || {}) : null;
+    if (!modern) assertNavigationDeclaration({countryCode: "BR", minimumAge: policy.minimumAgeByCountry?.BR, declared: true}, policy, {birthDate: data.birthDate});
+    if (!modern && old.exists && old.data().birthDate != null && old.data().birthDate !== data.birthDate) {
       throw new HttpsError("failed-precondition", "Para corrigir a data de nascimento, solicite atendimento à loja.");
     }
     if (old.exists && profileCurrent(old.data(), policy)) return {accepted: true};
-    const record = {birthDate: data.birthDate, dateOfBirthVerified: false,
+    // Consent evidence contains no full birth date, phone or document number.
+    const record = {...(declaration ? {navigationAgeDeclaration: declaration} : {}),
       acceptTerms: true, acknowledgePrivacy: true, acknowledgeAlcohol: true,
       termsVersion: policy.termsVersion, privacyVersion: policy.privacyVersion,
       alcoholVersion: policy.alcoholVersion, policyRevision: policy.revision,
       policyHash: policy.contentHash, acceptedAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp()};
     tx.set(profileRef, {...record,
-      firstAcceptedAt: old.data()?.firstAcceptedAt ?? FieldValue.serverTimestamp()});
+      ...(!modern ? {birthDate: data.birthDate, dateOfBirthVerified: false} : {}),
+      firstAcceptedAt: old.data()?.firstAcceptedAt ?? FieldValue.serverTimestamp()}, {merge: true});
     const auditId = createHash("sha256").update(JSON.stringify([uid, policy.contentHash])).digest("hex");
     tx.set(db.collection(`customerConsentEvents/${uid}/events`).doc(auditId), record);
     return {accepted: true};
@@ -92,6 +59,7 @@ async function acceptDocuments(db, request) {
 async function prepareCustomerEligibility(tx, db, order) {
   // Old orders retain the financial/stock flow that existed when created.
   if (order.customerFlowVersion !== 2) return null;
+  assertSinglePayment(order);
   await assertCustomerAccountActive(db, order.customerUid, tx);
   const policyDoc = await tx.get(db.collection("customerPolicies").doc("current"));
   const profileDoc = await tx.get(db.collection("customerProfiles").doc(order.customerUid));
@@ -102,7 +70,9 @@ async function prepareCustomerEligibility(tx, db, order) {
   if (!["BR", "PY"].includes(order.deliveryAddress?.countryCode)) {
     throw new HttpsError("failed-precondition", "Confirme o país do destino.");
   }
-  return {policy, profile: profileDoc.data(), country: order.deliveryAddress.countryCode,
+  assertDestinationOperation(order.deliveryAddress.countryCode);
+  const ageProof = await tx.get(db.collection("customerAgeVerifications").doc(order.customerUid));
+  return {policy, profile: profileDoc.data(), ageProof: ageProof.data(), uid: order.customerUid, country: order.deliveryAddress.countryCode,
     documentRequiredAtDelivery: false};
 }
 function checkProductEligibility(context, product, now = new Date()) {
@@ -117,6 +87,7 @@ function checkProductEligibility(context, product, now = new Date()) {
         "A elegibilidade deste produto para o destino ainda não está disponível.");
   }
   const dob = birthDate(context.profile.birthDate, now);
+  if (!dob) throw new HttpsError("failed-precondition", "AGE_VERIFICATION_REQUIRED", {reason: "AGE_PROOF_REQUIRED"});
   let age = now.getUTCFullYear() - dob.getUTCFullYear();
   if (now.getUTCMonth() < dob.getUTCMonth() ||
       (now.getUTCMonth() === dob.getUTCMonth() && now.getUTCDate() < dob.getUTCDate())) age--;
@@ -124,6 +95,8 @@ function checkProductEligibility(context, product, now = new Date()) {
     throw new HttpsError("permission-denied", "Este produto não está disponível para sua faixa etária neste destino.",
         {reason: "AGE_RESTRICTED"});
   }
+  const floor = requiredAge(context.country, minimum);
+  assertAgeEvidence(context.ageProof, {uid: context.uid, minimum: floor, identityRevision: context.profile.identityRevision});
   context.documentRequiredAtDelivery = true;
 }
 async function checkPurchase(db, request) {

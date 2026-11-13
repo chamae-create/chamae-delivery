@@ -4,7 +4,7 @@ import 'package:chamae_delivery/core/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  Product product(String name, {String category='Bebidas', bool active=true, bool blocked=false}) => Product(
+  Product product(String name, {String category='Refrigerantes & Sucos', bool active=true, bool blocked=false}) => Product(
     id:name, name:name, category:category, price:20, stock:10, isActive:active,
     commercialBlocked:blocked, imageUrl:'https://example.test/product.webp', description:'',
     isOffer:true, isCombo:true, salesCount:10);
@@ -12,7 +12,7 @@ void main() {
   final products = [allowed,
     for(final name in ['POD', 'VAPE', 'CIGARRO', 'CIGARROS', 'CIGARRILHO', 'TABACO',
       'MARLBORO BLUE ICE', 'IGNITE V80 ULTRA']) product(name),
-    product('Genérico', category:'Tabacaria'), product('Bloqueado', blocked:true),
+    product('Genérico', category:'Tabacaria'), product('Artigo', category:'Head Shop'), product('Bloqueado', blocked:true),
     product('Inativo', active:false),
   ];
   test('catalog, search, promotions and combos exclude restricted/inactive products', () {

@@ -1,0 +1,21 @@
+{
+  "functions": [
+    "tests 414",
+    "pass 414",
+    "fail 0"
+  ],
+  "emulator": [
+    "tests 403",
+    "pass 403",
+    "fail 0"
+  ],
+  "affectedFlutter": [
+    "00:12 +74: All tests passed!"
+  ],
+  "allFlutter": [
+    "00:47 +207 -2: Some tests failed."
+  ],
+  "analyze": true,
+  "protectedFiles": 19,
+  "allProtectedUnchanged": true
+}

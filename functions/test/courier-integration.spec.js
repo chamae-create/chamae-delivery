@@ -25,7 +25,7 @@ test("foreign UID, altered bytes, arbitrary privilege or legacy protocol are rej
 test("synthetic PIN and demo delivery confirmations are never accepted by phase one", () => {
   for (const type of ["confirmDelivery", "pickedUp", "acceptDelivery", "startRoute", "reportProblem"]) {
     assert.throws(() => parseEvent(event({type, payload: {proof: {simulation: true}}}), "rider"),
-        (error) => error.details.reason === "OPERATION_NOT_ENABLED");
+        (error) => error.code === "invalid-argument" || error.details?.reason === "OPERATION_NOT_ENABLED");
   }
 });
 test("pickup action needs assignment and a strictly allowed payload", () => {

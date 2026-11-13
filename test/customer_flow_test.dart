@@ -41,9 +41,12 @@ Widget gate(FlowAuth auth, FlowOnboarding onboarding, FlowWorkspace workspace,
                     ])))));
 
 Future<void> accept(WidgetTester tester) async {
-  await tester.scrollUntilVisible(find.byType(TextField), -200,
+  final age = find.byKey(const Key('navigation-age-declaration'));
+  await tester.scrollUntilVisible(age, 150,
       scrollable: find.byType(Scrollable).first);
-  await tester.enterText(find.byType(TextField).first, '01/01/2000');
+  await Scrollable.ensureVisible(tester.element(age), alignment: 0.5);
+  await tester.pumpAndSettle();
+  await tester.tap(age);
   for (final text in [
     'Li e aceito os Termos de Uso',
     'Li e estou ciente da Política de Privacidade',
@@ -52,12 +55,21 @@ Future<void> accept(WidgetTester tester) async {
     await tester.scrollUntilVisible(find.text(text), 200,
         scrollable: find.byType(Scrollable).first);
     await tester.tap(find.text(text));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
   }
   await tester.scrollUntilVisible(find.text('Continuar'), 200,
       scrollable: find.byType(Scrollable).first);
   await tester.tap(find.text('Continuar'));
+  await settleFlow(tester);
+}
+
+Future<void> settleFlow(WidgetTester tester) async {
   await tester.pumpAndSettle();
+  if (find.byType(SplashScreen).evaluate().isNotEmpty) {
+    // Honor the existing Premium Splash minimum, without changing production.
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+  }
 }
 
 void main() {
@@ -66,7 +78,7 @@ void main() {
     final auth = FlowAuth(const CustomerIdentity(uid: 'buyer'));
     addTearDown(auth.events.close);
     await tester.pumpWidget(gate(auth, DeniedOnboarding(), FlowWorkspace()));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.textContaining('acesso aos dados foi negado'), findsOneWidget);
     expect(find.textContaining('Confira a conexão'), findsNothing);
     expect(auth.current?.uid, 'buyer');
@@ -79,11 +91,11 @@ void main() {
         workspace = FlowWorkspace();
     addTearDown(auth.events.close);
     await tester.pumpWidget(gate(auth, onboarding, workspace));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.text('Bem-vindo ao Chamaê'), findsOneWidget);
     expect(onboarding.loads, 0);
     await tester.tap(find.text('Continuar com Google'));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(auth.calls, [CustomerProvider.google]);
     expect(find.text('Vamos começar'), findsOneWidget);
     await accept(tester);
@@ -91,7 +103,7 @@ void main() {
     expect(onboarding.profile['acceptedAt'], isNotNull);
     expect(find.text('Etapa endereço'), findsOneWidget);
     await tester.tap(find.text('Destino confirmado'));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.text('Catálogo • Rua de teste, 1'), findsOneWidget);
   });
   testWidgets(
@@ -104,7 +116,7 @@ void main() {
           ..data = {'lastAddress': testCustomerAddress.toMap()};
     addTearDown(auth.events.close);
     await tester.pumpWidget(gate(auth, onboarding, workspace));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.text('Catálogo • Rua de teste, 1'), findsOneWidget);
     expect(find.text('Vamos começar'), findsNothing);
     expect(auth.calls, isEmpty);
@@ -116,7 +128,7 @@ void main() {
     onboarding.profile['termsVersion'] = 'TEST-OLDER';
     addTearDown(auth.events.close);
     await tester.pumpWidget(gate(auth, onboarding, FlowWorkspace()));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.text('Vamos começar'), findsOneWidget);
     expect(find.text('Etapa endereço'), findsNothing);
   });
@@ -128,12 +140,12 @@ void main() {
     addTearDown(auth.events.close);
     await tester
         .pumpWidget(gate(auth, FlowOnboarding(accepted: true), workspace));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     auth.events.addError(StateError('temporary auth error'));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.text('Tentar novamente'), findsOneWidget);
     await tester.tap(find.text('Tentar novamente'));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.text('Catálogo • Rua de teste, 1'), findsOneWidget);
   });
   testWidgets('logout disposes private route stack and returns to login',
@@ -144,14 +156,14 @@ void main() {
     addTearDown(auth.events.close);
     await tester
         .pumpWidget(gate(auth, FlowOnboarding(accepted: true), workspace));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     final context = tester.element(find.text('Catálogo • Rua de teste, 1'));
     Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => const Scaffold(body: Text('Pedido privado'))));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.text('Pedido privado'), findsOneWidget);
     await auth.signOut();
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.text('Pedido privado'), findsNothing);
     expect(find.text('Bem-vindo ao Chamaê'), findsOneWidget);
   });
@@ -167,15 +179,15 @@ void main() {
             onComplete: () => completed = true)));
     await tester.scrollUntilVisible(find.text('Termos de Uso'), 200,
         scrollable: find.byType(Scrollable).first);
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     await tester.ensureVisible(find.text('Termos de Uso'));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     await tester.tap(find.text('Termos de Uso'));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.textContaining('Não é um documento jurídico de produção'),
         findsOneWidget);
     await tester.pageBack();
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     await tester.scrollUntilVisible(find.text('Continuar'), 200,
         scrollable: find.byType(Scrollable).first);
     expect(
@@ -187,7 +199,7 @@ void main() {
     await accept(tester);
     expect(completed, isTrue);
     expect(repository.acceptCalls, 0);
-    expect(repository.profile, isEmpty);
+    expect(repository.profile, {'identificationSchemaVersion': 1});
     expect((await repository.load()).acceptedCurrent, isFalse);
   });
   test('build mode gates DRAFT without changing official availability', () {
@@ -211,7 +223,7 @@ void main() {
     final workspace = FlowWorkspace();
     addTearDown(auth.events.close);
     await tester.pumpWidget(gate(auth, onboarding, workspace));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     await tester.scrollUntilVisible(
         find.textContaining('AMBIENTE DE DESENVOLVIMENTO'), 200,
         scrollable: find.byType(Scrollable).first);
@@ -222,19 +234,19 @@ void main() {
     await accept(tester);
     expect(find.text('Etapa endereço'), findsOneWidget);
     expect(onboarding.acceptCalls, 0);
-    expect(onboarding.profile, isEmpty);
+    expect(onboarding.profile, {'identificationSchemaVersion': 1});
     await tester.tap(find.text('Destino confirmado'));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.text('Catálogo • Rua de teste, 1'), findsOneWidget);
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.text('Catálogo • Rua de teste, 1'), findsOneWidget);
     await auth.signOut();
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     auth.change(const CustomerIdentity(uid: 'buyer'));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(find.text('Vamos começar'), findsOneWidget);
-    expect(onboarding.profile, isEmpty);
+    expect(onboarding.profile, {'identificationSchemaVersion': 1});
   });
 
   test(
@@ -254,7 +266,7 @@ void main() {
     expect(tester.getTopLeft(find.text('Continuar com Apple')).dy,
         lessThan(tester.getTopLeft(find.text('Continuar com Google')).dy));
     await tester.tap(find.text('Continuar com Apple'));
-    await tester.pumpAndSettle();
+    await settleFlow(tester);
     expect(
         find.textContaining('Não foi possível entrar agora'), findsOneWidget);
     expect(find.textContaining('FirebaseException'), findsNothing);
@@ -274,7 +286,7 @@ void main() {
                   .copyWith(textScaler: const TextScaler.linear(1.6)),
               child: child!),
           home: CustomerLoginScreen(auth: auth)));
-      await tester.pumpAndSettle();
+      await settleFlow(tester);
       expect(tester.takeException(), isNull);
       await tester.scrollUntilVisible(find.text('Continuar com Apple'), 200,
           scrollable: find.byType(Scrollable).first);

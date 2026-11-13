@@ -1,0 +1,12 @@
+{
+  "analyze": true,
+  "targeted": [
+    "00:08 +21: All tests passed!"
+  ],
+  "full": [
+    "00:48 +209: All tests passed!"
+  ],
+  "protectedFiles": 247,
+  "allProtectedPreserved": true,
+  "productionLogicChanged": false
+}

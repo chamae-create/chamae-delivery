@@ -1,3 +1,5 @@
+import '../l10n/customer_localizations.dart';
+import '../data/binational_identity.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../core/models.dart';
@@ -14,6 +16,7 @@ class CustomerSessionGate extends StatefulWidget {
   final CustomerAuth? auth;
   final CustomerOnboardingRepository Function(String uid)? onboarding;
   final CustomerWorkspace Function(String uid)? workspace;
+  final IdentificationRepository Function(String uid)? identification;
   final Widget Function(DeliveryAddress? address)? catalog;
   final Widget Function(ValueChanged<DeliveryAddress?> complete)? destination;
   const CustomerSessionGate(
@@ -21,6 +24,7 @@ class CustomerSessionGate extends StatefulWidget {
       this.auth,
       this.onboarding,
       this.workspace,
+      this.identification,
       this.catalog,
       this.destination});
   @override
@@ -139,13 +143,13 @@ class _CustomerSessionGateState extends State<CustomerSessionGate>
                         padding: const EdgeInsets.all(24),
                         child:
                             Column(mainAxisSize: MainAxisSize.min, children: [
-                          const Text('Conta excluída'),
+                          const LocalizedText('Conta excluída'),
                           if (cleanup == LocalClosureCleanup.cleaning) ...[
                             const CircularProgressIndicator(),
-                            const Text(
+                            const LocalizedText(
                                 'Encerrando sessão e limpando os dados deste aparelho…'),
                           ] else if (cleanup == LocalClosureCleanup.failed) ...[
-                            const Text(
+                            const LocalizedText(
                                 'A exclusão no serviço foi concluída, mas a limpeza deste aparelho está pendente.'),
                             TextButton(
                                 onPressed: () async {
@@ -155,9 +159,10 @@ class _CustomerSessionGateState extends State<CustomerSessionGate>
                                     /* State already reports the pending cleanup. */
                                   }
                                 },
-                                child: const Text('Tentar limpeza novamente')),
+                                child: const LocalizedText(
+                                    'Tentar limpeza novamente')),
                           ] else
-                            const Text(
+                            const LocalizedText(
                                 'Limpeza local concluída. Feche e abra o app (ou recarregue a página) para continuar.'),
                         ])))));
       });
@@ -222,6 +227,13 @@ class _CustomerSessionGateState extends State<CustomerSessionGate>
                               onRetry: _reload,
                               onSignOut: () => _auth.signOut());
                         }
+                        // Identification/contact are requested only by their operational flow.
+                        UserSession.fullName =
+                            data.onboarding.profile["fullName"] as String? ??
+                                user.name;
+                        UserSession.whatsapp =
+                            data.onboarding.profile["phone"] as String? ??
+                                UserSession.whatsapp;
                         final address = _chosenAddress ?? data.address;
                         if (address != null || _enteredCatalog) {
                           return widget.catalog?.call(address) ??
@@ -248,7 +260,7 @@ class _CustomerSessionGateState extends State<CustomerSessionGate>
               child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    Text(
+                    LocalizedText(
                         error is FirebaseException &&
                                 error.code == 'permission-denied'
                             ? 'Sua conta entrou, mas o acesso aos dados foi negado. Tente novamente ou entre em contato com o suporte.'
@@ -256,10 +268,10 @@ class _CustomerSessionGateState extends State<CustomerSessionGate>
                         textAlign: TextAlign.center),
                     TextButton(
                         onPressed: _restartSession,
-                        child: const Text('Tentar novamente')),
+                        child: const LocalizedText('Tentar novamente')),
                     TextButton(
                         onPressed: () => _auth.signOut(),
-                        child: const Text('Sair da conta')),
+                        child: const LocalizedText('Sair da conta')),
                   ])))));
 }
 
@@ -272,7 +284,8 @@ class _Journey {
     if (saved is! Map) return null;
     try {
       final address = DeliveryAddress.fromMap(Map<String, dynamic>.from(saved));
-      return address.confirmed &&
+      return address.label != 'Não salvar' &&
+              address.confirmed &&
               address.hasCoordinates &&
               ['BR', 'PY'].contains(address.countryCode)
           ? address

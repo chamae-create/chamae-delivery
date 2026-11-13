@@ -54,7 +54,8 @@ async function pickupAction(db, request, action, administrator = false) {
     if (!order || !matchAssignment(order, administrator ? order.courierUid : uid, d.assignmentId, nowMs)) reject();
     uid = order.courierUid;
     const bindingRef = db.doc(`courierPickupAssignments/${d.assignmentId}`); const binding = await tx.get(bindingRef);
-    if (binding.exists && binding.data().status !== "active") reject();
+    if (!binding.exists || binding.data().status !== "active" ||
+        binding.data().orderId !== d.orderId || binding.data().courierUid !== uid) reject();
     if (order.courierPickedUpAt || ["pickedUp", "headingToCustomer"].includes(order.courierPickupState) ||
         !["Novo", "Em Separação"].includes(order.status)) reject("Retirada já confirmada ou pedido indisponível.");
     let patch = {}; let type = action;

@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-28",
+  "indexSha256": "7B768ED0B809BE32DCDACFA5EFBE1A90DA222C34092AB6418BB966235386C3C2",
+  "statusCounts": {
+    "D ": 12,
+    " M": 21,
+    "??": 263
+  },
+  "staged": [
+    "D\tandroid/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java",
+    "D\tandroid/local.properties",
+    "D\tios/Flutter/Generated.xcconfig",
+    "D\tios/Flutter/ephemeral/flutter_lldb_helper.py",
+    "D\tios/Flutter/ephemeral/flutter_lldbinit",
+    "D\tios/Flutter/ephemeral/flutter_native_integration.env",
+    "D\tios/Flutter/flutter_export_environment.sh",
+    "D\tios/Runner/GeneratedPluginRegistrant.h",
+    "D\tios/Runner/GeneratedPluginRegistrant.m",
+    "D\tmacos/Flutter/ephemeral/Flutter-Generated.xcconfig",
+    "D\tmacos/Flutter/ephemeral/flutter_export_environment.sh",
+    "D\tmacos/Flutter/ephemeral/flutter_native_integration.env"
+  ],
+  "files": [
+    {
+      "path": "functions/customer-provider-revocation.js",
+      "sha256": "1F6DDD9611E844471766B6C5474289CD76B45E62B2743890C597CB76AA0111E0"
+    },
+    {
+      "path": "functions/customer-account.js",
+      "sha256": "2D983B729E5A7BD1FCD3C3C724C170F8964B683122C781FEA8511FE2678C23A7"
+    },
+    {
+      "path": "functions/package.json",
+      "sha256": "331512C66551C165EE45418CF5CE2F996E020A96782694CF334693B4A872A162"
+    },
+    {
+      "path": "functions/.eslintrc.js",
+      "sha256": "AF98037410BE980400E3442E3B109979F529187E57DAB294A4967393E9569EC4"
+    },
+    {
+      "path": "functions/test/customer-provider-revocation.spec.js",
+      "sha256": "97C28711BDAD86F78297034662687860A38CABC5B7D437613F5E7F94ED9C70E7"
+    },
+    {
+      "path": "functions/test/customer-privacy.emulator.spec.js",
+      "sha256": "3041D10B6C09572735E4AD955B5B89E247A55F880AE8CB883F1537E032060F41"
+    },
+    {
+      "path": "lib/data/customer_account.dart",
+      "sha256": "D7F38632550770D1C5621665BEAA58FCD5ECDA243967CD46902B917D8B3B3674"
+    },
+    {
+      "path": "lib/data/customer_auth.dart",
+      "sha256": "9A337422012FAB7666F8831A08BA6B6768E2562EF3ADC834F7E2928EBE1B11D0"
+    },
+    {
+      "path": "lib/screens/customer_account_closure_screen.dart",
+      "sha256": "61A69EA3B7284348E426EBA8BB1F0F109CF1732443CAE419DDB7F9A1948B7E2C"
+    },
+    {
+      "path": "test/customer_privacy_test.dart",
+      "sha256": "1C6CE67D44D3A1B11B9DCFD9F49576EE7595047030024C6745643089077D2108"
+    },
+    {
+      "path": "docs/KB-06-PRIVACIDADE-APPLE-CONTA-2026-10-24.md",
+      "sha256": "5AC7A2AC913BCA6F8F7F8B46EB092C14DDC321D81B63A9EBB658B3957A980AB2"
+    }
+  ]
+}

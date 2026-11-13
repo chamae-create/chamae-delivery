@@ -1,0 +1,42 @@
+{
+  "applicationId": "br.com.loumak.chamae",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "pubGetLocked": true,
+  "gradleHelp": true,
+  "guard": {
+    "preflight": {
+      "PreflightExit": 1,
+      "MissingSigningRejected": true
+    },
+    "guardInReleaseGraph": true,
+    "releaseTasksAfterGuard": true,
+    "releaseGraphTasks": 61,
+    "guardAbsentFromDebugGraph": true,
+    "releaseTasksSkipped": true,
+    "actualKeyPropertiesCreated": false,
+    "aabExists": false,
+    "releaseApkExists": false
+  },
+  "analyze": true,
+  "flutter": [
+    "00:45 +209: All tests passed!"
+  ],
+  "protectedFiles": 341,
+  "allProtectedPreserved": true,
+  "checklist": {
+    "scenarioCount": 196,
+    "matchingIds": true,
+    "manualIdsPreserved": true,
+    "compactIdsPreserved": true,
+    "resultsBlank": true,
+    "gatesPreserved": true
+  },
+  "secrets": {
+    "trackedSigningOrPrivateCredentialFiles": 0,
+    "trackedNonExampleEnvFiles": 0,
+    "trackedServiceAccountContent": 0,
+    "actualKeyPropertiesExists": false,
+    "emptyTemplate": true
+  }
+}

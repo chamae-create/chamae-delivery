@@ -1,0 +1,990 @@
+[
+  {
+    "path": "docs\\frete_google_routes_final_readiness_2026-10-19.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\android_toolchain_google_oauth_2026-10-18.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\firebase_options.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\order_chat.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\store_hours_builder.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\core\\utils.dart",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\flutterfire_mobile_configuration_2026-10-18.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\firestore_rules_audit.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\EXCLUSAO-CONTA-E-CONFIRMACAO-PEDIDO-2026-10-24.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\customer_visual_real_device_homologation_2026-10-20.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\customer_visual_homologation_2026-10-20.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\customer_visual_freeze_with_references_2026-10-20.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\customer_order_access.md",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\main.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\delivery_quote_summary.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\delivery_pin_card.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\customer_visual.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\customer_order_history_card.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\customer_feedback.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\customer_chat_entry.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\chamae_logo.dart",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\sponsor_video_banner.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\core\\theme.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\real_web_map.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\core\\store_hours.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\product_image.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\core\\order_confirmation_policy.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\pix_payment_presentation.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\core\\models.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\core\\catalog_commercial_policy.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\core\\catalog.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\core\\cart_validation.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\pix_payment_dialog.dart",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\git_checkpoint_audit_2026-10-20.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\frete_raio_operacional_readiness_2026-10-19.md",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\order_notification_card.dart",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\frete_ponta_a_ponta_2026-10-24.md",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\widgets\\order_confirmation.dart",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\google_authentication_audit_2026-10-18.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\git_checkpoint_execution_2026-10-20.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_official_visual_audit_2026-10-21.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\KB-06-PRIVACIDADE-APPLE-CONTA-2026-10-24.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\KB-05-CONTINGENCIA-ENTREGA-2026-10-24.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\KB-04-CANCELAMENTO-COMPENSACOES-2026-10-24.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\KB-03-HORARIO-PAIS-BACKEND-2026-10-24.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\production_identifiers_migration_2026-10-18.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\post_login_firestore_audit_2026-10-19.md",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\customer-onboarding.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\customer-identity.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\customer-account.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\customer-account-state.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\courier-dispatch-contract.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\courier-deliveries.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\courier-assignment.js",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\app_cliente_fluxo_oficial_auditoria_2026-10-18.md",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\catalog-commercial-policy.js",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\app_cliente_final_readiness_2026-10-18.md",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\delivery-pin.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\delivery-contingency.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\delivery-contingency-state.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\customer-security.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\customer-provider-revocation.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\delivery-service.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\delivery-pricing.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\destination-country.js",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\APP-CLIENTE-CONSOLIDACAO-FINAL-2026-10-24.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\chamae_ux_1810_frete_30km_auditoria.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\app_cliente_store_checklist_2026-10-18.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\chamae_ux_1810_frete_30km_readiness.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\codemagic_ios_setup.md",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\tracking_view.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\tracking_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\splash_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\registration_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\motoboy_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\legal_document_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\home_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\customer_session_gate.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\customer_profile_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\customer_onboarding_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\customer_login_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\customer_account_closure_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\checkout_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\cart_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\admin_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\address_map_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\screens\\address_destination_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\docs\\pilot.md",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\docs\\order-chat-and-printing.md",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\docs\\operational-flow.md",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\docs\\customer-auth-onboarding.md",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\docs\\courier-deliveries.md",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\docs\\courier-assignment.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\analyze_result.txt",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\build_apk_result.txt",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\customer_bootstrap.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\customer_auth.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\customer_account.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\customer_local_privacy.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\customer_location.dart",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\tracking.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\tracking-progresso.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\produto.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\perfil.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\home.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\confirmacao.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\checkout.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\categorias.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\carrinho.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\cold_sequence.mp4",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\cold_02_start.txt",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\cold_02_metrics.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\cold_01_start.txt",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\cold_01_metrics.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\error_retry.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\comparison.html",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\official_splash.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\README.md",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\customer_verification.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\customer_orders.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\customer_onboarding.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\customer_workspace.dart",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\reduced_motion.png",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\delivery_quote.dart",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\sequence_start.txt",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\reopen_start.txt",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\reopen_no_replay.png",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\reverse_geocode_web.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\reverse_geocode_native.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\reverse_geocode.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\restore_customer_cart.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\order_notifications.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\order_attempt.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib\\data\\geocoded_address.dart",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\index.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\google-routes-provider.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\operational-contingency.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\order-acceptance.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\order-cancellation-state.js",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\cold_01_metrics.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\actual_app_splash.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\cold_02_metrics.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\cold_01_start.txt",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\cold_02_start.txt",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\config\\delivery-pricing-initial.json",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\order-chat.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\order-cancellation.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\order-operations.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\order-printing.js",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\README.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\official_splash.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\error_retry.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\cold_sequence.mp4",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\reopen_no_replay.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\reduced_motion.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\reopen_start.txt",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\sequence_start.txt",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\validation.json",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\cart-state.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\capture_inventory.json",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\catalog.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\categories-preview.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\capture_inventory.json",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\package-lock.json",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\empty.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\config\\customer_documents.draft.json",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\search.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\README.md",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\quote-error.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\promotions.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\popular.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\no-address.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\large-text.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\home.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\error.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_chat-keyboard.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_chat-keyboard-footer.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_categories.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_catalog.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_cart.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_cart-footer.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_chat.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_chat-merchant.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_chat-merchant-footer.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_checkout.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_checkout-footer.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_history.png",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\package.json",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\test_result.txt",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\tests_result.txt",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\references_inventory.json",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\preservation.json",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_profile.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_profile-footer.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_product.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_product-footer.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-waiting.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-retry.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-qr.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-paid.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-footer.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-expired.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-error.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-creating.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_orders.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_map.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_map-footer.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_home_products.png",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_home.png",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\scripts\\audit-orders.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\audit-orders.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\backend-fixture.js",
+    "unchanged": true
+  },
+  {
+    "path": "docs\\config\\firebase_legacy\\README.md",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\pilot.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\order-operations.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\order-chat.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\order-cancellation.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\order-cancellation.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\order-acceptance.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\order-acceptance.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\operational-fixture.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\firestore.rules.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\financial.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\final-operations.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\delivery-radius.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\delivery-pricing-fixture.json",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\delivery-official.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\delivery-fixture.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\delivery-contracts.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\delivery-contingency.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\delivery-contingency.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\customer-provider-revocation.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\customer-privacy.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\customer-policy-fixture.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\customer-onboarding.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\customer-account.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\customer-account.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\courier-deliveries.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\courier-deliveries.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\courier-assignment.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions\\test\\courier-assignment.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "firestore.rules",
+    "unchanged": true
+  },
+  {
+    "path": "pubspec.yaml",
+    "unchanged": true
+  },
+  {
+    "path": "pubspec.lock",
+    "unchanged": true
+  },
+  {
+    "path": "functions/package-lock.json",
+    "unchanged": true
+  }
+]

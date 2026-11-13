@@ -14,7 +14,7 @@ import 'package:chamae_delivery/screens/cart_screen.dart';
 Product product({int stock = 5}) => Product(
     id: 'beer',
     name: 'Bebida 350 ml',
-    category: 'Cervejas',
+    category: 'Refrigerantes & Sucos',
     price: 20,
     stock: stock,
     isActive: true,
@@ -72,6 +72,7 @@ void main() {
     final cart = item();
     final data = <String, dynamic>{
       'name': cart.name,
+      'category': 'Refrigerantes & Sucos',
       'stock': 5,
       'reservedStock': 2,
       'priceBRL': 20
@@ -115,7 +116,7 @@ void main() {
     await tester.pump();
     ready.complete();
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 2500));
+    await tester.pump(const Duration(milliseconds: 3000));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
     await tester.pumpAndSettle();
@@ -172,7 +173,7 @@ void main() {
     await tester.ensureVisible(find.text('Dinheiro'));
     await tester.tap(find.text('Dinheiro'));
     await tester.pumpAndSettle();
-    for (final currency in ['BRL', 'PYG', 'USD']) {
+    for (final currency in ['BRL']) {
       await tester.ensureVisible(find.text(currency));
       await tester.tap(find.text(currency));
       await tester.pumpAndSettle();
@@ -184,17 +185,11 @@ void main() {
       expect(tester.takeException(), isNull);
     }
   });
-  testWidgets('pagamento dividido começa recolhido e aceita dinheiro',
-      (tester) async {
+  testWidgets('pagamento dividido fica indisponível na v1', (tester) async {
     await tester.pumpWidget(checkout('BR'));
     await tester.pumpAndSettle();
-    final toggle = find.byType(Switch);
-    await tester.ensureVisible(toggle);
-    expect(tester.widget<Switch>(toggle).value, isFalse);
-    await tester.tap(toggle);
-    await tester.pumpAndSettle();
-    expect(find.textContaining('Somente dinheiro'), findsWidgets);
-    expect(find.text('Cartão na entrega'), findsNothing);
+    expect(find.byType(Switch), findsNothing);
+    expect(find.text('Dividir pagamento'), findsNothing);
   });
   testWidgets('carrinho altera quantidade, total e remove item',
       (tester) async {
@@ -208,10 +203,13 @@ void main() {
               cart.single.quantity += delta;
               if (cart.single.quantity <= 0) cart.clear();
             })));
-    expect(find.text('R\$ 40,40'), findsOneWidget);
+    expect(find.text('R\$ 40,00'), findsWidgets);
+    expect(find.text('R\$ 0,00'), findsOneWidget);
+    expect(find.text('R\$ 40,40'), findsNothing);
     await tester.tap(find.byTooltip('Aumentar quantidade'));
     await tester.pump();
-    expect(find.text('R\$ 60,60'), findsOneWidget);
+    expect(find.text('R\$ 60,00'), findsWidgets);
+    expect(find.text('R\$ 60,60'), findsNothing);
     await tester.tap(find.byTooltip('Remover Bebida 350 ml'));
     await tester.pump();
     expect(find.text('Seu carrinho está vazio.'), findsOneWidget);

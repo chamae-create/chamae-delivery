@@ -1,0 +1,93 @@
+{
+  "projectId": "chamae-delivery-staging",
+  "deploymentAuthorized": false,
+  "groups": {
+    "customer": [
+      "chamaeAceitarDocumentosCliente",
+      "chamaeConferirElegibilidadeCompra",
+      "chamaeObterPinEntrega",
+      "chamaeRedefinirPinEntrega",
+      "chamaeEstadoVerificacao"
+    ],
+    "pricing": [
+      "chamaeSalvarConfiguracaoEntrega",
+      "chamaeCotarEntrega",
+      "chamaeDescartarPropostaPedido"
+    ],
+    "paymentAndStock": [
+      "chamaeCriarPixAutomatico",
+      "chamaeMercadoPagoWebhook",
+      "chamaeReservarEstoquePagamentoEntrega",
+      "chamaeResolverReservaEstoque"
+    ],
+    "operations": [
+      "chamaeIniciarSeparacao",
+      "chamaeListarMotoboysAtribuiveis",
+      "chamaeAtribuirMotoboy",
+      "chamaeDespacharPedido",
+      "chamaeConcluirEntrega",
+      "chamaeRegistrarAcertoMotoboy",
+      "chamaeSincronizarCourierDelivery"
+    ],
+    "exceptions": [
+      "chamaeRegistrarContingenciaEntrega",
+      "chamaeCancelarPedido",
+      "chamaeAutorizarDevolucaoPedido"
+    ],
+    "pickup": [
+      "chamaeMinhasAtribuicoes",
+      "chamaeEmitirTicketRetirada",
+      "chamaePrepararRetirada",
+      "chamaeConfirmarPacoteRetirada"
+    ],
+    "pinReconciliation": [
+      "chamaeVerificarPinPedido"
+    ],
+    "chatAndPrinting": [
+      "chamaeEnviarMensagemPedido",
+      "chamaeMarcarChatLido",
+      "chamaeRegistrarImpressaoPedido"
+    ],
+    "f03": [
+      "chamaeSincronizarEventoMotoboy"
+    ],
+    "navigation": [
+      "chamaeRotaOnlineMotoboy",
+      "chamaePrevisaoEntrega"
+    ],
+    "ageCheck": [
+      "chamaeAtualizarIdentificacaoCliente",
+      "chamaeIniciarVerificacaoEtaria",
+      "chamaeConsultarVerificacaoEtaria",
+      "chamaeConferirDestinatarioMaioridade"
+    ],
+    "courierRemuneration": [
+      "chamaeObterRemuneracaoMotoboy",
+      "chamaeSalvarRemuneracaoMotoboy",
+      "chamaeVerificarDocumentosMotofrete",
+      "chamaeOfertarEntrega",
+      "chamaeMinhasOfertas",
+      "chamaeResponderOferta",
+      "chamaeMeusAcertosRemuneracao",
+      "chamaeRegistrarOcorrenciaRemuneracao",
+      "chamaeCaixaRemuneracao",
+      "chamaeDetalharRevisaoRemuneracao",
+      "chamaeRegistrarAcertoRemuneracao",
+      "chamaeRegistrarEtapasRemuneracao"
+    ]
+  },
+  "excluded": [
+    "chamaeStatus",
+    "chamaeMercadoPagoTeste",
+    "chamaePixTeste",
+    "chamaeCriarPix",
+    "chamaeAtivarConfiguracaoEntrega"
+  ],
+  "notes": [
+    "Future commercial increment; does not replace or delete previously deployed onboarding/account/event exports.",
+    "PIX sandbox credentials and webhook secret are external requirements; no credential is read by packaging or local tests.",
+    "Signing and authoritative offline package providers are still required by the pickup runtime.",
+    "PIN reconciliation does not itself mark an order paid, delivered or settled.",
+    "Mapped GranCheff products require a proven physical-stock bridge; this candidate does not bypass that gate."
+  ]
+}

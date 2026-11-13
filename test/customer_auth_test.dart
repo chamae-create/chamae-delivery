@@ -163,6 +163,7 @@ void main() {
   for (final code in [
     'popup-closed-by-user',
     'network-request-failed',
+    'too-many-requests',
     'operation-not-allowed'
   ]) {
     test('Google $code returns friendly feedback without a new session',

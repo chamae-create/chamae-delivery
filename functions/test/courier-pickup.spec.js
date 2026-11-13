@@ -78,10 +78,10 @@ for (const field of ["pin", "plainPin", "plaintextPin", "privateKey", "private_k
     const t = {orderId: "order", assignmentId: "assignment", courierUid: "rider", packageVersion: 1,
       expiresAtMs: expiry};
     const p = {schemaVersion: 2, assignment: {...t}, delivery: {orderId: "order", courierUid: "rider",
-      address: "Synthetic example", coordinates: n.destination,
+      address: "Synthetic example", expiresAtMs: expiry, coordinates: n.destination,
       payment: {state: "paid", amountMinor: 0, currency: "BRL"},
       pinVerifier: {orderId: "order", verificationVersion: 1, expiresAtMs: expiry, maxAttempts: 3,
-        verificationMaterial: "synthetic-opaque-order-verifier"}},
+        verificationMaterial: "server-only:v1"}},
     map: {geometry: n.coverage.corridors[0], asset: "synthetic-map", navigation: n}};
     assert.doesNotThrow(() => validatePackage(Buffer.from(JSON.stringify(p)), t));
     p.delivery.extra = {nested: [{[field]: "synthetic-placeholder-never-a-real-secret"}]};

@@ -1,0 +1,1366 @@
+[
+  {
+    "path": "lib\\widgets\\store_hours_builder.dart",
+    "hash": "eac8caf53257023c9e59d9c1a25c7c0b99bfab6b09cbca38d2c148f8b101e21b"
+  },
+  {
+    "path": "lib\\widgets\\sponsor_video_banner.dart",
+    "hash": "ef1901c8c1b91fc2c10a4e0279b8830146e81b8356a06e3448f5b76f12c477df"
+  },
+  {
+    "path": "lib\\widgets\\real_web_map.dart",
+    "hash": "c0a19e18ef910930d89f4573116f83c30a5f6eaac66b892fb009f0b169f24d05"
+  },
+  {
+    "path": "lib\\widgets\\product_image.dart",
+    "hash": "935a06d4be36d3e1d3182bc78e9191bc7db9e487a7db2c58bbba77219de4b179"
+  },
+  {
+    "path": "lib\\widgets\\pix_payment_presentation.dart",
+    "hash": "ef19b6d08837f504f2e26340386d32ba3cd0c936104f84e40f55e4ba50a515a3"
+  },
+  {
+    "path": "lib\\widgets\\pix_payment_dialog.dart",
+    "hash": "c7464711292bf1570fde4b5078a1ee42482d168b5831476bad16356326e3bd59"
+  },
+  {
+    "path": "lib\\widgets\\order_notification_card.dart",
+    "hash": "3b2952a9e25773a253d9923ab679d58f128afb44c2f392939a28b8f5113f5eac"
+  },
+  {
+    "path": "lib\\widgets\\order_confirmation.dart",
+    "hash": "7aa73bbb12382108ff670018013efec7f0188bcd047a1d26ff23346cb32c7e4e"
+  },
+  {
+    "path": "lib\\widgets\\delivery_quote_summary.dart",
+    "hash": "0c300520487bfc91742011242a494accf081c0fbf4b316f5a849403e2075908d"
+  },
+  {
+    "path": "lib\\widgets\\delivery_pin_card.dart",
+    "hash": "c4746f1bcf71f388d3654502f18a0f2949a00321899f8c6bb0c57e1d6175f4f8"
+  },
+  {
+    "path": "lib\\widgets\\customer_visual.dart",
+    "hash": "50b5a80142c854ac487679723d29f1259550f1ace729d18dcacfd3989e9c1f83"
+  },
+  {
+    "path": "lib\\widgets\\customer_order_history_card.dart",
+    "hash": "0943d56f9495a1aee17d3db95ccfa2bd540bfea44334d168e9058d39a6bdcb27"
+  },
+  {
+    "path": "lib\\widgets\\customer_feedback.dart",
+    "hash": "9b35006632b775c8386d425c03155c5dc0e943c4bfa4a79928cebf8102220639"
+  },
+  {
+    "path": "lib\\widgets\\customer_chat_entry.dart",
+    "hash": "7a0913f88083762805fdb7a0ecaa8c56631093ad2f692458d2a3fbd035d4328e"
+  },
+  {
+    "path": "lib\\widgets\\chamae_logo.dart",
+    "hash": "d36f2a5a1a415652607bcb3dc62a6fad0cbd9f607b15d057eea71f6bc5da18c6"
+  },
+  {
+    "path": "test\\client_readiness_test.dart",
+    "hash": "58eab2075df213540d0dd4c1599f3e4e480037c1ae4f9c4d26b7120b3efa8280"
+  },
+  {
+    "path": "test\\checkout_web_test.dart",
+    "hash": "cfd88043a2d699c6b7b66b08203c275e3e565a0fb91f690f7077afa3269ad6a3"
+  },
+  {
+    "path": "test\\checkout_delivery_contract_test.dart",
+    "hash": "08c20dfa16420b3841441a30ebc1821955876607f610c6e9926de35ad99a76ac"
+  },
+  {
+    "path": "test\\catalog_test.dart",
+    "hash": "8db620db18f383aab3f229a0ba486f5cb33223d3df5b9fca9686d68dd3cd68fc"
+  },
+  {
+    "path": "test\\app_client_final_visual_test.dart",
+    "hash": "b50652bde6312f251c2b0897d418dda10f1f25acec3eb0cc9ec7e5aa2f01ad50"
+  },
+  {
+    "path": "test\\app_client_final_test.dart",
+    "hash": "170129b1c46e6799123db05aabb8400b3b77946ecdcdf20633dee0b486a19bae"
+  },
+  {
+    "path": "test\\address_flow_test.dart",
+    "hash": "be16e565a1d2b607b6761a4e5d330876756832bbdfca887194799efaef00062d"
+  },
+  {
+    "path": "test\\customer_flow_test.dart",
+    "hash": "66b52cd00b357c14268d86114002230808ee7fb511ad406fb86db87add2c5faa"
+  },
+  {
+    "path": "test\\customer_auth_test.dart",
+    "hash": "a70c918997e60ff46f0bd24637bff7db6f06b8a9961cf408d2c8fe1a828af50b"
+  },
+  {
+    "path": "test\\customer_account_cycle_test.dart",
+    "hash": "4c751ed0c8c7060fa737b58f3d437361ac34d17657b02f557ab2583e987310bb"
+  },
+  {
+    "path": "test\\customer_orders_test.dart",
+    "hash": "17b6278b9f67c9f1c38511564df8b5de76a6c89af20ccce0d66ecdaed51126a5"
+  },
+  {
+    "path": "test\\customer_location_test.dart",
+    "hash": "c281334699e929d8f16cc671680ce2f84336097c6fb0edd0e2119841f6172941"
+  },
+  {
+    "path": "test\\customer_premium_components_test.dart",
+    "hash": "8b0e93ca3e548fa8fcd90d541dcec3e323cb4a87e3a7d9f22ae93b066ce8ac64"
+  },
+  {
+    "path": "lib\\firebase_options.dart",
+    "hash": "472b6d35cdcc2bc027bcbbb8238484f3d87c7aea4772938bcbe53324d07ddb02"
+  },
+  {
+    "path": "lib\\screens\\tracking_view.dart",
+    "hash": "1a6feade07c15e21507d08f9ee1bafe94c4e41f6871ad312269dc80e596205cd"
+  },
+  {
+    "path": "test\\workspace_cart_test.dart",
+    "hash": "bb25b2ba3e714a4ca7cd4ffb50f38416004260a694fb7b3570053a4b29f7b0f7"
+  },
+  {
+    "path": "lib\\screens\\tracking_screen.dart",
+    "hash": "54728a247e12ae6bcc2676e1bef256d64c6975f21536a39d836102160edbed47"
+  },
+  {
+    "path": "lib\\screens\\splash_screen.dart",
+    "hash": "78dcebe0ba0cb0eb3a773293c866ad671f068c482542d70c06d7ef6139a9795a"
+  },
+  {
+    "path": "lib\\screens\\registration_screen.dart",
+    "hash": "b61c319bdf3a4e1dd628759c5e85deeb6c72b7e89829c83e1b8ac37439cee9b0"
+  },
+  {
+    "path": "lib\\screens\\motoboy_screen.dart",
+    "hash": "615149e0e8635e712e46670438469af1475b57cb8e0ef6543affa58546f7cbff"
+  },
+  {
+    "path": "lib\\screens\\legal_document_screen.dart",
+    "hash": "24f584cd307c82448d0d70602500d111094331e3d1433866ef9e359635fefc47"
+  },
+  {
+    "path": "lib\\screens\\home_screen.dart",
+    "hash": "4a6c8889ccc7b64b4fadb86ee0b8e0cf64226abbff33491d42837dc4e2ac6ad2"
+  },
+  {
+    "path": "lib\\screens\\customer_session_gate.dart",
+    "hash": "dbf25c9ac1758534d833007eb984308796be5ad4379997966d70700639388b8e"
+  },
+  {
+    "path": "lib\\screens\\customer_profile_screen.dart",
+    "hash": "638fc3fd6c24a4fd0074aeff4951cc1d0ef06cd6345cafeae840c025f1ab47e6"
+  },
+  {
+    "path": "lib\\screens\\customer_onboarding_screen.dart",
+    "hash": "5fa193c803b3c96dafd946b8bac84ce90d2533cd9b7a09007cefdbc1b6956545"
+  },
+  {
+    "path": "lib\\screens\\customer_login_screen.dart",
+    "hash": "abfcd037d61889e95bf5d3631c4505a0b925b4191f4935fb543a88404f0a3259"
+  },
+  {
+    "path": "lib\\screens\\customer_account_closure_screen.dart",
+    "hash": "61a69ea3b7284348e426eba8bb1f0f109cf1732443cae419ddb7f9a1948b7e2c"
+  },
+  {
+    "path": "lib\\screens\\checkout_screen.dart",
+    "hash": "ad03bb6c4fd3005ec872f6c5dd7b3c854418e2a738836335b21b4589eecd19b3"
+  },
+  {
+    "path": "lib\\screens\\cart_screen.dart",
+    "hash": "ffb9150d762573560955cae17ddbf73cc6653c57f1594e0e5242408f452f9ba3"
+  },
+  {
+    "path": "lib\\screens\\admin_screen.dart",
+    "hash": "ed44914bb57089856a035b291c24a1faf972075e582b6805b1339317be443ad4"
+  },
+  {
+    "path": "lib\\screens\\address_map_screen.dart",
+    "hash": "83d0027f8dcfc541b87e5611477f1dd6cda04ffaf3e5ead0380be5187e2ca9bf"
+  },
+  {
+    "path": "lib\\screens\\address_destination_screen.dart",
+    "hash": "b7f6d506121c6e130a95c60159c9c6d6b24de52e41389925789beac7c6f1ec9a"
+  },
+  {
+    "path": "lib\\order_chat.dart",
+    "hash": "59dea96f9f76adf0d64e0b7cb4b625b4a43bfd1d34ef76cbb4006e3a40fd837d"
+  },
+  {
+    "path": "lib\\main.dart",
+    "hash": "f5e8787b02df700949a221a49307405f8f36c2b1b3332c93505d4cda445c8681"
+  },
+  {
+    "path": "docs\\frete_ponta_a_ponta_2026-10-24.md",
+    "hash": "94bd8fe0679ee7c537b9f8b6452ccdd074920d07c48075238fc1c1eee89f49fb"
+  },
+  {
+    "path": "docs\\frete_google_routes_final_readiness_2026-10-19.md",
+    "hash": "a75872215c4ccb8f62dca872f0d7175faf15de3850618816eac20529aa0f451c"
+  },
+  {
+    "path": "docs\\flutterfire_mobile_configuration_2026-10-18.md",
+    "hash": "c13c204a6fe05373a29a6deaa2164c3501dca47c95d6a1c829a9e11a692fb7a5"
+  },
+  {
+    "path": "docs\\firestore_rules_audit.md",
+    "hash": "9083fde35664db5e7942b2f10c51945d105f7a865108c5ba0724f4cecde954df"
+  },
+  {
+    "path": "docs\\EXCLUSAO-CONTA-E-CONFIRMACAO-PEDIDO-2026-10-24.md",
+    "hash": "1daeddf648e3e2f39dcb85c774d8208665795f366a15a34af4472ff6732b7d36"
+  },
+  {
+    "path": "docs\\customer_visual_real_device_homologation_2026-10-20.md",
+    "hash": "56d905f1d85df98a55f248af56ef90a901841b28caf1da4de066fdc29e06a940"
+  },
+  {
+    "path": "docs\\customer_visual_homologation_2026-10-20.md",
+    "hash": "3f56695d4d1ca6e6ad78b064b4d048a4a47f66755948e2232a07803388892817"
+  },
+  {
+    "path": "docs\\customer_visual_freeze_with_references_2026-10-20.md",
+    "hash": "b1745359c998e37e3d51335bf2b60929b00c2d75ddf1cab7dd1f42af2864f790"
+  },
+  {
+    "path": "docs\\customer_order_access.md",
+    "hash": "1e584395306ba34a9f98122646827a26ac4285574411970dee621a0a841c7fdc"
+  },
+  {
+    "path": "docs\\CORRECAO-TESTES-CHECKOUT-2026-10-25.md",
+    "hash": "e2ea309845681ec43f10f243506392c667339c110f780ba36bf44f2f34971b00"
+  },
+  {
+    "path": "docs\\app_cliente_fluxo_oficial_auditoria_2026-10-18.md",
+    "hash": "d38c41866a305665a32318d167af1ca940380446b3f96f94943b1ca72f116210"
+  },
+  {
+    "path": "docs\\app_cliente_final_readiness_2026-10-18.md",
+    "hash": "56e6b66f4ffe932ea2ed63a7a921a5ab8c713365d44a98ceef1cc2c63496c726"
+  },
+  {
+    "path": "test\\order_acceptance_test.dart",
+    "hash": "c5a56f55eeae5fd8052d8962711fc17d1b2f574a2a103e0d9ee00945e5e6f48a"
+  },
+  {
+    "path": "test\\home_visual_sprint_test.dart",
+    "hash": "67df662b07691f95511c47e165de7a2a19b27bb89cd5652b9f9aa6bcc33a8986"
+  },
+  {
+    "path": "test\\google_login_test.dart",
+    "hash": "49238e289f06e4fdff17fdb1f8c4b8259307f1afd0729edb0ccc57e1fed25fe0"
+  },
+  {
+    "path": "test\\delivery_quote_state_test.dart",
+    "hash": "6cd950dc120d4536ec2b22e9b1336d02f4baaba071bdcb990066ee1475d0cf77"
+  },
+  {
+    "path": "test\\customer_visual_states_test.dart",
+    "hash": "2f34c7794ec673efc4981732151a45899d0778b34da8fb02fa0f73ff53c282dd"
+  },
+  {
+    "path": "test\\customer_visual_homologation_test.dart",
+    "hash": "ed967280abd755db217af94d4c2c92df1a89f4db528c91b875d07304a7be339b"
+  },
+  {
+    "path": "test\\customer_visual_freeze_test.dart",
+    "hash": "9433e44c88b6e6aae42c4dd367fc08e88d89bfb93edff129cf488eb7966e0946"
+  },
+  {
+    "path": "test\\customer_privacy_test.dart",
+    "hash": "1c6ce67d44d3a1b11b9dcfd9f49576ee7595047030024c6745643089077d2108"
+  },
+  {
+    "path": "test\\pix_payment_presentation_test.dart",
+    "hash": "9eb52e8ad879bf1b288cf572e6158225b1e18025cc44fb28589cae8f62301cc3"
+  },
+  {
+    "path": "test\\order_notification_test.dart",
+    "hash": "e633ebc6c899500df6947a5477da80c5423ac030ba25d9c0e54adbf81796a455"
+  },
+  {
+    "path": "test\\order_chat_test.dart",
+    "hash": "12eef558e9ad5d20c811bf1611203d554243ebdc4e5142fa44d7b40df7537486"
+  },
+  {
+    "path": "test\\order_attempt_test.dart",
+    "hash": "c7cd754f23515b49b362752087367466c5b24ed61f04a4452b94608f5cdfdd5d"
+  },
+  {
+    "path": "test\\restore_customer_cart_test.dart",
+    "hash": "e6c34b28c26d5c83c9686506599b7513b9e643c05916aad6096b7954c383705a"
+  },
+  {
+    "path": "test\\production_firebase_configuration_test.dart",
+    "hash": "9b791572bf6092863d7484c667168720d450b9527e706f501292982d16f1abef"
+  },
+  {
+    "path": "test\\splash_official_test.dart",
+    "hash": "e15ba059b44e703979856d9c01efb3246e39a3a7fc2dc7f132da36009777ec82"
+  },
+  {
+    "path": "docs\\android_toolchain_google_oauth_2026-10-18.md",
+    "hash": "dbce40028b0edbfa81069e9b45b15bcfc3acda5383d91bf698606a84a5360fcf"
+  },
+  {
+    "path": "docs\\APP-CLIENTE-CONSOLIDACAO-FINAL-2026-10-24.md",
+    "hash": "a23552acff31edc26fd6f658b53171d8d1327f5fccda9ebb646edded841542f1"
+  },
+  {
+    "path": "docs\\chamae_ux_1810_frete_30km_auditoria.md",
+    "hash": "4082d97933af2614e13bdf0b67be9c33b4b54a8bc3cbb216673583788fb08f18"
+  },
+  {
+    "path": "docs\\app_cliente_store_checklist_2026-10-18.md",
+    "hash": "95c15ab041032e462ad95bb54f8042dc95ebe3be067edd248cac82846a6cad58"
+  },
+  {
+    "path": "docs\\chamae_ux_1810_frete_30km_readiness.md",
+    "hash": "56b534e6b4e0f423bc0652c18e6f6734d391e232c94928fcb5aec45500923a89"
+  },
+  {
+    "path": "docs\\codemagic_ios_setup.md",
+    "hash": "21b4989f8764f9181c6ed5a35ac367415ed46ca6a96915a491ec9fef43de87a4"
+  },
+  {
+    "path": "docs\\git_checkpoint_execution_2026-10-20.md",
+    "hash": "1b00d6c5a717c571b09cc11b83fce82f407158ddd72022f96f54c4e846db19c8"
+  },
+  {
+    "path": "docs\\git_checkpoint_audit_2026-10-20.md",
+    "hash": "fcaf0f341694e61b5c47bcfcfb1bf854b04430b4df958d2571c39f8aff32cc0a"
+  },
+  {
+    "path": "docs\\frete_raio_operacional_readiness_2026-10-19.md",
+    "hash": "fd2fd7cb3fc79d22e4781e0c501ce4051859197e12c7288335b3bb14c7829295"
+  },
+  {
+    "path": "docs\\google_authentication_audit_2026-10-18.md",
+    "hash": "1a80a5a8864b37ed708bc058a4202d8086e62434f33637d39c9b1f097459cf0a"
+  },
+  {
+    "path": "docs\\home_official_visual_audit_2026-10-21.md",
+    "hash": "443dd307acdfd3106d2f3806c83ceae12f4269c6a78891614e0771548c9adc0c"
+  },
+  {
+    "path": "docs\\KB-04-CANCELAMENTO-COMPENSACOES-2026-10-24.md",
+    "hash": "c2ff9f5e020df329a6bec417fa88dbf8966aea2b9a83724821229a6229d25b80"
+  },
+  {
+    "path": "docs\\KB-03-HORARIO-PAIS-BACKEND-2026-10-24.md",
+    "hash": "4d629f13ecf4bb8810fe4342ec137dfad28c34b6255cebe733e8ccece413e4a9"
+  },
+  {
+    "path": "docs\\KB-06-PRIVACIDADE-APPLE-CONTA-2026-10-24.md",
+    "hash": "5ac7a2ac913bca6f8f7f8b46eb092c14ddc321d81b63a9ebb658b3957a980ab2"
+  },
+  {
+    "path": "docs\\KB-05-CONTINGENCIA-ENTREGA-2026-10-24.md",
+    "hash": "6bc204b8d23042a9d7ffdd9939811de0c7f3ffbcb85a630b373c3f65c1ca8079"
+  },
+  {
+    "path": "docs\\post_login_firestore_audit_2026-10-19.md",
+    "hash": "5b8f9c3f1a0619979b9e1fa4e13252301c0048e6d160f21c90082fd63a7cf148"
+  },
+  {
+    "path": "docs\\production_identifiers_migration_2026-10-18.md",
+    "hash": "989f7f4818f4cb3c8df71fffe8fe089fa7ffe3af3e502cade6c123e887850368"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_categories.png",
+    "hash": "d624e668be444673d0f19108755ebc9eafa3d19edb5a2f34792f83a1e365aad2"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_catalog.png",
+    "hash": "b1f58a2fcbfa1a2050263b684dafb4b22c702ca1ce8970099b96797ef1604abc"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_cart.png",
+    "hash": "9860be15affa2452c306000ab1384da68e39ef8d8727abf51ec12e4b8848d805"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_cart-footer.png",
+    "hash": "66e48551841be2a2d0486fae9d296320d63c4f1cdd104fbddbd15b9dbc016e38"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\capture_inventory.json",
+    "hash": "b34c6cc433e676c56c048816b98aed469d8856cef93953e104c8dd0e2a970da0"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\build_apk_result.txt",
+    "hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\analyze_result.txt",
+    "hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+  },
+  {
+    "path": "lib\\data\\reverse_geocode_web.dart",
+    "hash": "1b329b303195b95d048b2e30c218e8a976cec28b72869b2a158d5d6058d97593"
+  },
+  {
+    "path": "lib\\data\\reverse_geocode_native.dart",
+    "hash": "d1e9015d15dffa6653691d96dfe6234412157f241fe8fc9bfb05c3511d49bbed"
+  },
+  {
+    "path": "lib\\data\\reverse_geocode.dart",
+    "hash": "10f55e0bd82dbc51e7748e8e7ff050e95e6e505717c397b8eaadb2a5e0eb8185"
+  },
+  {
+    "path": "lib\\data\\restore_customer_cart.dart",
+    "hash": "b98d045ed5c90897d428f8eb76dd1d207ec45e0c378982dcd0ff50f0ecd56b77"
+  },
+  {
+    "path": "lib\\data\\order_notifications.dart",
+    "hash": "a3aecdea3b7b7e28b187547a0db63f6789ede0cfab3fc82a393bd3d0f7de01b5"
+  },
+  {
+    "path": "lib\\data\\order_attempt.dart",
+    "hash": "9642742e1327ffa82ddf1439a185bb428b321147dd915fdb6f1f643abb520b8e"
+  },
+  {
+    "path": "lib\\data\\geocoded_address.dart",
+    "hash": "eb8fd1b5210a5c63e21e8df8724aee730225a98f9538edf3192c784f3baace81"
+  },
+  {
+    "path": "lib\\data\\delivery_quote.dart",
+    "hash": "f9d3fd8b1aaa61a3c8fa7fa234244515ca580efc66a9a94969f1260cf9db6fb0"
+  },
+  {
+    "path": "lib\\data\\customer_workspace.dart",
+    "hash": "9bda8df9940f52e25be01b48ef2022b6adbbbca0e4cf822f04f747c4f6c9f9f3"
+  },
+  {
+    "path": "lib\\data\\customer_verification.dart",
+    "hash": "7ffaf3ff518bfa575b9606fce5cfc923d6393dc42d7ddf8be9dd9448ef3b347e"
+  },
+  {
+    "path": "lib\\data\\customer_orders.dart",
+    "hash": "935654e15ce2e692fb26fd410d9b0f40988f2ea78ced083bf60937951eb18e69"
+  },
+  {
+    "path": "lib\\data\\customer_onboarding.dart",
+    "hash": "f3568687249df7f2c0bb699c21d1ebcfcaed6ccee3576d48b8b5f72f2a827dcf"
+  },
+  {
+    "path": "lib\\data\\customer_location.dart",
+    "hash": "1e8dd181a4c36d9f7f8516e6644d95d4662a80cdea52b2e01f258ed14a2221c5"
+  },
+  {
+    "path": "lib\\data\\customer_local_privacy.dart",
+    "hash": "fa1e9a87b7a2030ff012f51a0c048a8d817b2c1595dca1d2efaada1de0629d2e"
+  },
+  {
+    "path": "lib\\data\\customer_bootstrap.dart",
+    "hash": "8d76c4023f7824211b57d1f40a5713170899f5b0912e16b343c2e4db527e1966"
+  },
+  {
+    "path": "lib\\data\\customer_auth.dart",
+    "hash": "9a337422012fab7666f8831a08ba6b6768e2562ef3adc834f7e2928ebe1b11d0"
+  },
+  {
+    "path": "lib\\data\\customer_account.dart",
+    "hash": "d7f38632550770d1c5621665beaa58fcd5ecda243967cd46902b917d8b3b3674"
+  },
+  {
+    "path": "android\\settings.gradle.kts",
+    "hash": "9b3bfa8d4a1c4c0d96a863751a2c0f2ecfa1a36d576cf05059f1e757faf3fddf"
+  },
+  {
+    "path": "android\\gradle.properties",
+    "hash": "7714698de712a7872e371f0dbae626c255fc83ac1c15e52e7cd9fcaa241b5092"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\test_result.txt",
+    "hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\tests_result.txt",
+    "hash": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\references_inventory.json",
+    "hash": "da180bcfdcab9a5287589021a0de3d1ae1cb925ae9102d5499c9eedd5b95341e"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\preservation.json",
+    "hash": "58fb4fb163436133a7cc8feb5dd108eb390a9d56bddedb5a2f9a6cc4438c5ed2"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_profile.png",
+    "hash": "92234ae70111cd3eab215b8e80bba994154e9ef9575b2a94dc2dfcaa5a18d177"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_profile-footer.png",
+    "hash": "b452093defa8e1596c5763f306b7de0318305fadda01e0889fc93f516d501712"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_product.png",
+    "hash": "0ccf6a8ec874d530370234079f446105a61f20a85fb323f0fdff45780081a653"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_product-footer.png",
+    "hash": "b41e3aefc3f7a52543ce733b9198970af9d7b8cc3ebb2b6030ae5d54595cc4fd"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-waiting.png",
+    "hash": "e242c2be7bc15c36dd579f0e59c0d2566580e3b955e95f0556a7702b06a95951"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-retry.png",
+    "hash": "e376efae4fd300235f2c1cb983a746d3c95ab7f298575aa1e42277f34a80a8ab"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-qr.png",
+    "hash": "271ef8f29164f30166164c065dc249afdce180092ad083a9cc72634fc0f04ade"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-paid.png",
+    "hash": "db71af34cdf43780f6b1b899cd6155132133b38486fb347bc142c6adbe4bf4a1"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-footer.png",
+    "hash": "a3b0618409deb65d5ef4db21c3d007909c66aaab77151b1cb3753c9586d36659"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-expired.png",
+    "hash": "40b6787922c7778ddac50f4a37a3524caa65483f57291a4e080cd308244c0881"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-error.png",
+    "hash": "dc87d42327d272e7c03b3a3e627d634b37918e8ecf6e166fbd5483234f27a0b8"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_pix-creating.png",
+    "hash": "828aabea29c45380ce9f12ae11555f2f5af201403409b8d7ba4911c00cef228d"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_orders.png",
+    "hash": "572274ffd88c0bff87bf7543282bc5c0914b4431aadeeb55bfe34b5f3c5fec95"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_map.png",
+    "hash": "ce4e99cdddb32c114e03ad9b342f9e8f23c0741a8ed831ff22525e8a3841d60d"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_map-footer.png",
+    "hash": "3d847aa9eb0fe38f423428bfb881d74cead40b8ed3be69ec3aa1a07e8e3b0288"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_home_products.png",
+    "hash": "6d1fa04489db66a0c95c790a68e092ee282afda23fb766d36d30da5e68e16f62"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_home.png",
+    "hash": "599af64063c15e741ad777b543f7b77945b974ad0bd842154665deabe7ccd84e"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_history.png",
+    "hash": "b720b4e9f1c2166a06c3a737c63de28dc92683bf1a0cf81ce8185fee6a3101f4"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_checkout.png",
+    "hash": "1f4e94bffab1d8c6df195df6681bfaa208b34731086cb0eb06491d2350cecebc"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_checkout-footer.png",
+    "hash": "216c0defad3161f1d018e05d79c4607bbbccf1bc111466b9412efd8666a542c3"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_chat.png",
+    "hash": "331a83880012841337f972ca6a18a0a064563ad46eb41a5f9476227515b37c73"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_chat-merchant.png",
+    "hash": "c16a811033b81d8ef0fa18c1e6905102dd3870c384afdd1957e7cd982e17fc3c"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_chat-merchant-footer.png",
+    "hash": "931c20533227263a48ab793ebe830cd2026633ffae4b1c2c69bb024e0fa29936"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_chat-keyboard.png",
+    "hash": "720a1f2f2aeb0d20f8344f2ed6a4d382f5f176b99376d012d5f9b596ee9305a2"
+  },
+  {
+    "path": "docs\\visual_homologation_real_device_2026-10-20\\local_chat-keyboard-footer.png",
+    "hash": "cc6f2559f740870425110b74b3a19f720aceee1ec63c986b9c1c84a3708e8487"
+  },
+  {
+    "path": "test\\support\\customer_flow_fakes.dart",
+    "hash": "37d5d57a27419fd40d59f5fa1e80a6c991095d1f7cbd7afb708e85fc1ab64eff"
+  },
+  {
+    "path": "ios\\Podfile",
+    "hash": "8de3c3b8fafebee4390431eaed94848dff6c6cdbdc6542ca6ac47a0ec698e98b"
+  },
+  {
+    "path": "lib\\core\\utils.dart",
+    "hash": "528776a1d618551ad2aa119838008acc00ac2bc83437d3e6d8fb9717ef5b7872"
+  },
+  {
+    "path": "lib\\core\\theme.dart",
+    "hash": "7f201f22cf36e2524414bc3621d4e849fa586971894b8b59b35c535c7cb20084"
+  },
+  {
+    "path": "lib\\core\\store_hours.dart",
+    "hash": "1a5eab395805d06e1d328af82bf5f52a6b28ce9e889a897890b257961140ab59"
+  },
+  {
+    "path": "lib\\core\\order_confirmation_policy.dart",
+    "hash": "c75125e9425f4fe6aa78ccc2c776ba1da6bb1a283d1bd19950969ac9c7ab9ce9"
+  },
+  {
+    "path": "lib\\core\\models.dart",
+    "hash": "9674fc7710e2a0199d3960a34753333100429b4ea1f1c2dfb7f449d584933197"
+  },
+  {
+    "path": "lib\\core\\catalog_commercial_policy.dart",
+    "hash": "c76ac6385c172699660ec34dab744f32e609fe36fc55b4b9bd3e1fe9d23f83ec"
+  },
+  {
+    "path": "lib\\core\\catalog.dart",
+    "hash": "2f06a96140f471fbe980b23a41d43b8581e00d3791e942dbdf8997af804b9105"
+  },
+  {
+    "path": "lib\\core\\cart_validation.dart",
+    "hash": "67b54764f155e088bec48339f8064f489f5e9ab35a175ae063fd47909d7c8556"
+  },
+  {
+    "path": "functions\\delivery-pin.js",
+    "hash": "ab6c947e2a26f994642aea4a6e764cb006c34707d9d9fb938f56efc41d624970"
+  },
+  {
+    "path": "functions\\delivery-contingency.js",
+    "hash": "ce1a297922ce4b3de2cb05108ed1090cd3d6ef24bd4c9ca5ff8344067eb157d1"
+  },
+  {
+    "path": "functions\\delivery-contingency-state.js",
+    "hash": "eeb8298b6156de80fda254ef8eb21d934af48c77555121aafa0302ad08b58616"
+  },
+  {
+    "path": "functions\\customer-security.js",
+    "hash": "238f07251988a84ed7b0a3a5d86dafa5b6e0186a74cbb95394c6186985e64f5b"
+  },
+  {
+    "path": "functions\\customer-provider-revocation.js",
+    "hash": "1f6ddd9611e844471766b6c5474289cd76b45e62b2743890c597cb76aa0111e0"
+  },
+  {
+    "path": "functions\\customer-onboarding.js",
+    "hash": "ea2bf897295974141e2fd10b583131f2089585eccbd4dbf6300e70fa81172300"
+  },
+  {
+    "path": "functions\\customer-identity.js",
+    "hash": "9d4d18779c913bef208e8a3645e379fad692ef1a5e5ee480118d57f6e146e3a8"
+  },
+  {
+    "path": "functions\\customer-account.js",
+    "hash": "2d983b729e5a7bd1fcd3c3c724c170f8964b683122c781fea8511fe2678c23a7"
+  },
+  {
+    "path": "functions\\customer-account-state.js",
+    "hash": "6ad69f07bc75f00957e1b423b04992e0f46a2f8b0aec772eefe857c93f89dc2d"
+  },
+  {
+    "path": "functions\\courier-dispatch-contract.js",
+    "hash": "859167872c4b28291755cc6661bfa142188a7cafc7180f5d692a156e151ac025"
+  },
+  {
+    "path": "functions\\courier-deliveries.js",
+    "hash": "21283bd853df1c371c07220d9f5701218776d08c7a104dbc010e9d11754d470c"
+  },
+  {
+    "path": "functions\\courier-assignment.js",
+    "hash": "88d8f09660fb676a135d947ce7563f8cf4252662745b8a9630181680b575b703"
+  },
+  {
+    "path": "android\\gradle\\wrapper\\gradle-wrapper.properties",
+    "hash": "594a00250ef7a36609a01f3263bf5ed63963afaf9ca9f82f2cd1de0f6f056383"
+  },
+  {
+    "path": "android\\build.gradle.kts",
+    "hash": "218f400e3fff31c9c986a2535dfb974560e1b4d33cc27b7c1fee96a2b7e44454"
+  },
+  {
+    "path": "functions\\catalog-commercial-policy.js",
+    "hash": "a09381085056574ec19d15920b11efc77c4073b02b943347563166817d11e1af"
+  },
+  {
+    "path": "functions\\order-acceptance.js",
+    "hash": "4fe8eea940321b4995829616182e8f80e0f8897185141cf5c3f1167933651d7d"
+  },
+  {
+    "path": "functions\\operational-contingency.js",
+    "hash": "fe36cc99d8370e1c9ac1f68af3e73ea1d4d59b7dd22982821d0c6ca2eb52c754"
+  },
+  {
+    "path": "functions\\index.js",
+    "hash": "446f6a08fc840e5af3ed30707d22c7daa1c03a3ee0d30137996896a5af62210b"
+  },
+  {
+    "path": "functions\\google-routes-provider.js",
+    "hash": "054d4eecdb0d2959a93d94f0b690467b69f972b9376618b54d3dd30004a23bd1"
+  },
+  {
+    "path": "ios\\Flutter\\Release.xcconfig",
+    "hash": "f1a2e46792280a99f79c4c2775df5817c2ab803d2c0d928ccf4e3c59721faca2"
+  },
+  {
+    "path": "ios\\Flutter\\Debug.xcconfig",
+    "hash": "0252d55e8f79bda3b6f336b9523c740fe59d4d1b806e6398a906132b1734b309"
+  },
+  {
+    "path": "ios\\Flutter\\AppFrameworkInfo.plist",
+    "hash": "e51cfa76fca1ae586244b43bf97423577315d2906394c1e7768ef43b8d23e161"
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\categorias.png",
+    "hash": "eeff8ace1ae5ae9615abdb8b96813377f88f19a9f8af5fcd99705e6617192375"
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\carrinho.png",
+    "hash": "3cd0e57891ce9332790a64edff0957fd7283537e088cbb4a075a676ede8cb53a"
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\checkout.png",
+    "hash": "2e15daab2abe3ae5c0469775253169d9cafdda1af5f2ed6b6ef79229624f679d"
+  },
+  {
+    "path": "docs\\config\\customer_documents.draft.json",
+    "hash": "f371e4e99dd269eec236acde491b87680d804b6af515c353f2f7a2c9e3ac18dd"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\catalog.png",
+    "hash": "5f4e597afa507c8f28b312174eef9380ac9b34b9d8a64f24b9db8ef7e625315c"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\cart-state.png",
+    "hash": "b30ae5ae58234c85865d7c550b89d071f3ac7d80982e5b7b00af82f60c3fe757"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\capture_inventory.json",
+    "hash": "8d4174bc3d98f1560c17b2ffe91879d885d73ab3e316e448f171b29cebc7fcf8"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\empty.png",
+    "hash": "3b37e2fa76338b7c96a9834c8c519bdc6808a41798fe9b2993b8226d85b54117"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\categories-preview.png",
+    "hash": "fd58bbac5606072f015a6edba9950b94c4718f19b352c2f24621c0fa68f20eac"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\error.png",
+    "hash": "db4629590eef4f90f6a407ecb2e63035cea0eaada9e05d01ee50ef96cfd9eb18"
+  },
+  {
+    "path": "android\\app\\google-services.json",
+    "hash": "b75c1f1d4ae7bd5074201415d0f9fb642a67bdd9bd1ce7117744e56dbbd52ca5"
+  },
+  {
+    "path": "ios\\RunnerTests\\RunnerTests.swift",
+    "hash": "c0e04141287eb7f9c9f3d31cf5be8cb626a9ea71351206c9121578e8b8f480c3"
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\tracking.png",
+    "hash": "7d785fa00e88421cff9d51df5bfaffce62738b3611cdfb2d7d21455d8fed8a01"
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\tracking-progresso.png",
+    "hash": "c3e4a952c91d6cf98e7d34fd0686202b815d77e455547618ce79bbbf8238c33a"
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\produto.png",
+    "hash": "8b80313db1e29f1983930757e266d0dda8a1a31819eda473446a89b0642d3ccb"
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\perfil.png",
+    "hash": "80cefe343eec1dd0754bab60de71f9f176492da3b96c530fe7afd5765b198049"
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\home.png",
+    "hash": "43b0f4de092cc004d11aa628b98a43b37e2b202b16f192a4bb2743d715cdc7be"
+  },
+  {
+    "path": "docs\\app_cliente_final_2026-10-24\\confirmacao.png",
+    "hash": "c4fc2c063e6690d02bff64fedaa31ac807176dc93afb6bc5697a134b3ffd6bef"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\no-address.png",
+    "hash": "a479f824c73188600afb748159930b6e1036329d29e1bcb7b545fd028fafa3ed"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\large-text.png",
+    "hash": "8b271ef4e5a8c4eb383abcdd74e09505d70fa136629979c621abfee0aa148d5e"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\home.png",
+    "hash": "0b562d751fa0ea71575d0d4d0f8a80fcc9ca9f9d6837d800b0f9da04db0de99b"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\promotions.png",
+    "hash": "07d9b798b21a0ef10557c1c5181f3114b6398ea82f2028d496c2b2806a97d48f"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\popular.png",
+    "hash": "ca8731147368319798a4361ddd31ca16b72c6b0c8c5736535cd70c4220e15d6b"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\quote-error.png",
+    "hash": "7ac71d77f460f74da4e411b5cdc1847e88bc9eed54755db96a99754df9339fdf"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\search.png",
+    "hash": "33b31687ee8660e5c56dba67f140f0c4d1b141d8058708186fc8d17f932258d3"
+  },
+  {
+    "path": "docs\\home_visual_sprint_2026-10-21\\README.md",
+    "hash": "236d5b8e3d64cfe2cbfc9b2edcfa0deea02a582213f5145c9baae2404456e110"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\sequence_start.txt",
+    "hash": "c672166bd9c94fc094eb294cae4d5de0263c1db0d0288123e44f372244c7b319"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\reopen_start.txt",
+    "hash": "12c48557e6cb9db669c26263625420829b31f8791edf1a9a904765db483ca29d"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\reopen_no_replay.png",
+    "hash": "0400e25c7d41dc465d277190a266b68583ba4f4275bfc534bc019d6b784fdf57"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\reduced_motion.png",
+    "hash": "1b1fe28bdb3af34d7db17b33ab6030733323a1df4e124087da5b33749b41565a"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\README.md",
+    "hash": "3f79cbead711eab1e1bb8b932fdc36cfcbbad069b3e2e07da91362275847bb9e"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\official_splash.png",
+    "hash": "1b1fe28bdb3af34d7db17b33ab6030733323a1df4e124087da5b33749b41565a"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\error_retry.png",
+    "hash": "6821ec1d76d00389a1d90582a025b0a213bc875f75d2fe4fd6146d883569fa7d"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\comparison.html",
+    "hash": "6e7e140d85907999851814e0363c458677988a0d03b493f8905782359ce48072"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\cold_sequence.mp4",
+    "hash": "51891c6d2db9104a8114f69bdb7577c48e5b6c24f255fe0f1137c7f05bf47412"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\cold_02_start.txt",
+    "hash": "20083e00077878ac3c26aee064c689d0967ca292278e2be61cb356d07c7b5356"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\cold_02_metrics.png",
+    "hash": "7eac1b0cef4bdd5c97f9d80fdb2910a73abe5890ef4715396237c794ff8666a8"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\cold_01_start.txt",
+    "hash": "f3ba83b19c50b1ba4238690c57d3f2a0aade8bf4251dee7e5149638cb6b33a0e"
+  },
+  {
+    "path": "docs\\splash_official_validation_2026-10-21\\cold_01_metrics.png",
+    "hash": "02c52456acb1f4db4a47be8662abb261e826dfda2d2616e46816f98bbdb472da"
+  },
+  {
+    "path": "ios\\Runner\\AppDelegate.swift",
+    "hash": "bf45e912c0cf52f2cdac11b58189c1999a5364d701dcfba7234fcff9ac299ccb"
+  },
+  {
+    "path": "android\\app\\src\\profile\\AndroidManifest.xml",
+    "hash": "b01a4541a8144c15bc617bab7eb267c99fa1476368fbbda5a12cdbf4e316a34c"
+  },
+  {
+    "path": "android\\app\\src\\debug\\AndroidManifest.xml",
+    "hash": "b01a4541a8144c15bc617bab7eb267c99fa1476368fbbda5a12cdbf4e316a34c"
+  },
+  {
+    "path": "ios\\Runner\\SceneDelegate.swift",
+    "hash": "edce811c671ca0a6ccb14753e14e16deb0d89a0adf4f1b685e362d87d8f4c366"
+  },
+  {
+    "path": "ios\\Runner\\Runner-Bridging-Header.h",
+    "hash": "efe657d8b27f7f8595a0d416bffb33fe7d93bd2869d81f7353b556c439d7a1a7"
+  },
+  {
+    "path": "ios\\Runner\\Info.plist",
+    "hash": "fc79a836865f55d9c8e9149a46247997ce113f1c0097ef5d2384452ae1aaa20f"
+  },
+  {
+    "path": "ios\\Runner\\GoogleService-Info.plist",
+    "hash": "25d96da182ee2a1b218576c94541ec75206212ed20267c4b0cbd015e20e0bac4"
+  },
+  {
+    "path": "functions\\delivery-service.js",
+    "hash": "eb268f4794675d537802cc8f71ed7d13329269ee46b1a6241ca61ad6a169f9f8"
+  },
+  {
+    "path": "functions\\delivery-pricing.js",
+    "hash": "7fd520e0a81ab2d486bcee5e4dfbf86c56c6bdf64ead4da73e57c0f1718b0ab9"
+  },
+  {
+    "path": "functions\\destination-country.js",
+    "hash": "36f3dd2c4f4886d8557a4e98c9a575681c163e92526d2524cfae7803f570c8ca"
+  },
+  {
+    "path": "functions\\docs\\courier-assignment.md",
+    "hash": "46e32e6e3356eff0bc5870738ff0922b633a3679dc4a69d7f51df1795f979daa"
+  },
+  {
+    "path": "functions\\docs\\courier-deliveries.md",
+    "hash": "38d9bb0c8e0b07a3d494b9b315b28c35b5279e91e43fcc7ea6afd7e8656d0f1d"
+  },
+  {
+    "path": "functions\\order-operations.js",
+    "hash": "8f9076646cb098a2c851c6235f8255cfa307f1171df5bc1249a34664ca455a17"
+  },
+  {
+    "path": "functions\\order-chat.js",
+    "hash": "3fb7c9cf4a3d53d867ece1f539823c3164e3cefde7370984c0859da46fcea8a4"
+  },
+  {
+    "path": "functions\\order-cancellation.js",
+    "hash": "243f2435ba4206f82196d32d5566494fe2226cfa6a40cf414f656d357ceb8124"
+  },
+  {
+    "path": "functions\\order-cancellation-state.js",
+    "hash": "dc5d41180f61b3dfcdccd48fb7f2b23c641f6de45addbbf4957da416a103112e"
+  },
+  {
+    "path": "functions\\package-lock.json",
+    "hash": "c7741ef3caf08cef7afbc38575460c84ab26aaf7b05d5bb3c90781a6cfe140ff"
+  },
+  {
+    "path": "functions\\order-printing.js",
+    "hash": "ae48e4a9ed83e6aaefa33891610d49e93785bc970b54eb7b64f38ac399a17832"
+  },
+  {
+    "path": "functions\\package.json",
+    "hash": "ed62940d5cfc2d50496e8cdec3c260479f59e1c6b80f610fef90339ccd21ebd2"
+  },
+  {
+    "path": "functions\\docs\\pilot.md",
+    "hash": "df51d53ffefff7849d825f3511c55ea349180db6684d49570b984063d60e38b7"
+  },
+  {
+    "path": "functions\\docs\\order-chat-and-printing.md",
+    "hash": "a4afad5a82047ee4dc60df329a47f18d1235a7ff6d4d98b74caf511b3151ad57"
+  },
+  {
+    "path": "functions\\docs\\operational-flow.md",
+    "hash": "bf27e799886e554d85c8fafe1d004681dbd0878892c15d8fc5826638dfc67cc6"
+  },
+  {
+    "path": "functions\\docs\\customer-auth-onboarding.md",
+    "hash": "51d8a46df20610995daf523e75adb3ba74eda738fd877ceda6a9a18f00fab36b"
+  },
+  {
+    "path": "docs\\config\\firebase_legacy\\README.md",
+    "hash": "6bbb6190505c953a2ab2b502e606abef277716cde186c68bd0b9c19ee91ba0d5"
+  },
+  {
+    "path": "android\\app\\src\\main\\AndroidManifest.xml",
+    "hash": "cd6dc3bcfe569bca2a5118e8c40f4d76c5a1ee5e19bb4850ceffbcf96364e00c"
+  },
+  {
+    "path": "ios\\Runner\\Base.lproj\\Main.storyboard",
+    "hash": "dcea4686c02065e56217fd19fcfb73d7509b41872e7486126149d47a18559363"
+  },
+  {
+    "path": "ios\\Runner\\Base.lproj\\LaunchScreen.storyboard",
+    "hash": "7699053d23c29ee264c3e516d7a5e42c22493a6c20bfcc5c74bd54f481bcd34f"
+  },
+  {
+    "path": "functions\\config\\delivery-pricing-initial.json",
+    "hash": "53b748aaab63c1198126a3eda6eccaff56dcf392d303a5a9bbef645b9c635b4b"
+  },
+  {
+    "path": "functions\\test\\audit-orders.spec.js",
+    "hash": "be1815b09f8cfc2f0d91e56f6423d75f6b8f1b51059a07aa25a9855ae7366f59"
+  },
+  {
+    "path": "functions\\scripts\\audit-orders.js",
+    "hash": "3019828419eb6012c8b5bd9150dfbdefad72a43a03a62ff163e4517f2f1e815f"
+  },
+  {
+    "path": "ios\\Runner.xcworkspace\\contents.xcworkspacedata",
+    "hash": "706a4c812f2a1e220e6785c27580020d58048e2ae4d30d1280f3c43344ce6b38"
+  },
+  {
+    "path": "functions\\test\\backend-fixture.js",
+    "hash": "203670ec4ea9cc8ecdb4f815bb889badb52a423bd0ec5748574dff39996e832e"
+  },
+  {
+    "path": "functions\\test\\courier-assignment.emulator.spec.js",
+    "hash": "8c7be497d981709de8ef3c60a9165db9fd8c4c595ce7380658d87d7f83b233fe"
+  },
+  {
+    "path": "ios\\Runner.xcworkspace\\xcshareddata\\WorkspaceSettings.xcsettings",
+    "hash": "dd64c0308ab2971c456871b990b24a008bdc3ece09833e8dbe9675e33a496e74"
+  },
+  {
+    "path": "ios\\Runner.xcworkspace\\xcshareddata\\IDEWorkspaceChecks.plist",
+    "hash": "d557c2c32fc6258ec28981fa45dc847b76c9968beb90a2e26d13ef9c4ea45c30"
+  },
+  {
+    "path": "functions\\test\\customer-privacy.emulator.spec.js",
+    "hash": "3041d10b6c09572735e4ad955b5b89e247a55f880ae8cb883f1537e032060f41"
+  },
+  {
+    "path": "functions\\test\\customer-policy-fixture.js",
+    "hash": "d266ff69d18f45ef2ef1bdce6fd491a1d316a2b4ba3d2ac2ba45bab19a6912fb"
+  },
+  {
+    "path": "functions\\test\\customer-onboarding.spec.js",
+    "hash": "85806976c22247b96b9113508dd6ec4f71a2d829726508b997ced04a29c5b080"
+  },
+  {
+    "path": "functions\\test\\customer-account.spec.js",
+    "hash": "fae0dbd2e61582ff31d2c79fefb7dd2a38818d16b841bfc2fa5d7861d8c094c4"
+  },
+  {
+    "path": "functions\\test\\customer-account.emulator.spec.js",
+    "hash": "a00dc6cc37e85b5236fc588f6790f01bc207aacfd52d5c0f36164e16a2d6e77d"
+  },
+  {
+    "path": "functions\\test\\courier-deliveries.spec.js",
+    "hash": "684302201e1236fc1af615813a2ec72b7a4c4051bcc22ee4ef2303a5062ae204"
+  },
+  {
+    "path": "functions\\test\\courier-deliveries.emulator.spec.js",
+    "hash": "2eaebec94270642e801402e242e985deb5a319e8acce4a83972f3b3950a39e87"
+  },
+  {
+    "path": "functions\\test\\courier-assignment.spec.js",
+    "hash": "a4776efd7d1bf7952545eee3554dd9be7b18f34ef0674fccdac2aad2443f7f1b"
+  },
+  {
+    "path": "functions\\test\\delivery-contracts.spec.js",
+    "hash": "1272cfc5991e33d7119aaa1f01ba71490a12abd8beef9138c9e8af9750b3d381"
+  },
+  {
+    "path": "functions\\test\\delivery-contingency.spec.js",
+    "hash": "c518ca68ee8399bcf5d292f9dca1e296f7e63d98c39832f7b83d2a6899405837"
+  },
+  {
+    "path": "functions\\test\\delivery-contingency.emulator.spec.js",
+    "hash": "2dcf00fe8cf28ec406a2326ec4b62f6194fb16dce1040e9a130dd66f4547826c"
+  },
+  {
+    "path": "functions\\test\\customer-provider-revocation.spec.js",
+    "hash": "97c28711bdad86f78297034662687860a38cabc5b7d437613f5e7f94ed9c70e7"
+  },
+  {
+    "path": "functions\\test\\delivery-official.spec.js",
+    "hash": "55144010ece2c9fea83077891b790c8c401fe457480b460a9e9dd6aca51e0b58"
+  },
+  {
+    "path": "functions\\test\\delivery-fixture.js",
+    "hash": "60c0fbfc4c9e5ceda67eb5892f6c749b469564306e13466ee075af9edf386bb0"
+  },
+  {
+    "path": "functions\\test\\delivery-pricing-fixture.json",
+    "hash": "28032b7596f563bea1dbda63ab9dc6000641353d05f77a628c12bd1cc338afa8"
+  },
+  {
+    "path": "functions\\test\\delivery-radius.emulator.spec.js",
+    "hash": "18e12606d6016c38f094443efce0bad93b904f4e5316cda9f22bf9e10008768d"
+  },
+  {
+    "path": "ios\\Runner.xcodeproj\\project.pbxproj",
+    "hash": "2aaf0fcc58e68f34304b0ca8c9eaebb7985db826d02654ace1d319a471eab6eb"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\validation.json",
+    "hash": "60df370c0e7788cb56ae5f9e227bce6959ff1c669dfada5b371160b4532b861b"
+  },
+  {
+    "path": "functions\\test\\pilot.emulator.spec.js",
+    "hash": "8b8cd9ccd5c5ce67fc071824d8d4dbe1631c3596753264f8ca284f5146fbbbbf"
+  },
+  {
+    "path": "functions\\test\\order-operations.spec.js",
+    "hash": "91a0a3024d89ee4f68a03b41843c7d3333b92c694d14bc7e3bf4b7d794023ef2"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\sequence_start.txt",
+    "hash": "9e92d1ea25d43fd438ded469b81e48074733e7b4382e93c4202bc1dbe2401315"
+  },
+  {
+    "path": "functions\\test\\order-chat.emulator.spec.js",
+    "hash": "2d4a515d7ce3437cc585a28017279c9c2a3a3f6f86c3a4783cf1014d15b924c5"
+  },
+  {
+    "path": "functions\\test\\order-cancellation.spec.js",
+    "hash": "dcecca5c1628ea0085d7c3b6fecb05bde97e2e3fae92d1a4ac51c3f0ff2c3826"
+  },
+  {
+    "path": "functions\\test\\order-cancellation.emulator.spec.js",
+    "hash": "879f6caac29a611f14e37ed3e9535e23228fd51275d2b4f1717ba19ebd4aa5a3"
+  },
+  {
+    "path": "functions\\test\\order-acceptance.spec.js",
+    "hash": "331899627a83d786fcac76efaa741c00159d302b986d9d8af12cbdd72a42723f"
+  },
+  {
+    "path": "functions\\test\\order-acceptance.emulator.spec.js",
+    "hash": "c44c3f787a59ed23fa43e644c738eb2b60ad4d9cb68aee3cfa3fb18f76d5bee6"
+  },
+  {
+    "path": "functions\\test\\operational-fixture.js",
+    "hash": "74f20c3b251786f5b22399f2f76f6d435864e30c903df5b29fa728650c217997"
+  },
+  {
+    "path": "functions\\test\\firestore.rules.spec.js",
+    "hash": "c0747ccbe02a42e18126196a374911dc11da2273902c4ba89dfa996ebab36ff4"
+  },
+  {
+    "path": "functions\\test\\financial.spec.js",
+    "hash": "09e3471b1852b63c33dc70d3b8a7c50a1b7322090d325bc8adb0f8002f31f730"
+  },
+  {
+    "path": "functions\\test\\final-operations.emulator.spec.js",
+    "hash": "d0024339496554799a02ddf5b048859be7ce030790aa86518e66fa69892462b4"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\reopen_start.txt",
+    "hash": "3cdd54f9851dd4f6beb98a8c4bed20500be5834db1503951f638d19526762a0e"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\reopen_no_replay.png",
+    "hash": "d1f50e8d180d0cc5b1e7ff19135764a021d24320d818a38a124a681212814fd2"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\reduced_motion.png",
+    "hash": "df2e3082cb6ac7b94c0a7db084777bf343f5a645ea8a91610a5054fddc1a6685"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\README.md",
+    "hash": "dd095aa854b833a2fee90e00a6e2971eb24a43cfb84b7b3ec39f55a70c028f6f"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\official_splash.png",
+    "hash": "59abe904e2989808d5db1af534e3389d95afb591077dfbd3f1269c750ed46475"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\error_retry.png",
+    "hash": "723436695be1ac9e75e553d995ae8151c68411478eb4c6e086bbe5903038730d"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\cold_sequence.mp4",
+    "hash": "c8c319d2fabb8fa92772a2e414da2a037559e059b3b1d58d95d13ded839f6611"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\cold_02_start.txt",
+    "hash": "f3f8e1aa3762640b08a5fa4de4885920177686c7ff624babe69a98656a64bf7f"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\cold_02_metrics.png",
+    "hash": "334d43e58acbe341bb3d963c68a3fce80a684b9190ca66ae4f7d54726dd0381f"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\cold_01_start.txt",
+    "hash": "0133973e14da8d58cc96e85d529dca0ea3dd83309e4f7492b0a669667c3336a7"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\cold_01_metrics.png",
+    "hash": "bc0001b90dd1888330cfc71a5d7f7012c8e075b04c0746e074a991f860a332b6"
+  },
+  {
+    "path": "docs\\splash_final_correction_2026-10-21\\actual_app_splash.png",
+    "hash": "736efdbf8c085beefae31278b02c4c0a718829211d805f1c041095ccb50953ce"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\LaunchImage.imageset\\Contents.json",
+    "hash": "fbd112a9f3b541a1d811f71ac8e4fe68b6176687d973a5f4d99b7aa4a722e94e"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\LaunchImage.imageset\\README.md",
+    "hash": "853ac958e2416fe2540f6f61165283a3618b71a7ba5f85f65ac41c2158dfcd21"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\LaunchImage.imageset\\LaunchImage@3x.png",
+    "hash": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\LaunchImage.imageset\\LaunchImage@2x.png",
+    "hash": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\LaunchImage.imageset\\LaunchImage.png",
+    "hash": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20"
+  },
+  {
+    "path": "android\\app\\src\\main\\res\\values-v31\\styles.xml",
+    "hash": "2da115a72943bebd99fe38bacf6fc508a0484b44ed1f328ef0cac9d00ddd8d6a"
+  },
+  {
+    "path": "android\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher.png",
+    "hash": "e14aa40904929bf313fded22cf7e7ffcbf1d1aac4263b5ef1be8bfce650397aa"
+  },
+  {
+    "path": "android\\app\\src\\main\\res\\drawable-v21\\launch_background.xml",
+    "hash": "d74fef903916a0c8be0f50ae1928f3defae6a3f0ddf75306fb2101b1408993ad"
+  },
+  {
+    "path": "android\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher.png",
+    "hash": "6a7c8f0d703e3682108f9662f813302236240d3f8f638bb391e32bfb96055fef"
+  },
+  {
+    "path": "ios\\Runner.xcodeproj\\project.xcworkspace\\xcshareddata\\WorkspaceSettings.xcsettings",
+    "hash": "dd64c0308ab2971c456871b990b24a008bdc3ece09833e8dbe9675e33a496e74"
+  },
+  {
+    "path": "ios\\Runner.xcodeproj\\project.xcworkspace\\xcshareddata\\IDEWorkspaceChecks.plist",
+    "hash": "d557c2c32fc6258ec28981fa45dc847b76c9968beb90a2e26d13ef9c4ea45c30"
+  },
+  {
+    "path": "ios\\Runner.xcodeproj\\project.xcworkspace\\contents.xcworkspacedata",
+    "hash": "ac28b35c2b940210bec0fff8e424b07fd0efe9112ab178a10533583f251a386c"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-20x20@1x.png",
+    "hash": "cab10a0d391ec5bc09ef50ce49e8ad401cee7ef03707ec0923a222c5c2b3d212"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-1024x1024@1x.png",
+    "hash": "7770183009e914112de7d8ef1d235a6a30c5834424858e0d2f8253f6b8d31926"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Contents.json",
+    "hash": "5f8b941b774bde4496d73347c1f79cbdd786bb76fbdab9ed1f3f0cb78a0fb0d3"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-20x20@3x.png",
+    "hash": "c6e6d3b215ae744a9c391f4c4d44157eff5e739d6ad6c39f9bfa5df66dddd267"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-20x20@2x.png",
+    "hash": "b9ad02cf6576a04d1b6806ac02a2431481b448dd0c2e505ce25842d1f7c4730b"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-29x29@1x.png",
+    "hash": "5dee24dc104ac76dc162e42ae0beb163d426bf365562ee28ba7b3ad368559a60"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-29x29@2x.png",
+    "hash": "a9b21eb6f4271385655a8771f76e29eef8c1107d7879cbcfc567e6619d1f716a"
+  },
+  {
+    "path": "android\\app\\src\\main\\res\\values-night-v31\\styles.xml",
+    "hash": "4481fc2d303b3e3b2a781d9f60e646e06ecb3d31b182a1c01a58129b43a258da"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-83.5x83.5@2x.png",
+    "hash": "5d7e5bdf01b93802bc973345b3a78c038907147625035952a08a115a563b7f81"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-76x76@2x.png",
+    "hash": "41c7d42f6e61f8fe7f30b1ffa2256aecbc9682be06d18c4a3062043e1a2e547c"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-76x76@1x.png",
+    "hash": "836c918cb613249eba0483a6b02fa3df3c1c0a89a315ee4d3b88509b83c7ab73"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-60x60@3x.png",
+    "hash": "4209a49e44a92ec40a327d3455eb1b1c153ee83d75de1c2be0a12ab18b2ff9de"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-60x60@2x.png",
+    "hash": "19be171481dc71a0b2803ebcd01dd8b0c5fd5778dee34c0a3cabc948c225f24e"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-40x40@3x.png",
+    "hash": "19be171481dc71a0b2803ebcd01dd8b0c5fd5778dee34c0a3cabc948c225f24e"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-40x40@2x.png",
+    "hash": "7c61c42fc7b657d9cf314d32a4ec458f0647c3aaf360be1b9377857266ec2499"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-40x40@1x.png",
+    "hash": "b9ad02cf6576a04d1b6806ac02a2431481b448dd0c2e505ce25842d1f7c4730b"
+  },
+  {
+    "path": "ios\\Runner\\Assets.xcassets\\AppIcon.appiconset\\Icon-App-29x29@3x.png",
+    "hash": "e677d701ffe4af7bc2935098d6b3984cc9ab7ace573e6900955a5535b12410cf"
+  },
+  {
+    "path": "android\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher.png",
+    "hash": "c7c0c0189145e4e32a401c61c9bdc615754b0264e7afae24e834bb81049eaf81"
+  },
+  {
+    "path": "android\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher.png",
+    "hash": "3c34e1f298d0c9ea3455d46db6b7759c8211a49e9ec6e44b635fc5c87dfb4180"
+  },
+  {
+    "path": "android\\app\\src\\main\\res\\drawable\\launch_background.xml",
+    "hash": "d74fef903916a0c8be0f50ae1928f3defae6a3f0ddf75306fb2101b1408993ad"
+  },
+  {
+    "path": "ios\\Runner.xcodeproj\\xcshareddata\\xcschemes\\Runner.xcscheme",
+    "hash": "a46c0d064503db8bf9f452b492c61fdf76f9febb8894005fe30b2facec21e550"
+  },
+  {
+    "path": "android\\app\\src\\main\\res\\values-night\\styles.xml",
+    "hash": "28977fce4ce697b06ddd1e0d728e98944c17de91b29dc05cd4f42cbaac4323a1"
+  },
+  {
+    "path": "android\\app\\src\\main\\res\\drawable-nodpi\\splash_gold.png",
+    "hash": "5f6d5ba0487d5f624af7f636c6d93a28d89e6299b57d8deec8565f16f0727f7f"
+  },
+  {
+    "path": "android\\app\\src\\main\\res\\values\\styles.xml",
+    "hash": "05b6f4b63d76f394be31d438874ddd4ab04cc0b130699db7a55df2a3dec2cb46"
+  },
+  {
+    "path": "android\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher.png",
+    "hash": "4d470bf22d5c17d84edc5f82516d1ba8a1c09559cd761cefb792f86d9f52b540"
+  },
+  {
+    "path": "android\\app\\src\\main\\kotlin\\br\\com\\loumak\\chamae\\MainActivity.kt",
+    "hash": "361db61e81d20e7d4e95e2de46086b0413b47019ac991d2af05f9483a3b95108"
+  },
+  {
+    "path": "pubspec.yaml",
+    "hash": "fbcd1ed55f46783a515c73a7056c3df094561233a46af7118cd30ff0056171b6"
+  },
+  {
+    "path": "pubspec.lock",
+    "hash": "78a59519e1bb1c9761fadb58f4ef16e1e4215dd21b06ce83020a95f1eb477c63"
+  },
+  {
+    "path": "functions/package-lock.json",
+    "hash": "c7741ef3caf08cef7afbc38575460c84ab26aaf7b05d5bb3c90781a6cfe140ff"
+  },
+  {
+    "path": "firestore.rules",
+    "hash": "d428eb314b4e246563f1e8d3275a5be6c6bf6d84d9e9117947558e1f0d534415"
+  },
+  {
+    "path": ".gitignore",
+    "hash": "0bafdd23c8469350db0179ab545a44fa047d6015b73f6b7852c1f3ec3d02465d"
+  },
+  {
+    "path": "android/.gitignore",
+    "hash": "c9af75dbc2c8aa867476a09426c80b178c4aeed8b9393ae48503eedfa3273d71"
+  },
+  {
+    "path": "android/local.properties",
+    "hash": "8f57c5cd8b0f8c274de8c43fd4cec23ade3551741553f56d27970e68132dee4d"
+  }
+]

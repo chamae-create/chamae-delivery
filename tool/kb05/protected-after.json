@@ -1,0 +1,50 @@
+﻿[
+    {
+        "Path":  "pubspec.yaml",
+        "Preserved":  true
+    },
+    {
+        "Path":  "pubspec.lock",
+        "Preserved":  true
+    },
+    {
+        "Path":  "functions/package-lock.json",
+        "Preserved":  true
+    },
+    {
+        "Path":  "functions/order-acceptance.js",
+        "Preserved":  true
+    },
+    {
+        "Path":  "functions/destination-country.js",
+        "Preserved":  true
+    },
+    {
+        "Path":  "functions/delivery-service.js",
+        "Preserved":  true
+    },
+    {
+        "Path":  "functions/delivery-pricing.js",
+        "Preserved":  true
+    },
+    {
+        "Path":  "functions/config/delivery-pricing-initial.json",
+        "Preserved":  true
+    },
+    {
+        "Path":  "functions/customer-account.js",
+        "Preserved":  true
+    },
+    {
+        "Path":  "functions/customer-onboarding.js",
+        "Preserved":  true
+    },
+    {
+        "Path":  "lib/data/customer_orders.dart",
+        "Preserved":  true
+    },
+    {
+        "Path":  "lib/core/order_confirmation_policy.dart",
+        "Preserved":  true
+    }
+]

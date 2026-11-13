@@ -29,6 +29,10 @@ async function requireApprovedCourier(db, request, transaction) {
     throw new HttpsError("permission-denied",
         "Seu acesso operacional não está liberado.");
   }
+  if (request.auth.token?.firebase?.sign_in_provider === "password" && request.auth.token.email_verified !== true) {
+    throw new HttpsError("failed-precondition", "Verifique seu e-mail e entre novamente para operar.",
+        {reason: "EMAIL_VERIFICATION_REQUIRED"});
+  }
   return {uid, ref, profile: snapshot.data()};
 }
 

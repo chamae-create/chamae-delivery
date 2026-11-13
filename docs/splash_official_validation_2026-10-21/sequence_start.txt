@@ -1,0 +1,7 @@
+Starting: Intent { cmp=br.com.loumak.chamae/.MainActivity }
+Status: ok
+Activity: br.com.loumak.chamae/.MainActivity
+ThisTime: 1069
+TotalTime: 1069
+WaitTime: 1105
+Complete

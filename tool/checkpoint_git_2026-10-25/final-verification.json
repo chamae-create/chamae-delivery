@@ -1,0 +1,17 @@
+{
+  "initialFiles": 343,
+  "inventoryComplete": true,
+  "reportRowsComplete": true,
+  "include": 116,
+  "exclude": 228,
+  "listsDisjoint": true,
+  "includeFilesExist": true,
+  "unsafeIncluded": [],
+  "templateEmpty": true,
+  "allRequiredSections": true,
+  "protectedFiles": 612,
+  "protectedChanges": [],
+  "staged": "",
+  "newFilesOutsideAuthorizedArtifacts": [],
+  "newLocalFiles": 15
+}

@@ -111,7 +111,7 @@ async function webhook(item, paid = true, terminal = "canceled") {
   body.transactions.payments[0].status = paid ? "processed" : "canceled";
   const ts = String(Math.floor(Date.now() / 1000)); const requestId = "test-hook-request";
   const signature = createHmac("sha256", "TEST_ONLY")
-      .update(`id:${mpId};request-id:${requestId};ts:${ts};`).digest("hex");
+      .update(`id:${mpId.toLowerCase()};request-id:${requestId};ts:${ts};`).digest("hex");
   let code;
   const response = Object.assign(new EventEmitter(), {status: (value) => {
     code = value; return response;
@@ -136,8 +136,7 @@ test("before PIX/reservation: authoritative cancellation blocks stale triggers a
     assert.equal((await stock(item)).reservedStock, 0); assert.equal(posts.length, postCount);
   }
 });
-for (const [method, country] of [["Dinheiro", "BR"], ["Maquininha", "BR"], ["Dinheiro", "PY"],
-  ["Pagamento dividido", "PY"]]) {
+for (const [method, country] of [["Dinheiro", "BR"], ["Maquininha", "BR"]]) {
   test(`${method}/${country}: RELEASE once, financial/3% preserved and no commission in closing`, async () => {
     const item = await seed(method, country);
     const financial = await get(`orderFinancials/${item.id}`);
@@ -152,6 +151,18 @@ for (const [method, country] of [["Dinheiro", "BR"], ["Maquininha", "BR"], ["Din
     assert.equal((await item.ref.get()).data().paymentStatus, "Pendente na entrega");
   });
 }
+for (const method of ["Dinheiro", "Pagamento dividido"]) {
+  test(method + "/PY: new purchases remain blocked without reservation or financial effects", async () => {
+    const postCount = posts.length;
+    const item = await seed(method, "PY");
+    assert.equal((await db.doc(`orderFinancials/${item.id}`).get()).exists, false);
+    assert.equal((await stock(item)).reservedStock, 0);
+    assert.equal((await stock(item)).stock, 10);
+    assert.equal(posts.length, postCount);
+    assert.ok((await item.ref.get()).data().financialValidationError);
+  });
+}
+
 test("PIX pending: no invented void/refund and no new charge; late paid webhook never debits or reopens", async () => {
   const item = await seed("PIX"); const financial = await get(`orderFinancials/${item.id}`);
   const postCount = posts.length; await cancel(item.id);

@@ -4,7 +4,9 @@ import 'models.dart';
 bool commerciallyAvailable(Product product) =>
     product.isActive &&
     product.stock > 0 &&
+    !categoryReviewRequired({'category': product.category}) &&
     !isCommerciallyBlocked({
+      'id': product.id,
       'name': product.name,
       'category': product.category,
       'commercialBlocked': product.commercialBlocked
@@ -22,7 +24,9 @@ List<Product> visibleCatalogProducts(
   final result = products
       .where((p) =>
           p.isActive &&
+          !categoryReviewRequired({'category': p.category}) &&
           !isCommerciallyBlocked({
+            'id': p.id,
             'name': p.name,
             'category': p.category,
             'commercialBlocked': p.commercialBlocked

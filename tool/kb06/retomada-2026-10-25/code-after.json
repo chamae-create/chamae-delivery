@@ -1,0 +1,66 @@
+[
+  {
+    "path": "functions/customer-account.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/customer-provider-revocation.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/test/customer-account.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/test/customer-provider-revocation.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/test/customer-privacy.emulator.spec.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/.eslintrc.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/package.json",
+    "unchanged": true
+  },
+  {
+    "path": "lib/core/models.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib/data/customer_auth.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib/data/customer_account.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib/data/customer_bootstrap.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib/data/customer_local_privacy.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib/screens/customer_session_gate.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib/screens/customer_account_closure_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "test/customer_auth_test.dart",
+    "unchanged": true
+  },
+  {
+    "path": "test/customer_privacy_test.dart",
+    "unchanged": true
+  }
+]

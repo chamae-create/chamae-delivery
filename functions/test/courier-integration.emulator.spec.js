@@ -5,6 +5,7 @@ const {initializeApp, deleteApp} = require("firebase-admin/app");
 const {getFirestore, Timestamp} = require("firebase-admin/firestore");
 const {getStorage} = require("firebase-admin/storage");
 const {getAuth} = require("firebase-admin/auth");
+const {seedCourierPolicy} = require("./courier-policy-fixture");
 const {submitCourierEvent} = require("../courier-events");
 const {confirmCourierPhoto} = require("../courier-photo");
 const {pickupAction, inspectPickup, pickupPolicy} = require("../courier-pickup-lifecycle");
@@ -26,6 +27,7 @@ after(async () => {
 async function fixture(status = "approved") {
   const uid = `f03-core-${++counter}`; const id = `f03-core-order-${counter}`;
   await auth.createUser({uid});
+  await seedCourierPolicy(db, uid, Timestamp.now());
   await db.doc(`couriers/${uid}`).set({role: "courier", name: "Fictitious courier", phone: "67000000000",
     profilePhoto: "fixture", approvalStatus: status, administrativeState: status === "approved" ? "active" : status,
     enabled: status === "approved", online: true});
@@ -41,7 +43,8 @@ async function fixture(status = "approved") {
     confirmation: `CONFIRMAR ${id}`}});
   const read = async () => (await db.doc(`orders/${id}`).get()).data();
   const initial = await read();
-  const identity = {uid, token: {auth_time: Math.floor(Date.now() / 1000), firebase: {sign_in_provider: "password"}}};
+  const identity = {uid, token: {email_verified: true, auth_time: Math.floor(Date.now() / 1000),
+    firebase: {sign_in_provider: "password"}}};
   let sequence = 0;
   const event = (type = "pickupAction", payload = {action: "accept"}, eventId) => {
     const data = {...(type === "availability" ? {} : {assignmentId: initial.courierAssignmentId}),

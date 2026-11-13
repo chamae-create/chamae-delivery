@@ -1,0 +1,8 @@
+docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md:577: new blank line at EOF.
+docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md:5: trailing whitespace.
++Rodada: __________ • Data/início/fim e offset/UTC: __________ • Operador/revisor: __________  
+docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md:6: trailing whitespace.
++Ambiente/projeto: __________ • Build/hash cliente/painel/backend/Rules/bridge: __________  
+docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md:7: trailing whitespace.
++Commit de referência existente + dirty: __________ • Dispositivos/modelo/SO/rede/driver: __________  
+docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md:379: new blank line at EOF.

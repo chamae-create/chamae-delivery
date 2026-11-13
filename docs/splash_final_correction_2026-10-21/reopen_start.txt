@@ -1,0 +1,8 @@
+Starting: Intent { cmp=br.com.loumak.chamae/.MainActivity }
+Warning: Activity not started, its current task has been brought to the front
+Status: ok
+Activity: br.com.loumak.chamae/.MainActivity
+ThisTime: 58
+TotalTime: 58
+WaitTime: 74
+Complete

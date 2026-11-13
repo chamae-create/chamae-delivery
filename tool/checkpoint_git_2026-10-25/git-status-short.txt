@@ -1,0 +1,133 @@
+ M android/app/build.gradle.kts
+ M android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+ M android/app/src/main/res/drawable-v21/launch_background.xml
+ M android/app/src/main/res/drawable/launch_background.xml
+ M android/app/src/main/res/values-night/styles.xml
+ M android/app/src/main/res/values/styles.xml
+ M android/local.properties
+ M design/references/customer_app/official/README.md
+ M firestore.rules
+ M functions/.eslintrc.js
+ M functions/config/delivery-pricing-initial.json
+ M functions/courier-assignment.js
+ M functions/customer-onboarding.js
+ M functions/customer-security.js
+ M functions/delivery-pricing.js
+ M functions/delivery-service.js
+ M functions/index.js
+ M functions/operational-contingency.js
+ M functions/order-chat.js
+ M functions/order-operations.js
+ M functions/package.json
+ M functions/test/backend-fixture.js
+ M functions/test/delivery-contracts.spec.js
+ M functions/test/delivery-official.spec.js
+ M functions/test/delivery-radius.emulator.spec.js
+ M functions/test/final-operations.emulator.spec.js
+ M functions/test/financial.spec.js
+ M functions/test/firestore.rules.spec.js
+ M functions/test/pilot.emulator.spec.js
+ M ios/Runner/Base.lproj/LaunchScreen.storyboard
+ M ios/Runner/GeneratedPluginRegistrant.m
+ M lib/core/models.dart
+ M lib/data/customer_auth.dart
+ M lib/data/customer_bootstrap.dart
+ M lib/data/customer_orders.dart
+ M lib/data/customer_workspace.dart
+ M lib/data/delivery_quote.dart
+ M lib/screens/admin_screen.dart
+ M lib/screens/cart_screen.dart
+ M lib/screens/checkout_screen.dart
+ M lib/screens/customer_profile_screen.dart
+ M lib/screens/customer_session_gate.dart
+ M lib/screens/home_screen.dart
+ M lib/screens/registration_screen.dart
+ M lib/screens/splash_screen.dart
+ M lib/screens/tracking_screen.dart
+ M lib/screens/tracking_view.dart
+ M lib/widgets/chamae_logo.dart
+ M lib/widgets/pix_payment_dialog.dart
+ M lib/widgets/product_image.dart
+ M lib/widgets/real_web_map.dart
+ M lib/widgets/sponsor_video_banner.dart
+ M pubspec.yaml
+ M test/checkout_delivery_contract_test.dart
+ M test/checkout_web_test.dart
+ M test/client_readiness_test.dart
+ M test/customer_auth_test.dart
+ M test/customer_orders_test.dart
+ M test/customer_visual_freeze_test.dart
+ M test/customer_visual_homologation_test.dart
+ M test/delivery_quote_state_test.dart
+?? android/app/src/main/res/drawable-nodpi/
+?? android/app/src/main/res/values-night-v31/
+?? android/app/src/main/res/values-v31/
+?? android/key.properties.example
+?? assets/images/home/
+?? assets/images/splash/
+?? design/references/customer_app/official/baseline_manifest.json
+?? docs/APP-CLIENTE-CONSOLIDACAO-FINAL-2026-10-24.md
+?? docs/CORRECAO-TESTES-CHECKOUT-2026-10-25.md
+?? docs/EXCLUSAO-CONTA-E-CONFIRMACAO-PEDIDO-2026-10-24.md
+?? docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md
+?? docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md
+?? docs/KB-03-HORARIO-PAIS-BACKEND-2026-10-24.md
+?? docs/KB-04-CANCELAMENTO-COMPENSACOES-2026-10-24.md
+?? docs/KB-05-CONTINGENCIA-ENTREGA-2026-10-24.md
+?? docs/KB-06-PRIVACIDADE-APPLE-CONTA-2026-10-24.md
+?? docs/KB-07-ANDROID-SIGNING-BUILD-2026-10-25.md
+?? docs/app_cliente_final_2026-10-24/
+?? docs/frete_ponta_a_ponta_2026-10-24.md
+?? docs/home_official_visual_audit_2026-10-21.md
+?? docs/home_visual_sprint_2026-10-21/
+?? docs/splash_final_correction_2026-10-21/
+?? docs/splash_official_validation_2026-10-21/
+?? firebase.account-test.json
+?? firebase.frete-test.json
+?? functions/customer-account-state.js
+?? functions/customer-account.js
+?? functions/customer-provider-revocation.js
+?? functions/delivery-contingency-state.js
+?? functions/delivery-contingency.js
+?? functions/destination-country.js
+?? functions/order-acceptance.js
+?? functions/order-cancellation-state.js
+?? functions/order-cancellation.js
+?? functions/test/customer-account.emulator.spec.js
+?? functions/test/customer-account.spec.js
+?? functions/test/customer-privacy.emulator.spec.js
+?? functions/test/customer-provider-revocation.spec.js
+?? functions/test/delivery-contingency.emulator.spec.js
+?? functions/test/delivery-contingency.spec.js
+?? functions/test/delivery-fixture.js
+?? functions/test/delivery-pricing-fixture.json
+?? functions/test/operational-fixture.js
+?? functions/test/order-acceptance.emulator.spec.js
+?? functions/test/order-acceptance.spec.js
+?? functions/test/order-cancellation.emulator.spec.js
+?? functions/test/order-cancellation.spec.js
+?? lib/core/order_confirmation_policy.dart
+?? lib/data/customer_account.dart
+?? lib/data/customer_local_privacy.dart
+?? lib/screens/customer_account_closure_screen.dart
+?? lib/widgets/customer_feedback.dart
+?? lib/widgets/order_confirmation.dart
+?? lib/widgets/store_hours_builder.dart
+?? test/app_client_final_test.dart
+?? test/app_client_final_visual_test.dart
+?? test/customer_account_cycle_test.dart
+?? test/customer_privacy_test.dart
+?? test/home_visual_sprint_test.dart
+?? test/order_acceptance_test.dart
+?? test/splash_official_test.dart
+?? tool/account_cycle/
+?? tool/app_cliente_final/
+?? tool/checkout_test_fixes_2026-10-25/
+?? tool/kb03/
+?? tool/kb04/
+?? tool/kb05/
+?? tool/kb06/
+?? tool/kb07/
+?? tool/visual_device/capture.ps1
+?? tool/visual_home/
+?? tool/visual_splash/

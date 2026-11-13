@@ -1,0 +1,20 @@
+{
+  "createdAt": "2026-10-24T21:33:08.831Z",
+  "artifacts": [
+    {
+      "path": "build/web/index.html",
+      "bytes": 2668,
+      "sha256": "bfa275c52ee60c1c069261f86d2a878dafdc63157f4531571c074e4caff43d6c"
+    },
+    {
+      "path": "build/web/main.dart.js",
+      "bytes": 3663258,
+      "sha256": "55f8e95b16e533b960b97605b9f722c94358ecaa413a7276f19f939f1e45749a"
+    },
+    {
+      "path": "build/web/flutter_bootstrap.js",
+      "bytes": 13094,
+      "sha256": "b70b58a67cd4b3a996de163b06b102ea78f65156ed6895959b3fd70b80cda434"
+    }
+  ]
+}

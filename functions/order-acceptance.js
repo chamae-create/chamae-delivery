@@ -75,6 +75,9 @@ async function prepareOrderAcceptance(tx, db, orderRef, order) {
   } catch (_) {
     reject("DESTINATION_COUNTRY_UNVERIFIED");
   }
+  const {assertDestinationOperation, assertSinglePayment} = require("./checkout-policy");
+  assertDestinationOperation(country);
+  assertSinglePayment(order);
   assertPaymentCountry(order, country);
 }
 

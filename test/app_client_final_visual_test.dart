@@ -42,7 +42,7 @@ void main() {
         1));
     await tester.pumpAndSettle();
     await visuals.capture(tester, 'confirmation_390');
-    await tester.scrollUntilVisible(find.text('Acompanhar pedido'), 180,
+    await tester.scrollUntilVisible(find.text('Acompanhar pedido').last, 180,
         scrollable: find.byType(Scrollable).first);
     await tester.pumpAndSettle();
     await visuals.capture(tester, 'confirmation_cta_390');

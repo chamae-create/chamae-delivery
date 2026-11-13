@@ -1,0 +1,3089 @@
+[
+  {
+    "status": " M",
+    "path": "android/app/build.gradle.kts",
+    "group": "E",
+    "also": "",
+    "include": true,
+    "reason": "Configuração/recursos nativos do produto; preservar junto do splash/assinatura.",
+    "bytes": 5767
+  },
+  {
+    "status": " M",
+    "path": "android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java",
+    "group": "F",
+    "also": "E",
+    "include": false,
+    "reason": "Autogerado, já rastreado apesar do ignore; regenerável pelo Flutter.",
+    "bytes": 3971
+  },
+  {
+    "status": "??",
+    "path": "android/app/src/main/res/drawable-nodpi/splash_gold.png",
+    "group": "E",
+    "also": "D",
+    "include": true,
+    "reason": "Imagem nativa de splash referenciada pelos recursos XML; preservar junto dos temas.",
+    "bytes": 69
+  },
+  {
+    "status": " M",
+    "path": "android/app/src/main/res/drawable-v21/launch_background.xml",
+    "group": "E",
+    "also": "",
+    "include": true,
+    "reason": "Configuração/recursos nativos do produto; preservar junto do splash/assinatura.",
+    "bytes": 268
+  },
+  {
+    "status": " M",
+    "path": "android/app/src/main/res/drawable/launch_background.xml",
+    "group": "E",
+    "also": "",
+    "include": true,
+    "reason": "Configuração/recursos nativos do produto; preservar junto do splash/assinatura.",
+    "bytes": 268
+  },
+  {
+    "status": "??",
+    "path": "android/app/src/main/res/values-night-v31/styles.xml",
+    "group": "E",
+    "also": "",
+    "include": true,
+    "reason": "Configuração/recursos nativos do produto; preservar junto do splash/assinatura.",
+    "bytes": 676
+  },
+  {
+    "status": " M",
+    "path": "android/app/src/main/res/values-night/styles.xml",
+    "group": "E",
+    "also": "",
+    "include": true,
+    "reason": "Configuração/recursos nativos do produto; preservar junto do splash/assinatura.",
+    "bytes": 1364
+  },
+  {
+    "status": "??",
+    "path": "android/app/src/main/res/values-v31/styles.xml",
+    "group": "E",
+    "also": "",
+    "include": true,
+    "reason": "Configuração/recursos nativos do produto; preservar junto do splash/assinatura.",
+    "bytes": 676
+  },
+  {
+    "status": " M",
+    "path": "android/app/src/main/res/values/styles.xml",
+    "group": "E",
+    "also": "",
+    "include": true,
+    "reason": "Configuração/recursos nativos do produto; preservar junto do splash/assinatura.",
+    "bytes": 1365
+  },
+  {
+    "status": "??",
+    "path": "android/key.properties.example",
+    "group": "E",
+    "also": "",
+    "include": true,
+    "reason": "Template de assinatura com campos vazios; não é o key.properties real.",
+    "bytes": 353
+  },
+  {
+    "status": " M",
+    "path": "android/local.properties",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Configuração da máquina já rastreada; não incluir este diff.",
+    "bytes": 151
+  },
+  {
+    "status": "??",
+    "path": "assets/images/home/commerce_backdrop.png",
+    "group": "D",
+    "also": "",
+    "include": true,
+    "reason": "Asset usado pelo produto e declarado no pubspec; inspecionado visualmente, sem dados pessoais aparentes.",
+    "bytes": 1957357
+  },
+  {
+    "status": "??",
+    "path": "assets/images/home/logo_transparent.png",
+    "group": "D",
+    "also": "",
+    "include": true,
+    "reason": "Asset usado pelo produto e declarado no pubspec; inspecionado visualmente, sem dados pessoais aparentes.",
+    "bytes": 1259918
+  },
+  {
+    "status": "??",
+    "path": "assets/images/splash/chamae_official_gold_2026_10_21.jpeg",
+    "group": "D",
+    "also": "",
+    "include": true,
+    "reason": "Asset usado pelo produto e declarado no pubspec; inspecionado visualmente, sem dados pessoais aparentes.",
+    "bytes": 93639
+  },
+  {
+    "status": "??",
+    "path": "design/references/customer_app/official/baseline_manifest.json",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 4264
+  },
+  {
+    "status": " M",
+    "path": "design/references/customer_app/official/README.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 3981
+  },
+  {
+    "status": "??",
+    "path": "docs/app_cliente_final_2026-10-24/carrinho.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 54035
+  },
+  {
+    "status": "??",
+    "path": "docs/app_cliente_final_2026-10-24/categorias.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 220993
+  },
+  {
+    "status": "??",
+    "path": "docs/app_cliente_final_2026-10-24/checkout.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 71640
+  },
+  {
+    "status": "??",
+    "path": "docs/app_cliente_final_2026-10-24/confirmacao.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 75887
+  },
+  {
+    "status": "??",
+    "path": "docs/app_cliente_final_2026-10-24/home.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 246777
+  },
+  {
+    "status": "??",
+    "path": "docs/app_cliente_final_2026-10-24/perfil.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 82353
+  },
+  {
+    "status": "??",
+    "path": "docs/app_cliente_final_2026-10-24/produto.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 99189
+  },
+  {
+    "status": "??",
+    "path": "docs/app_cliente_final_2026-10-24/tracking-progresso.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 54299
+  },
+  {
+    "status": "??",
+    "path": "docs/app_cliente_final_2026-10-24/tracking.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 75421
+  },
+  {
+    "status": "??",
+    "path": "docs/APP-CLIENTE-CONSOLIDACAO-FINAL-2026-10-24.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 24531
+  },
+  {
+    "status": "??",
+    "path": "docs/CORRECAO-TESTES-CHECKOUT-2026-10-25.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 4281
+  },
+  {
+    "status": "??",
+    "path": "docs/EXCLUSAO-CONTA-E-CONFIRMACAO-PEDIDO-2026-10-24.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 4339
+  },
+  {
+    "status": "??",
+    "path": "docs/frete_ponta_a_ponta_2026-10-24.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 17590
+  },
+  {
+    "status": "??",
+    "path": "docs/home_official_visual_audit_2026-10-21.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 27498
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/capture_inventory.json",
+    "group": "I",
+    "also": "C/F",
+    "include": false,
+    "reason": "Inventário/validação/comparação gerada de captura; revisão de metadados pendente.",
+    "bytes": 2605
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/cart-state.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 458561
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/catalog.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 398781
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/categories-preview.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 383228
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/empty.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 541634
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/error.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 550726
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/home.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 591098
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/large-text.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 552662
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/no-address.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 586149
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/popular.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 355801
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/promotions.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 445524
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/quote-error.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 557502
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/README.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 7690
+  },
+  {
+    "status": "??",
+    "path": "docs/home_visual_sprint_2026-10-21/search.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 300475
+  },
+  {
+    "status": "??",
+    "path": "docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 97438
+  },
+  {
+    "status": "??",
+    "path": "docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 29410
+  },
+  {
+    "status": "??",
+    "path": "docs/KB-03-HORARIO-PAIS-BACKEND-2026-10-24.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 18341
+  },
+  {
+    "status": "??",
+    "path": "docs/KB-04-CANCELAMENTO-COMPENSACOES-2026-10-24.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 21335
+  },
+  {
+    "status": "??",
+    "path": "docs/KB-05-CONTINGENCIA-ENTREGA-2026-10-24.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 15516
+  },
+  {
+    "status": "??",
+    "path": "docs/KB-06-PRIVACIDADE-APPLE-CONTA-2026-10-24.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 33904
+  },
+  {
+    "status": "??",
+    "path": "docs/KB-07-ANDROID-SIGNING-BUILD-2026-10-25.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 23415
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/actual_app_splash.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 503896
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/cold_01_metrics.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 88006
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/cold_01_start.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Log/marcador de captura ou dispositivo; preservar local, sem inclusão.",
+    "bytes": 176
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/cold_02_metrics.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 86925
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/cold_02_start.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Log/marcador de captura ou dispositivo; preservar local, sem inclusão.",
+    "bytes": 178
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/cold_sequence.mp4",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 607660
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/error_retry.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 493334
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/official_splash.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 504435
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/README.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 7124
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/reduced_motion.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 499024
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/reopen_no_replay.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 87189
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/reopen_start.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Log/marcador de captura ou dispositivo; preservar local, sem inclusão.",
+    "bytes": 251
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/sequence_start.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Log/marcador de captura ou dispositivo; preservar local, sem inclusão.",
+    "bytes": 178
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_final_correction_2026-10-21/validation.json",
+    "group": "I",
+    "also": "C/F",
+    "include": false,
+    "reason": "Inventário/validação/comparação gerada de captura; revisão de metadados pendente.",
+    "bytes": 6398
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/cold_01_metrics.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 86041
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/cold_01_start.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Log/marcador de captura ou dispositivo; preservar local, sem inclusão.",
+    "bytes": 175
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/cold_02_metrics.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 85614
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/cold_02_start.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Log/marcador de captura ou dispositivo; preservar local, sem inclusão.",
+    "bytes": 175
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/cold_sequence.mp4",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 394699
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/comparison.html",
+    "group": "I",
+    "also": "C/F",
+    "include": false,
+    "reason": "Inventário/validação/comparação gerada de captura; revisão de metadados pendente.",
+    "bytes": 1481
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/error_retry.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 405413
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/official_splash.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 415030
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/README.md",
+    "group": "C",
+    "also": "",
+    "include": true,
+    "reason": "Relatório, diretriz ou manifesto de referências oficiais, sem credencial privada detectada.",
+    "bytes": 3946
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/reduced_motion.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 415030
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/reopen_no_replay.png",
+    "group": "I",
+    "also": "D/F",
+    "include": false,
+    "reason": "Evidência visual não revisada individualmente para PII/metadados nesta tarefa; manter local.",
+    "bytes": 85922
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/reopen_start.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Log/marcador de captura ou dispositivo; preservar local, sem inclusão.",
+    "bytes": 251
+  },
+  {
+    "status": "??",
+    "path": "docs/splash_official_validation_2026-10-21/sequence_start.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Log/marcador de captura ou dispositivo; preservar local, sem inclusão.",
+    "bytes": 178
+  },
+  {
+    "status": "??",
+    "path": "firebase.account-test.json",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 233
+  },
+  {
+    "status": "??",
+    "path": "firebase.frete-test.json",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 184
+  },
+  {
+    "status": " M",
+    "path": "firestore.rules",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 15378
+  },
+  {
+    "status": " M",
+    "path": "functions/.eslintrc.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 1777
+  },
+  {
+    "status": " M",
+    "path": "functions/config/delivery-pricing-initial.json",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 265
+  },
+  {
+    "status": " M",
+    "path": "functions/courier-assignment.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 11955
+  },
+  {
+    "status": "??",
+    "path": "functions/customer-account-state.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 591
+  },
+  {
+    "status": "??",
+    "path": "functions/customer-account.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 9796
+  },
+  {
+    "status": " M",
+    "path": "functions/customer-onboarding.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 8870
+  },
+  {
+    "status": "??",
+    "path": "functions/customer-provider-revocation.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 3641
+  },
+  {
+    "status": " M",
+    "path": "functions/customer-security.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 3030
+  },
+  {
+    "status": "??",
+    "path": "functions/delivery-contingency-state.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 1665
+  },
+  {
+    "status": "??",
+    "path": "functions/delivery-contingency.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 6418
+  },
+  {
+    "status": " M",
+    "path": "functions/delivery-pricing.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 6271
+  },
+  {
+    "status": " M",
+    "path": "functions/delivery-service.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 13382
+  },
+  {
+    "status": "??",
+    "path": "functions/destination-country.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 2081
+  },
+  {
+    "status": " M",
+    "path": "functions/index.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 87398
+  },
+  {
+    "status": " M",
+    "path": "functions/operational-contingency.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 2160
+  },
+  {
+    "status": "??",
+    "path": "functions/order-acceptance.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 4091
+  },
+  {
+    "status": "??",
+    "path": "functions/order-cancellation-state.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 5966
+  },
+  {
+    "status": "??",
+    "path": "functions/order-cancellation.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 11553
+  },
+  {
+    "status": " M",
+    "path": "functions/order-chat.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 5690
+  },
+  {
+    "status": " M",
+    "path": "functions/order-operations.js",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 15018
+  },
+  {
+    "status": " M",
+    "path": "functions/package.json",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 2078
+  },
+  {
+    "status": " M",
+    "path": "functions/test/backend-fixture.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 678
+  },
+  {
+    "status": "??",
+    "path": "functions/test/customer-account.emulator.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 12648
+  },
+  {
+    "status": "??",
+    "path": "functions/test/customer-account.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 2787
+  },
+  {
+    "status": "??",
+    "path": "functions/test/customer-privacy.emulator.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 11287
+  },
+  {
+    "status": "??",
+    "path": "functions/test/customer-provider-revocation.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 5117
+  },
+  {
+    "status": "??",
+    "path": "functions/test/delivery-contingency.emulator.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 18640
+  },
+  {
+    "status": "??",
+    "path": "functions/test/delivery-contingency.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 4574
+  },
+  {
+    "status": " M",
+    "path": "functions/test/delivery-contracts.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 10370
+  },
+  {
+    "status": "??",
+    "path": "functions/test/delivery-fixture.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 1595
+  },
+  {
+    "status": " M",
+    "path": "functions/test/delivery-official.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 18130
+  },
+  {
+    "status": "??",
+    "path": "functions/test/delivery-pricing-fixture.json",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 4470
+  },
+  {
+    "status": " M",
+    "path": "functions/test/delivery-radius.emulator.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 3020
+  },
+  {
+    "status": " M",
+    "path": "functions/test/final-operations.emulator.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 6502
+  },
+  {
+    "status": " M",
+    "path": "functions/test/financial.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 34265
+  },
+  {
+    "status": " M",
+    "path": "functions/test/firestore.rules.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 42879
+  },
+  {
+    "status": "??",
+    "path": "functions/test/operational-fixture.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 1368
+  },
+  {
+    "status": "??",
+    "path": "functions/test/order-acceptance.emulator.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 10322
+  },
+  {
+    "status": "??",
+    "path": "functions/test/order-acceptance.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 4959
+  },
+  {
+    "status": "??",
+    "path": "functions/test/order-cancellation.emulator.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 22450
+  },
+  {
+    "status": "??",
+    "path": "functions/test/order-cancellation.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 4311
+  },
+  {
+    "status": " M",
+    "path": "functions/test/pilot.emulator.spec.js",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 20173
+  },
+  {
+    "status": " M",
+    "path": "ios/Runner/Base.lproj/LaunchScreen.storyboard",
+    "group": "E",
+    "also": "",
+    "include": true,
+    "reason": "Configuração/recursos nativos do produto; preservar junto do splash/assinatura.",
+    "bytes": 2435
+  },
+  {
+    "status": " M",
+    "path": "ios/Runner/GeneratedPluginRegistrant.m",
+    "group": "F",
+    "also": "E",
+    "include": false,
+    "reason": "Autogerado, já rastreado apesar do ignore; regenerável pelo Flutter.",
+    "bytes": 2812
+  },
+  {
+    "status": " M",
+    "path": "lib/core/models.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 7510
+  },
+  {
+    "status": "??",
+    "path": "lib/core/order_confirmation_policy.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 983
+  },
+  {
+    "status": "??",
+    "path": "lib/data/customer_account.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 3825
+  },
+  {
+    "status": " M",
+    "path": "lib/data/customer_auth.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 8667
+  },
+  {
+    "status": " M",
+    "path": "lib/data/customer_bootstrap.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 1852
+  },
+  {
+    "status": "??",
+    "path": "lib/data/customer_local_privacy.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 1393
+  },
+  {
+    "status": " M",
+    "path": "lib/data/customer_orders.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 3335
+  },
+  {
+    "status": " M",
+    "path": "lib/data/customer_workspace.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 3374
+  },
+  {
+    "status": " M",
+    "path": "lib/data/delivery_quote.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 4624
+  },
+  {
+    "status": " M",
+    "path": "lib/screens/admin_screen.dart",
+    "group": "A",
+    "also": "I",
+    "include": false,
+    "reason": "Status M sem diff substantivo; normalização/estatística do Git, sem mudança a selecionar.",
+    "bytes": 8308
+  },
+  {
+    "status": " M",
+    "path": "lib/screens/cart_screen.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 10733
+  },
+  {
+    "status": " M",
+    "path": "lib/screens/checkout_screen.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 75110
+  },
+  {
+    "status": "??",
+    "path": "lib/screens/customer_account_closure_screen.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 6362
+  },
+  {
+    "status": " M",
+    "path": "lib/screens/customer_profile_screen.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 22799
+  },
+  {
+    "status": " M",
+    "path": "lib/screens/customer_session_gate.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 11212
+  },
+  {
+    "status": " M",
+    "path": "lib/screens/home_screen.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 65823
+  },
+  {
+    "status": " M",
+    "path": "lib/screens/registration_screen.dart",
+    "group": "A",
+    "also": "I",
+    "include": false,
+    "reason": "Status M sem diff substantivo; normalização/estatística do Git, sem mudança a selecionar.",
+    "bytes": 9300
+  },
+  {
+    "status": " M",
+    "path": "lib/screens/splash_screen.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 8868
+  },
+  {
+    "status": " M",
+    "path": "lib/screens/tracking_screen.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 2568
+  },
+  {
+    "status": " M",
+    "path": "lib/screens/tracking_view.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 14439
+  },
+  {
+    "status": " M",
+    "path": "lib/widgets/chamae_logo.dart",
+    "group": "A",
+    "also": "I",
+    "include": false,
+    "reason": "Status M sem diff substantivo; normalização/estatística do Git, sem mudança a selecionar.",
+    "bytes": 1168
+  },
+  {
+    "status": "??",
+    "path": "lib/widgets/customer_feedback.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 1707
+  },
+  {
+    "status": "??",
+    "path": "lib/widgets/order_confirmation.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 5918
+  },
+  {
+    "status": " M",
+    "path": "lib/widgets/pix_payment_dialog.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 5581
+  },
+  {
+    "status": " M",
+    "path": "lib/widgets/product_image.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 2029
+  },
+  {
+    "status": " M",
+    "path": "lib/widgets/real_web_map.dart",
+    "group": "A",
+    "also": "I",
+    "include": false,
+    "reason": "Status M sem diff substantivo; normalização/estatística do Git, sem mudança a selecionar.",
+    "bytes": 3785
+  },
+  {
+    "status": " M",
+    "path": "lib/widgets/sponsor_video_banner.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 6078
+  },
+  {
+    "status": "??",
+    "path": "lib/widgets/store_hours_builder.dart",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 1494
+  },
+  {
+    "status": " M",
+    "path": "pubspec.yaml",
+    "group": "A",
+    "also": "",
+    "include": true,
+    "reason": "Código/regra/configuração funcional, necessário ao conjunto acumulado.",
+    "bytes": 856
+  },
+  {
+    "status": "??",
+    "path": "test/app_client_final_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 12998
+  },
+  {
+    "status": "??",
+    "path": "test/app_client_final_visual_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 2528
+  },
+  {
+    "status": " M",
+    "path": "test/checkout_delivery_contract_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 5791
+  },
+  {
+    "status": " M",
+    "path": "test/checkout_web_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 2090
+  },
+  {
+    "status": " M",
+    "path": "test/client_readiness_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 10756
+  },
+  {
+    "status": "??",
+    "path": "test/customer_account_cycle_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 6383
+  },
+  {
+    "status": " M",
+    "path": "test/customer_auth_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 8025
+  },
+  {
+    "status": " M",
+    "path": "test/customer_orders_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 10556
+  },
+  {
+    "status": "??",
+    "path": "test/customer_privacy_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 15517
+  },
+  {
+    "status": " M",
+    "path": "test/customer_visual_freeze_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 9174
+  },
+  {
+    "status": " M",
+    "path": "test/customer_visual_homologation_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 4530
+  },
+  {
+    "status": " M",
+    "path": "test/delivery_quote_state_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 6347
+  },
+  {
+    "status": "??",
+    "path": "test/home_visual_sprint_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 6049
+  },
+  {
+    "status": "??",
+    "path": "test/order_acceptance_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 8208
+  },
+  {
+    "status": "??",
+    "path": "test/splash_official_test.dart",
+    "group": "B",
+    "also": "",
+    "include": true,
+    "reason": "Teste/fixture ou configuração de emulador loopback, necessária à reprodução local.",
+    "bytes": 6475
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/firestore.rules.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 13407
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/functions__customer-onboarding.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 8679
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/functions__customer-security.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 2903
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/functions__delivery-service.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 12486
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/functions__index.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 82747
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/functions__order-chat.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 5400
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/lib__data__customer_auth.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 8223
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/lib__data__customer_orders.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 3172
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/lib__data__customer_workspace.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 3175
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/lib__screens__customer_profile_screen.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 21332
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/lib__screens__tracking_screen.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 2538
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/lib__widgets__order_confirmation.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 6115
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/before/lib__widgets__pix_payment_dialog.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 4941
+  },
+  {
+    "status": "??",
+    "path": "tool/account_cycle/protected-before.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 2407
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/assets-contrast.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 149
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/before/lib__screens__cart_screen.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 9285
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/before/lib__screens__checkout_screen.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 73936
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/before/lib__screens__customer_profile_screen.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 20671
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/before/lib__screens__home_screen.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 65016
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/before/lib__screens__tracking_screen.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 2400
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/before/lib__screens__tracking_view.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 11922
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/before/lib__widgets__product_image.dart.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1031
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/build-proof.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 547
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/address_empty_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 28232
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/cart_1440.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 61773
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/cart_320.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 53954
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/cart_360.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 43196
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/cart_390.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 54035
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/cart_430.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 55552
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/cart_768.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 56883
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/cart_empty_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 13465
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/categories_1440.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 611968
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/categories_320.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 174769
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/categories_360.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 131163
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/categories_390.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 220993
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/categories_430.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 253411
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/categories_768.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 455758
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/checkout_1440.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 82230
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/checkout_320.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 70708
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/checkout_360.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 45258
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/checkout_390.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 71640
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/checkout_430.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 72254
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/checkout_768.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 76313
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/confirmation_390.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 75887
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/confirmation_cta_390.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 75887
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/home_1440.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 599650
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/home_320.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 184577
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/home_360.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 176436
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/home_390.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 246777
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/home_430.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 271132
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/home_768.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 451976
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/home_empty_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 156257
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/home_error_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 167845
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/home_loading_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 164196
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/login_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 47841
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/login_error_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 44705
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/onboarding_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 32918
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/onboarding_footer_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 33134
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/product_1440.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 314237
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/product_320.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 88712
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/product_360.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 20295
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/product_390.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 99189
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/product_430.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 103776
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/product_768.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 144346
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/product_footer_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 23521
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/profile_1440.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 113382
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/profile_320.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 76484
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/profile_360.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 60707
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/profile_390.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 82353
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/profile_430.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 81024
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/profile_768.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 104241
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/profile_footer_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 26545
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/splash_error_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 170019
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/splash_loading_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 173026
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/tracking_1440.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 105392
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/tracking_320.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 70333
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/tracking_360.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 58236
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/tracking_390_final.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 75421
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/tracking_390.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 74089
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/tracking_430.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 75427
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/tracking_768.0.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 94896
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/tracking_error_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 20798
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/tracking_footer_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 44249
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/tracking_loading_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 13115
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/tracking_progress_390.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 54299
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/captures/tracking_unavailable_360.png",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 18105
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/own-changes.diff",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 53713
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/preservation.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 88
+  },
+  {
+    "status": "??",
+    "path": "tool/app_cliente_final/preserved-before.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 10539
+  },
+  {
+    "status": "??",
+    "path": "tool/checkout_test_fixes_2026-10-25/checkout_delivery_contract_test.before.dart.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 4662
+  },
+  {
+    "status": "??",
+    "path": "tool/checkout_test_fixes_2026-10-25/client_readiness_test.before.dart.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 10569
+  },
+  {
+    "status": "??",
+    "path": "tool/checkout_test_fixes_2026-10-25/final-evidence.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 224
+  },
+  {
+    "status": "??",
+    "path": "tool/checkout_test_fixes_2026-10-25/protected-after.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 22998
+  },
+  {
+    "status": "??",
+    "path": "tool/checkout_test_fixes_2026-10-25/protected-before.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 37077
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/docs__HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 91160
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/docs__HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 27284
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/firestore.rules.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 13962
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/functions__.eslintrc.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1092
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/functions__delivery-service.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 12711
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/functions__index.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 82843
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/functions__test__delivery-fixture.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1474
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/functions__test__delivery-official.spec.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 16797
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/functions__test__delivery-radius.emulator.spec.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 2831
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/functions__test__final-operations.emulator.spec.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 6328
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/functions__test__financial.spec.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 24683
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/functions__test__firestore.rules.spec.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 42973
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/before/functions__test__pilot.emulator.spec.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 20173
+  },
+  {
+    "status": "??",
+    "path": "tool/kb03/protected-before.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 2038
+  },
+  {
+    "status": "??",
+    "path": "tool/kb04/before/docs__HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 92389
+  },
+  {
+    "status": "??",
+    "path": "tool/kb04/before/docs__HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 27626
+  },
+  {
+    "status": "??",
+    "path": "tool/kb04/before/functions__.eslintrc.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1305
+  },
+  {
+    "status": "??",
+    "path": "tool/kb04/before/functions__index.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 83461
+  },
+  {
+    "status": "??",
+    "path": "tool/kb04/before/functions__package.json.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1463
+  },
+  {
+    "status": "??",
+    "path": "tool/kb04/before/functions__test__financial.spec.js.before",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 31629
+  },
+  {
+    "status": "??",
+    "path": "tool/kb04/protected-before.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 2591
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 93345
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 28030
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/firestore.rules",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 15096
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/functions/.eslintrc.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1464
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/functions/courier-assignment.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 11655
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/functions/index.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 86613
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/functions/operational-contingency.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1855
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/functions/order-cancellation.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 11071
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/functions/order-operations.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 12459
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/functions/package.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1607
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/functions/test/final-operations.emulator.spec.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 6328
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/functions/test/financial.spec.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 33828
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/functions/test/order-cancellation.emulator.spec.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 21546
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/panel-operational_contingency.dart.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 9595
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/before/pilot.emulator.spec.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 20088
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/checklist-consistency.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 174
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/delivery_contingency_test.dart.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 7143
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/operational_contingency.dart.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 17981
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/protected-after.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1133
+  },
+  {
+    "status": "??",
+    "path": "tool/kb05/protected-before.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1817
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 95321
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 28420
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/functions/.eslintrc.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1631
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/functions/customer-account-state.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 591
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/functions/customer-account.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 8922
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/functions/package.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1754
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/functions/test/customer-account.emulator.spec.js",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 12642
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/lib/core/models.dart.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 7365
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/lib/data/customer_account.dart.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 3223
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/lib/data/customer_auth.dart.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 8223
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/lib/data/customer_bootstrap.dart.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1923
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/lib/main.dart.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 2791
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/lib/screens/customer_account_closure_screen.dart.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 5928
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/before/lib/screens/customer_session_gate.dart.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 8947
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/checklist-consistency.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 157
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/final-evidence.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 340
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/protected-after.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1784
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/protected-before.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 2867
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/retomada-2026-10-25/checklist-consistency.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 157
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/retomada-2026-10-25/code-after.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1306
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/retomada-2026-10-25/code-before.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 2218
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/retomada-2026-10-25/final-evidence.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 538
+  },
+  {
+    "status": "??",
+    "path": "tool/kb06/retomada-2026-10-25/protected.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1437
+  },
+  {
+    "status": "??",
+    "path": "tool/kb07/before/app.build.gradle.kts.txt",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 2082
+  },
+  {
+    "status": "??",
+    "path": "tool/kb07/before/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 95953
+  },
+  {
+    "status": "??",
+    "path": "tool/kb07/before/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 28843
+  },
+  {
+    "status": "??",
+    "path": "tool/kb07/checklist-consistency.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 161
+  },
+  {
+    "status": "??",
+    "path": "tool/kb07/final-evidence.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 1044
+  },
+  {
+    "status": "??",
+    "path": "tool/kb07/gradle-validation.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 102
+  },
+  {
+    "status": "??",
+    "path": "tool/kb07/guard-evidence.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 334
+  },
+  {
+    "status": "??",
+    "path": "tool/kb07/protected-after.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 31883
+  },
+  {
+    "status": "??",
+    "path": "tool/kb07/protected-before.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 51320
+  },
+  {
+    "status": "??",
+    "path": "tool/kb07/secrets-audit.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 184
+  },
+  {
+    "status": "??",
+    "path": "tool/kb07/signing-preflight-result.json",
+    "group": "G",
+    "also": "F",
+    "include": false,
+    "reason": "Backups, comparações, hashes, harness ou captura local; preservar fora do checkpoint.",
+    "bytes": 72
+  },
+  {
+    "status": "??",
+    "path": "tool/visual_device/capture.ps1",
+    "group": "I",
+    "also": "G",
+    "include": false,
+    "reason": "Harness/captura de ensaio; caminhos locais ou fixtures históricas. Revisar separadamente.",
+    "bytes": 979
+  },
+  {
+    "status": "??",
+    "path": "tool/visual_home/capture.ps1",
+    "group": "I",
+    "also": "G",
+    "include": false,
+    "reason": "Harness/captura de ensaio; caminhos locais ou fixtures históricas. Revisar separadamente.",
+    "bytes": 1456
+  },
+  {
+    "status": "??",
+    "path": "tool/visual_home/main.dart",
+    "group": "I",
+    "also": "G",
+    "include": false,
+    "reason": "Harness/captura de ensaio; caminhos locais ou fixtures históricas. Revisar separadamente.",
+    "bytes": 10155
+  },
+  {
+    "status": "??",
+    "path": "tool/visual_splash/capture.ps1",
+    "group": "I",
+    "also": "G",
+    "include": false,
+    "reason": "Harness/captura de ensaio; caminhos locais ou fixtures históricas. Revisar separadamente.",
+    "bytes": 2977
+  },
+  {
+    "status": "??",
+    "path": "tool/visual_splash/main.dart",
+    "group": "I",
+    "also": "G",
+    "include": false,
+    "reason": "Harness/captura de ensaio; caminhos locais ou fixtures históricas. Revisar separadamente.",
+    "bytes": 4271
+  }
+]

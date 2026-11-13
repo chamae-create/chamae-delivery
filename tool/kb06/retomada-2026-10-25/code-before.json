@@ -1,0 +1,66 @@
+[
+  {
+    "path": "functions/customer-account.js",
+    "hash": "2D983B729E5A7BD1FCD3C3C724C170F8964B683122C781FEA8511FE2678C23A7"
+  },
+  {
+    "path": "functions/customer-provider-revocation.js",
+    "hash": "1F6DDD9611E844471766B6C5474289CD76B45E62B2743890C597CB76AA0111E0"
+  },
+  {
+    "path": "functions/test/customer-account.emulator.spec.js",
+    "hash": "A00DC6CC37E85B5236FC588F6790F01BC207AACFD52D5C0F36164E16A2D6E77D"
+  },
+  {
+    "path": "functions/test/customer-provider-revocation.spec.js",
+    "hash": "97C28711BDAD86F78297034662687860A38CABC5B7D437613F5E7F94ED9C70E7"
+  },
+  {
+    "path": "functions/test/customer-privacy.emulator.spec.js",
+    "hash": "3041D10B6C09572735E4AD955B5B89E247A55F880AE8CB883F1537E032060F41"
+  },
+  {
+    "path": "functions/.eslintrc.js",
+    "hash": "8397249B032366155B6B103EAE007A983EDE249BC751D9375DCDD3A990991432"
+  },
+  {
+    "path": "functions/package.json",
+    "hash": "ED62940D5CFC2D50496E8CDEC3C260479F59E1C6B80F610FEF90339CCD21EBD2"
+  },
+  {
+    "path": "lib/core/models.dart",
+    "hash": "9674FC7710E2A0199D3960A34753333100429B4EA1F1C2DFB7F449D584933197"
+  },
+  {
+    "path": "lib/data/customer_auth.dart",
+    "hash": "9A337422012FAB7666F8831A08BA6B6768E2562EF3ADC834F7E2928EBE1B11D0"
+  },
+  {
+    "path": "lib/data/customer_account.dart",
+    "hash": "D7F38632550770D1C5621665BEAA58FCD5ECDA243967CD46902B917D8B3B3674"
+  },
+  {
+    "path": "lib/data/customer_bootstrap.dart",
+    "hash": "8D76C4023F7824211B57D1F40A5713170899F5B0912E16B343C2E4DB527E1966"
+  },
+  {
+    "path": "lib/data/customer_local_privacy.dart",
+    "hash": "FA1E9A87B7A2030FF012F51A0C048A8D817B2C1595DCA1D2EFAADA1DE0629D2E"
+  },
+  {
+    "path": "lib/screens/customer_session_gate.dart",
+    "hash": "DBF25C9AC1758534D833007EB984308796BE5AD4379997966D70700639388B8E"
+  },
+  {
+    "path": "lib/screens/customer_account_closure_screen.dart",
+    "hash": "61A69EA3B7284348E426EBA8BB1F0F109CF1732443CAE419DDB7F9A1948B7E2C"
+  },
+  {
+    "path": "test/customer_auth_test.dart",
+    "hash": "A70C918997E60FF46F0BD24637BFF7DB6F06B8A9961CF408D2C8FE1A828AF50B"
+  },
+  {
+    "path": "test/customer_privacy_test.dart",
+    "hash": "1C6CE67D44D3A1B11B9DCFD9F49576EE7595047030024C6745643089077D2108"
+  }
+]

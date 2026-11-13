@@ -1,16 +1,19 @@
 /* Route pricing: atomic explicit publication and server-only routing. */
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
-const {defineSecret} = require("firebase-functions/params");
+const {defineString} = require("firebase-functions/params");
 const {GoogleRoutesProvider} = require("./google-routes-provider");
-const routesApiKey = defineSecret("CHAMAE_ROUTES_API_KEY");
-const countryApiKey = defineSecret("CHAMAE_GEOCODING_API_KEY");
+const {createRuntimeMapsAuth} = require("./maps-runtime-auth");
+const {admitDeliveryQuote, assertStagingQuoteCaller} = require("./delivery-quote-limit");
+const runtimeMapsAuth = createRuntimeMapsAuth();
+const quoteTestUids = defineString("CHAMAE_DELIVERY_QUOTE_UIDS", {default: ""});
+const pricingRouteMode = defineString("CHAMAE_DELIVERY_ROUTE_MODE", {default: ""});
 const {GoogleDestinationCountry} = require("./destination-country");
 const {verifiedQuoteCountry} = require("./order-acceptance");
 const {FieldValue} = require("firebase-admin/firestore");
 const {verifiedCustomerToken} = require("./customer-identity");
 const {assertCustomerAccountActive} = require("./customer-account-state");
 const {validateTable, canonicalTable, bandForDistance, buildQuote, validateQuote, RoutingProvider,
-  fingerprint, point} = require("./delivery-pricing");
+  fingerprint, point, DeliveryError} = require("./delivery-pricing");
 const options = {region: "southamerica-east1", enforceAppCheck: false};
 const denied = () => {
   throw new HttpsError("permission-denied", "Acesso restrito.");
@@ -128,8 +131,14 @@ async function saveVersion(db, request) {
   });
 }
 
+function resolvePricingTravelMode(config, deploymentMode) {
+  const selected = Object.hasOwn(config, "travelMode") ? config.travelMode : deploymentMode;
+  if (!["DRIVE", "TWO_WHEELER"].includes(selected)) throw new DeliveryError("ROUTING_PROVIDER_NOT_CONFIGURED");
+  return selected;
+}
+
 async function quoteDelivery(db, request, provider = new RoutingProvider(), countryVerifier = null) {
-  const uid = customer(request);
+  const uid = customer(request, true);
   await assertCustomerAccountActive(db, uid);
   if ((await db.collection("couriers").doc(uid).get()).exists) denied();
   const id = requestKey(request, uid);
@@ -154,8 +163,10 @@ async function quoteDelivery(db, request, provider = new RoutingProvider(), coun
     safeError({code: e.code || e.message});
   }
   if (provider == null) {
-    provider = new GoogleRoutesProvider({apiKey: routesApiKey.value(),
-      travelMode: config.travelMode});
+    try {
+      provider = new GoogleRoutesProvider({authHeaders: runtimeMapsAuth,
+        travelMode: resolvePricingTravelMode(config, pricingRouteMode.value())});
+    } catch (error) { safeError(error); }
   }
   const ref = db.collection("deliveryQuotes").doc(id);
   const hash = fingerprint([uid, config.activeVersion, destination]);
@@ -172,9 +183,10 @@ async function quoteDelivery(db, request, provider = new RoutingProvider(), coun
       distanceUnit: "m", distanceSource: "route",
       routingProvider: value.provider, quotedAtMs: value.createdAtMs, expiresAtMs: value.expiresAtMs};
   }
+  await admitDeliveryQuote(db, uid);
   let quote;
   try {
-    const verifier = countryVerifier || new GoogleDestinationCountry({apiKey: countryApiKey.value()});
+    const verifier = countryVerifier || new GoogleDestinationCountry({authHeaders: runtimeMapsAuth});
     const destinationVerification = await verifier.verify(destination);
     quote = await buildQuote({table, provider, origin: table.origin,
       destination, uid, version: config.activeVersion});
@@ -229,7 +241,10 @@ function createDeliveryFunctions(db) {
   return {
     chamaeDescartarPropostaPedido: onCall(options, (r) => discardProposal(db, r)),
     chamaeSalvarConfiguracaoEntrega: onCall(options, (r) => saveVersion(db, r)),
-    chamaeCotarEntrega: onCall({...options, secrets: [routesApiKey, countryApiKey]}, (r) => quoteDelivery(db, r, null)),
+    chamaeCotarEntrega: onCall({...options, maxInstances: 2, concurrency: 10}, (r) => {
+      assertStagingQuoteCaller(r, quoteTestUids.value());
+      return quoteDelivery(db, r, null);
+    }),
     chamaeAtivarConfiguracaoEntrega: onCall(options, (r) => {
       administrator(r);
       throw new HttpsError("failed-precondition",
@@ -272,5 +287,5 @@ async function discardProposal(db, request) {
     return {cancelled: true, exists: false};
   });
 }
-module.exports = {customer, administrator, saveVersion, quoteDelivery,
+module.exports = {resolvePricingTravelMode, customer, administrator, saveVersion, quoteDelivery,
   prepareDelivery, createDeliveryFunctions, discardProposal};

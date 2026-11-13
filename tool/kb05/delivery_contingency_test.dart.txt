@@ -1,0 +1,186 @@
+import 'package:chamae_admin/admin_auth.dart';
+import 'package:chamae_admin/operational_contingency.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+class IncidentGateway implements ContingencyGateway {
+  final calls = <Map<String, dynamic>>[];
+  bool loseAck = false;
+  @override
+  Future<void> execute(String action, Map<String, dynamic> data) async {
+    calls.add({'actionName': action, ...data});
+    if (loseAck) {
+      loseAck = false;
+      throw StateError('ACK_LOST');
+    }
+  }
+}
+
+void main() {
+  Future<void> mount(WidgetTester tester, IncidentGateway gateway,
+          {Map<String, dynamic> patch = const {}, Key? key}) =>
+      tester.pumpWidget(
+        MaterialApp(
+            home: Scaffold(
+                body: SingleChildScrollView(
+                    child: ContingencyForm(
+          key: key,
+          orderId: 'order',
+          order: {
+            'id': '#TEST',
+            'status': 'Saiu para Entrega',
+            'paymentStatus': 'Pendente na entrega',
+            'deliveryIncidentRevision': 3,
+            'deliveryIncidentStatus': 'pending',
+            ...patch
+          },
+          access: AdminAccess.fromClaims({
+            'roles': ['superadmin']
+          }),
+          gateway: gateway,
+        )))),
+      );
+  Future<void> choose(WidgetTester tester, String label) async {
+    await tester.tap(find.byKey(const ValueKey('contingency-action')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(label).last);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const ValueKey('contingency-reason')),
+        'Ocorrência conferida pelo operador');
+    await tester.enterText(
+        find.byKey(const ValueKey('contingency-confirmation')),
+        'CONFIRMAR order');
+    await tester.pump();
+  }
+
+  bool enabled(WidgetTester tester) =>
+      tester
+          .widget<FilledButton>(
+            find.ancestor(
+                of: find.text('Revisar intervenção'),
+                matching: find.byType(FilledButton)),
+          )
+          .onPressed !=
+      null;
+  Future<void> confirm(WidgetTester tester) async {
+    await tester.ensureVisible(find.text('Revisar intervenção'));
+    await tester.tap(find.text('Revisar intervenção'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Confirmar intervenção'));
+    await tester.tap(find.text('Confirmar intervenção'));
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> check(WidgetTester tester, String name) async {
+    await tester.ensureVisible(find.byKey(ValueKey(name)));
+    await tester.tap(find.byKey(ValueKey(name)));
+    await tester.pump();
+  }
+
+  testWidgets(
+      'cash cannot conclude without explicit full delivery and collection',
+      (tester) async {
+    final gateway = IncidentGateway();
+    await mount(tester, gateway);
+    await choose(tester, 'Conclusão excepcional da entrega');
+    expect(enabled(tester), false);
+    await check(tester, 'delivery-confirmed');
+    expect(enabled(tester), false);
+    await check(tester, 'collection-confirmed');
+    expect(enabled(tester), true);
+    await confirm(tester);
+    expect(gateway.calls.single['deliveryConfirmed'], true);
+    expect(gateway.calls.single['collectionConfirmed'], true);
+    expect(gateway.calls.single['expectedDeliveryRevision'], 3);
+    expect(gateway.calls.single.containsKey('paymentStatus'), false);
+  });
+  testWidgets('paid PIX confirmation never asks to charge again',
+      (tester) async {
+    final gateway = IncidentGateway();
+    await mount(tester, gateway, patch: {'paymentStatus': 'Pago'});
+    await choose(tester, 'Conclusão excepcional da entrega');
+    expect(find.byKey(const ValueKey('collection-confirmed')), findsNothing);
+    await check(tester, 'delivery-confirmed');
+    await confirm(tester);
+    expect(gateway.calls.single['collectionConfirmed'], false);
+  });
+  testWidgets(
+      'attempt and future redelivery send expected status/version without new fee',
+      (tester) async {
+    for (final action in [
+      'Registrar tentativa frustrada',
+      'Registrar reentrega futura pendente'
+    ]) {
+      final gateway = IncidentGateway();
+      await mount(tester, gateway, key: ValueKey(action));
+      await choose(tester, action);
+      await confirm(tester);
+      final call = gateway.calls.single;
+      expect(call['expectedStatus'], 'Saiu para Entrega');
+      expect(call['expectedRevision'], 3);
+      expect(call.containsKey('deliveryFee'), false);
+      expect(call.containsKey('paymentStatus'), false);
+      if (action == 'Registrar tentativa frustrada') {
+        expect(call['reasonCode'], 'customer_not_located');
+      }
+    }
+  });
+  testWidgets(
+      'return requires physical attestation and sends partial condition without RESTOCK',
+      (tester) async {
+    final gateway = IncidentGateway();
+    await mount(tester, gateway);
+    await choose(tester, 'Registrar retorno físico à loja');
+    expect(enabled(tester), false);
+    await tester.ensureVisible(find.byKey(const ValueKey('return-condition')));
+    await tester.tap(find.byKey(const ValueKey('return-condition')));
+    await tester.pumpAndSettle();
+    await tester
+        .tap(find.text('Entrega/retorno parcial — revisão manual').last);
+    await tester.pumpAndSettle();
+    await check(tester, 'return-verified');
+    await confirm(tester);
+    expect(gateway.calls.single['returnCondition'], 'partial');
+    expect(gateway.calls.single['returnAuthorized'], true);
+    expect(gateway.calls.single.containsKey('stockAction'), false);
+  });
+  testWidgets('returned goods and planned redelivery block completion',
+      (tester) async {
+    for (final phase in ['returned', 'redelivery_pending']) {
+      final gateway = IncidentGateway();
+      await mount(tester, gateway,
+          key: ValueKey(phase), patch: {'deliveryIncidentStatus': phase});
+      await choose(tester, 'Conclusão excepcional da entrega');
+      await check(tester, 'delivery-confirmed');
+      await check(tester, 'collection-confirmed');
+      expect(enabled(tester), false);
+      expect(gateway.calls, isEmpty);
+    }
+  });
+  testWidgets(
+      'lost ACK freezes exact command; stream update cannot change retry payload',
+      (tester) async {
+    final gateway = IncidentGateway()..loseAck = true;
+    const key = ValueKey('persistent-form');
+    await mount(tester, gateway, key: key);
+    await choose(tester, 'Registrar tentativa frustrada');
+    await confirm(tester);
+    expect(gateway.calls.length, 1);
+    await mount(tester, gateway,
+        key: key, patch: {'deliveryIncidentRevision': 4});
+    expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('contingency-reason')))
+            .enabled,
+        false);
+    await confirm(tester);
+    expect(gateway.calls.length, 2);
+    expect(gateway.calls[1], gateway.calls[0]);
+    await mount(tester, gateway,
+        key: const ValueKey('reopened'),
+        patch: {'deliveryIncidentRevision': 4});
+    await tester.pump();
+    expect(gateway.calls.length, 2);
+    expect(find.textContaining('revisão 4'), findsOneWidget);
+  });
+}

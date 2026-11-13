@@ -2,6 +2,7 @@ const {createHash} = require("node:crypto");
 const {HttpsError, onCall} = require("firebase-functions/v2/https");
 const {Timestamp} = require("firebase-admin/firestore");
 const {requireApprovedCourier} = require("./courier-authorization");
+const {assertCurrentCourierAcceptance} = require("./courier-policy");
 const {pickupAction} = require("./courier-pickup-lifecycle");
 const {matchAssignment} = require("./courier-pickup");
 const hash = (value) => createHash("sha256").update(value).digest("hex");
@@ -20,7 +21,7 @@ function parseEvent(data, uid) {
       !data.payload || typeof data.payload !== "object" || Array.isArray(data.payload)) {
     throw new HttpsError("invalid-argument", "Evento ou UID inválido.");
   }
-  if (!["availability", "pickupAction"].includes(data.type)) {
+  if (!["availability", "pickupAction", "startRoute", "arrived", "confirmDelivery"].includes(data.type)) {
     reject("OPERATION_NOT_ENABLED", "QR, PIN e entrega dependem dos provedores da próxima fase.");
   }
   if (data.protocolVersion !== 2) throw new HttpsError("invalid-argument", "Protocolo de evento inválido.");
@@ -31,6 +32,22 @@ function parseEvent(data, uid) {
       throw new HttpsError("invalid-argument", "Disponibilidade inválida.");
     }
     payload = {on: data.payload.on};
+  } else if (["startRoute", "arrived", "confirmDelivery"].includes(data.type)) {
+    if (typeof data.assignmentId !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(data.assignmentId)) {
+      throw new HttpsError("invalid-argument", "ASSIGNMENT_INVALID");
+    }
+    if (data.type === "confirmDelivery") {
+      const proof = data.payload.proof;
+      if (Object.keys(data.payload).some((k) => k !== "proof") || !proof || typeof proof !== "object" ||
+          Object.keys(proof).some((k) => !["method", "verificationId"].includes(k)) ||
+          proof.method !== "pin" || !/^[a-f0-9]{64}$/.test(proof.verificationId || "")) {
+        throw new HttpsError("invalid-argument", "PROOF_INVALID");
+      }
+      payload = {proof: {method: "pin", verificationId: proof.verificationId}};
+    } else {
+      if (Object.keys(data.payload).length) throw new HttpsError("invalid-argument", "TRANSITION_INVALID");
+      payload = {};
+    }
   } else {
     if (typeof data.assignmentId !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(data.assignmentId) ||
         !actions.includes(data.payload.action) ||
@@ -70,11 +87,15 @@ async function submitCourierEvent(db, request, options = {}) {
   // The guard always runs, including retries: an old receipt cannot restore access.
   const courier = await requireApprovedCourier(db, request);
   const event = parseEvent(request.data, courier.uid);
+  if (["startRoute", "arrived", "confirmDelivery"].includes(event.type)) {
+    return require("./courier-delivery-events").submitDeliveryEvent(db, request, event, options);
+  }
   const ref = db.doc(`courierEventReceipts/${hash(`${courier.uid}:${event.eventId}`)}`);
   if (event.type === "availability") {
     return db.runTransaction(async (tx) => {
       const current = await requireApprovedCourier(db, request, tx);
       const old = await tx.get(ref);
+      if (event.payload.on) await assertCurrentCourierAcceptance(db, current.uid, tx);
       if (old.exists) {
         if (old.data().fingerprint !== event.fingerprint) reject("EVENT_ID_REUSED");
         return old.data().receipt;
@@ -134,9 +155,9 @@ async function courierState(db, request) {
   return {courierUid: courier.uid, online: courier.profile.online === true, completed, pending,
     mode: courier.profile.settlementMode === "perDelivery" ? "perDelivery" : "shift", amountVisible: false};
 }
-function createCourierEventFunctions(db) {
+function createCourierEventFunctions(db, helpers = {}) {
   const options = {region: "southamerica-east1", maxInstances: 10};
-  return {chamaeSincronizarEventoMotoboy: onCall(options, (r) => submitCourierEvent(db, r)),
+  return {chamaeSincronizarEventoMotoboy: onCall(options, (r) => submitCourierEvent(db, r, helpers)),
     chamaeEstadoOperacionalMotoboy: onCall(options, (r) => courierState(db, r))};
 }
 module.exports = {parseEvent, receiptFor, submitCourierEvent, courierState, createCourierEventFunctions};

@@ -1,0 +1,222 @@
+﻿[
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\.eslintrc.js",
+        "Hash":  "5134246F952AC7482D7F95DB1E4979D41DA5E6E653C7CF8021DBE4242C112856"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\.gitignore",
+        "Hash":  "E7C878F1962B5D93D05EB30EF6CB9F15AFD803595A5D47208C7D62C10213D3A9"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\catalog-commercial-policy.js",
+        "Hash":  "A09381085056574EC19D15920B11EFC77C4073B02B943347563166817D11E1AF"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\courier-assignment.js",
+        "Hash":  "6927F5A4ABAB1B0D4F39366F6CF0A01DE003851520F50F62AB7E57FA11AA42FB"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\courier-deliveries.js",
+        "Hash":  "21283BD853DF1C371C07220D9F5701218776D08C7A104DBC010E9D11754D470C"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\courier-dispatch-contract.js",
+        "Hash":  "859167872C4B28291755CC6661BFA142188A7CAFC7180F5D692A156E151AC025"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\customer-identity.js",
+        "Hash":  "9D4D18779C913BEF208E8A3645E379FAD692EF1A5E5EE480118D57F6E146E3A8"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\customer-onboarding.js",
+        "Hash":  "D03C67F9DCD0825FE7E3F4E99C5532A08C999279F1600857C7F09B3C9FC553BE"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\customer-security.js",
+        "Hash":  "DF6E150AEBF5EE112078AE82A50BC652F9A9611F3665700040758DF2882A1517"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\delivery-pin.js",
+        "Hash":  "AB6C947E2A26F994642AEA4A6E764CB006C34707D9D9FB938F56EFC41D624970"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\delivery-pricing.js",
+        "Hash":  "7FD520E0A81AB2D486BCEE5E4DFBF86C56C6BDF64EAD4DA73E57C0F1718B0AB9"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\delivery-service.js",
+        "Hash":  "AEAAE9F2B4B63285B7A3EF32A69B50615BCD51B2B046CC5FBDEF402A1E3B2AD8"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\google-routes-provider.js",
+        "Hash":  "054D4EECDB0D2959A93D94F0B690467B69F972B9376618B54D3DD30004A23BD1"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\index.js",
+        "Hash":  "D6635E9C67CBF751B343EE502114B4E6291A96B5B110BD98ED761CBBA747D03F"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\operational-contingency.js",
+        "Hash":  "D6414F586CBA1DCC16FA4710CE3E0C8FF7C28C7942FD83AE6948EFD7D7C8E220"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\order-chat.js",
+        "Hash":  "F24FD92D32AFB261FD1A34F9876CAF1EE7C0F923415AF16494354163E79E191B"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\order-operations.js",
+        "Hash":  "80F811D7E735E8F75714900D8282164D251F8C8DF24C90F5AF99CFB422F5F249"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\order-printing.js",
+        "Hash":  "AE48E4A9ED83E6AAEFA33891610D49E93785BC970B54EB7B64F38AC399A17832"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\package-lock.json",
+        "Hash":  "C7741EF3CAF08CEF7AFBC38575460C84AB26AAF7B05D5BB3C90781A6CFE140FF"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\package.json",
+        "Hash":  "4372EA476D282CF0C07C3A7C180EC9E29A4B51DFF6442E4B44DCA75CFEAF623F"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\config\\delivery-pricing-initial.json",
+        "Hash":  "53B748AAAB63C1198126A3EDA6ECCAFF56DCF392D303A5A9BBEF645B9C635B4B"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\docs\\courier-assignment.md",
+        "Hash":  "46E32E6E3356EFF0BC5870738FF0922B633A3679DC4A69D7F51DF1795F979DAA"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\docs\\courier-deliveries.md",
+        "Hash":  "38D9BB0C8E0B07A3D494B9B315B28C35B5279E91E43FCC7EA6AFD7E8656D0F1D"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\docs\\customer-auth-onboarding.md",
+        "Hash":  "51D8A46DF20610995DAF523E75ADB3BA74EDA738FD877CEDA6A9A18F00FAB36B"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\docs\\operational-flow.md",
+        "Hash":  "BF27E799886E554D85C8FAFE1D004681DBD0878892C15D8FC5826638DFC67CC6"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\docs\\order-chat-and-printing.md",
+        "Hash":  "A4AFAD5A82047EE4DC60DF329A47F18D1235A7FF6D4D98B74CAF511B3151AD57"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\docs\\pilot.md",
+        "Hash":  "DF51D53FFEFFF7849D825F3511C55EA349180DB6684D49570B984063D60E38B7"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\scripts\\audit-orders.js",
+        "Hash":  "3019828419EB6012C8B5BD9150DFBDEFAD72A43A03A62FF163E4517F2F1E815F"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\audit-orders.spec.js",
+        "Hash":  "BE1815B09F8CFC2F0D91E56F6423D75F6B8F1B51059A07AA25A9855AE7366F59"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\backend-fixture.js",
+        "Hash":  "85C2184208ACC00400512A1479D924CE5649637FBEA6E9E2CFD1E5A29D6D4411"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\courier-assignment.emulator.spec.js",
+        "Hash":  "8C7BE497D981709DE8EF3C60A9165DB9FD8C4C595CE7380658D87D7F83B233FE"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\courier-assignment.spec.js",
+        "Hash":  "A4776EFD7D1BF7952545EEE3554DD9BE7B18F34EF0674FCCDAC2AAD2443F7F1B"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\courier-deliveries.emulator.spec.js",
+        "Hash":  "2EAEBEC94270642E801402E242E985DEB5A319E8ACCE4A83972F3B3950A39E87"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\courier-deliveries.spec.js",
+        "Hash":  "684302201E1236FC1AF615813A2EC72B7A4C4051BCC22EE4EF2303A5062AE204"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\customer-onboarding.spec.js",
+        "Hash":  "85806976C22247B96B9113508DD6EC4F71A2D829726508B997CED04A29C5B080"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\customer-policy-fixture.js",
+        "Hash":  "D266FF69D18F45EF2EF1BDCE6FD491A1D316A2B4BA3D2AC2BA45BAB19A6912FB"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\delivery-contracts.spec.js",
+        "Hash":  "1272CFC5991E33D7119AAA1F01BA71490A12ABD8BEEF9138C9E8AF9750B3D381"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\delivery-fixture.js",
+        "Hash":  "B721460997EC38178CD5FEE05D1D33A73A0C5571A69AA1E80B46DED162E6AAAD"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\delivery-official.spec.js",
+        "Hash":  "7578078B9A10D1FB9D52315A2243BBB03F35C433C78E85D951FFB57D9011A24E"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\delivery-pricing-fixture.json",
+        "Hash":  "28032B7596F563BEA1DBDA63AB9DC6000641353D05F77A628C12BD1CC338AFA8"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\delivery-radius.emulator.spec.js",
+        "Hash":  "3DAA3627C2DD9E03A0CC9FB5B02B27B8C0C1A71640BC158D9D8A9BFB50C72155"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\final-operations.emulator.spec.js",
+        "Hash":  "3E97C2CB691E0ED8AB31B5E54B797F167E2079AB2419CC1F9776928784573546"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\financial.spec.js",
+        "Hash":  "6DDAC1635690A23DF85099AF8B3A1250AD311B92FD69559033016F0AC14649BD"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\firestore.rules.spec.js",
+        "Hash":  "FE4D21AFABFC2B7D256F50C7B4E9FB6846017F51AC40A2E5E4E8742B61692B18"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\order-chat.emulator.spec.js",
+        "Hash":  "2D4A515D7CE3437CC585A28017279C9C2A3A3F6F86C3A4783CF1014D15B924C5"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\order-operations.spec.js",
+        "Hash":  "91A0A3024D89EE4F68A03B41843C7D3333B92C694D14BC7E3BF4B7D794023EF2"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\test\\pilot.emulator.spec.js",
+        "Hash":  "C0D8CC0978540C6CD9752C0D4F6C9613C2045AF3843630D7D64F413619763CEA"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\lib\\data\\delivery_quote.dart",
+        "Hash":  "F9D3FD8B1AAA61A3C8FA7FA234244515CA580EFC66A9A94969F1260CF9DB6FB0"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\lib\\core\\store_hours.dart",
+        "Hash":  "1A5EAB395805D06E1D328AF82BF5F52A6B28CE9E889A897890B257961140AB59"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\lib\\core\\catalog_commercial_policy.dart",
+        "Hash":  "C76AC6385C172699660EC34DAB744F32E609FE36FC55B4B9BD3E1FE9D23F83EC"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\lib\\core\\cart_validation.dart",
+        "Hash":  "67B54764F155E088BEC48339F8064F489F5E9AB35A175AE063FD47909D7C8556"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\lib\\data\\customer_auth.dart",
+        "Hash":  "221E6E18A4282CD7A70946F33A8F09F370A455DC9D510DE2411327A4338518D7"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\lib\\data\\order_attempt.dart",
+        "Hash":  "9642742E1327FFA82DDF1439A185BB428B321147DD915FDB6F1F643ABB520B8E"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\lib\\widgets\\pix_payment_dialog.dart",
+        "Hash":  "97534DB931B580797B9F679B042561A4AB4F5DE51D81D7B2D3028BE8C6A46539"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\firestore.rules",
+        "Hash":  "400E993B1EA9636B1BEC60437D8AAA172C47FCD46A5A8CF1EEF5A6A7609F66E2"
+    }
+]

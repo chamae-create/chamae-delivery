@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primaryYellow = Color(0xFFFFCC00);
+  static const Color primaryYellow = Color(0xFFFFC400);
   static const Color darkBg = Color(0xFF141414);
-  static const Color lightBg = Color(0xFFFAF7F0);
+  static const Color lightBg = Color(0xFFFCF9F3);
   static const Color textDark = Color(0xFF191816);
 
   static ThemeData get lightTheme {
@@ -26,27 +26,39 @@ class AppTheme {
         elevation: 1,
         margin: const EdgeInsets.symmetric(vertical: AppSpace.xs),
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            side: const BorderSide(color: AppColors.borderLight)),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          side: const BorderSide(color: AppColors.borderLight),
+        ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: Colors.white,
         selectedColor: AppColors.lightGold,
-        labelStyle:
-            const TextStyle(color: textDark, fontWeight: FontWeight.w600),
+        labelStyle: const TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 12,
+          color: textDark,
+          fontWeight: FontWeight.w600,
+        ),
         side: const BorderSide(color: AppColors.borderLight),
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.sm)),
+          borderRadius: BorderRadius.circular(AppRadius.sm),
+        ),
       ),
       textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-              foregroundColor: textDark, minimumSize: const Size(48, 48))),
+        style: TextButton.styleFrom(
+          foregroundColor: textDark,
+          minimumSize: const Size(48, 48),
+        ),
+      ),
       outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-              foregroundColor: textDark,
-              minimumSize: const Size(48, 48),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md)))),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: textDark,
+          minimumSize: const Size(48, 48),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
@@ -59,9 +71,11 @@ class AppTheme {
           }
           return const TextStyle(color: textDark);
         }),
-        contentPadding: const EdgeInsets.all(AppSpace.md),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppRadius.md)),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: const BorderSide(color: AppColors.borderLight),
@@ -74,19 +88,26 @@ class AppTheme {
           minimumSize: const Size(48, 48),
           elevation: 1,
           textStyle: const TextStyle(
-              fontFamily: 'Roboto', fontSize: 15, fontWeight: FontWeight.w700),
+            fontFamily: 'Roboto',
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+          ),
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadius.md)),
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: darkBg,
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.md)),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
       ),
-      dividerTheme:
-          const DividerThemeData(color: AppColors.borderLight, thickness: 1),
+      dividerTheme: const DividerThemeData(
+        color: AppColors.borderLight,
+        thickness: 1,
+      ),
       appBarTheme: const AppBarTheme(
         backgroundColor: lightBg,
         surfaceTintColor: Colors.transparent,
@@ -97,7 +118,7 @@ class AppTheme {
           fontFamily: 'Roboto',
           color: textDark,
           fontWeight: FontWeight.w900,
-          fontSize: 22,
+          fontSize: 20,
         ),
       ),
     );
@@ -109,7 +130,7 @@ abstract final class AppSpace {
 }
 
 abstract final class AppRadius {
-  static const double sm = 12, md = 20, lg = 28;
+  static const double sm = 10, md = 14, lg = 20;
 }
 
 class AppColors {
@@ -120,7 +141,7 @@ class AppColors {
 
   static const Color accentGreen = Color(0xFF2E7D32);
   static const Color surfaceWhite = Colors.white;
-  static const Color borderLight = Color(0xFFECE2CF);
+  static const Color borderLight = Color(0xFFF1E4D0);
   static const Color textMain = AppTheme.textDark;
   static const Color textSecondary = Color(0xFF69655E);
   static const Color backgroundLight = AppTheme.lightBg;

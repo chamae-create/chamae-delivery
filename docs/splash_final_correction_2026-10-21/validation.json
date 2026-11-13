@@ -1,0 +1,171 @@
+{
+  "date": "2026-10-21",
+  "status": "implemented; owner visual approval pending",
+  "device": {
+    "model": "NUU M2",
+    "serial": "LDM2171600957",
+    "android": 7,
+    "api": 24,
+    "physicalPixels": [
+      720,
+      1280
+    ],
+    "logicalPixels": [
+      360,
+      640
+    ],
+    "densityDpi": 320,
+    "fontScale": 1,
+    "refreshHz": 66.12999725341797
+  },
+  "artwork": {
+    "file": "assets/images/splash/chamae_official_gold_2026_10_21.jpeg",
+    "sha256": "9dfae65937d04da00d2165c0e9a17148389811546c2ebc9e1df798ad9e464eda",
+    "unchangedFromOwner": true
+  },
+  "implementation": {
+    "fit": "cover",
+    "alignment": "bottomCenter",
+    "uniformScale": [
+      1,
+      1.008
+    ],
+    "animationMs": 2500,
+    "exitFadeMs": 300,
+    "configuredVisualTotalMs": 2800,
+    "entryFadeMs": 450,
+    "movingGlints": 8,
+    "nativeLegacyPreviewDisabled": true,
+    "android12SystemSplashPreserved": true,
+    "noNativeTimer": true,
+    "actualSessionReadyStillRequired": true,
+    "reducedMotionSkipsVisualWait": true
+  },
+  "checks": {
+    "flutterAnalyzeNoPub": "No issues found",
+    "splashSpecificTests": 11,
+    "splashReadinessTests": 2,
+    "directSplashSessionFlowTests": 14,
+    "totalRelatedTestsPassed": 27,
+    "fullSuiteRunThisCorrection": false,
+    "webBackendEmulatorsRun": false,
+    "gitDiffCheck": "passed"
+  },
+  "actualProfilePhysical": {
+    "coldFirstActivityMs": 1482,
+    "coldSecondActivityMs": 994,
+    "resumeActivityMs": 37,
+    "whiteFlashObserved": false,
+    "barsOrDistortionObserved": false,
+    "primaryArtworkElementsVisible": true,
+    "destination": "existing onboarding; no data/consent entered",
+    "resumeDoesNotReplaySplash": true,
+    "installedApk": ".dart_tool/splash_official_2026_10_21/actual-app-profile.apk",
+    "installedApkSha256": "1bfc0253ddd78af5f12e4ef4f15a5fce2072533e3f60a5f94e9a784eb57265fb",
+    "privateVideo": ".dart_tool/splash_official_2026_10_21/actual-app/actual-cold.mp4",
+    "debugStartupLimitation": "Debug initial am start timed out at 10063ms; a black window preceded Flutter; eventually reached existing onboarding. Profile cold starts were successful. Do not infer debug startup approval."
+  },
+  "profileHarnessMetrics": {
+    "apkSha256": "2ed6f883da2c9ad28755bb1e94de9918dd1c6baaafad49abc547c57794aefb51",
+    "initializerLocalMs": 1100,
+    "destination": "neutral local evidence screen",
+    "coldActivityMs": [
+      993,
+      1280
+    ],
+    "resumeActivityMs": 58,
+    "frameBudgetMs": 15.12173055955443,
+    "firstCold": {
+      "frames": 164,
+      "buildOverBudget": 0,
+      "rasterOverBudget": 5,
+      "firstRasterMs": 9.676,
+      "maxBuildMs": 12.475,
+      "maxRasterMs": 126.264
+    },
+    "secondCold": {
+      "frames": 175,
+      "buildOverBudget": 0,
+      "rasterOverBudget": 3,
+      "firstRasterMs": 6.614,
+      "maxBuildMs": 11.232,
+      "maxRasterMs": 30.875
+    },
+    "zeroJankClaim": false
+  },
+  "evidence": {
+    "actual_app_splash.png": {
+      "sha256": "736efdbf8c085beefae31278b02c4c0a718829211d805f1c041095ccb50953ce",
+      "bytes": 503896
+    },
+    "cold_01_metrics.png": {
+      "sha256": "bc0001b90dd1888330cfc71a5d7f7012c8e075b04c0746e074a991f860a332b6",
+      "bytes": 88006
+    },
+    "cold_01_start.txt": {
+      "sha256": "0133973e14da8d58cc96e85d529dca0ea3dd83309e4f7492b0a669667c3336a7",
+      "bytes": 176
+    },
+    "cold_02_metrics.png": {
+      "sha256": "334d43e58acbe341bb3d963c68a3fce80a684b9190ca66ae4f7d54726dd0381f",
+      "bytes": 86925
+    },
+    "cold_02_start.txt": {
+      "sha256": "f3f8e1aa3762640b08a5fa4de4885920177686c7ff624babe69a98656a64bf7f",
+      "bytes": 178
+    },
+    "cold_sequence.mp4": {
+      "sha256": "c8c319d2fabb8fa92772a2e414da2a037559e059b3b1d58d95d13ded839f6611",
+      "bytes": 607660
+    },
+    "error_retry.png": {
+      "sha256": "723436695be1ac9e75e553d995ae8151c68411478eb4c6e086bbe5903038730d",
+      "bytes": 493334
+    },
+    "official_splash.png": {
+      "sha256": "59abe904e2989808d5db1af534e3389d95afb591077dfbd3f1269c750ed46475",
+      "bytes": 504435
+    },
+    "reduced_motion.png": {
+      "sha256": "df2e3082cb6ac7b94c0a7db084777bf343f5a645ea8a91610a5054fddc1a6685",
+      "bytes": 499024
+    },
+    "reopen_no_replay.png": {
+      "sha256": "d1f50e8d180d0cc5b1e7ff19135764a021d24320d818a38a124a681212814fd2",
+      "bytes": 87189
+    },
+    "reopen_start.txt": {
+      "sha256": "3cdd54f9851dd4f6beb98a8c4bed20500be5834db1503951f638d19526762a0e",
+      "bytes": 251
+    },
+    "sequence_start.txt": {
+      "sha256": "9e92d1ea25d43fd438ded469b81e48074733e7b4382e93c4202bc1dbe2401315",
+      "bytes": 178
+    }
+  },
+  "sourceSha256": {
+    "lib/screens/splash_screen.dart": "78dcebe0ba0cb0eb3a773293c866ad671f068c482542d70c06d7ef6139a9795a",
+    "android/app/src/main/res/values/styles.xml": "baae287948adb4ed3402559c36c22f5f1f880abe1e5ad039130f252dd73fdd9b",
+    "android/app/src/main/res/values-night/styles.xml": "10fa5ac8c398132434e777c75788bf3ee3aede62b9f2b1a043bb97e7b8456f55",
+    "android/app/src/main/res/values-v31/styles.xml": "1e3dae0176db98267654f12b91b9c3fe4f87278b7cee5592bb9bb17476340577",
+    "android/app/src/main/res/values-night-v31/styles.xml": "8efe690f660b6422dce2eebf7208ec71ac71a9b9a563466d00a4a126e0aa2591",
+    "test/splash_official_test.dart": "e15ba059b44e703979856d9c01efb3246e39a3a7fc2dc7f132da36009777ec82",
+    "test/client_readiness_test.dart": "76040e97320a0a3a8cd6e213ee09d9a98a41cfb3d77901bf4c0ff2c83c32f1fb",
+    "tool/visual_splash/main.dart": "2b67e23af18fb0335342b858d284b65b8581e168a5ef8fbebf9435f315c53092",
+    "tool/visual_splash/capture.ps1": "ee932c2eb29c670a04f208ef9bafc97e92481236499a648b1910a713f2934f7a"
+  },
+  "preservation": {
+    "unexpectedChangesFromBaseline": [],
+    "localPropertiesPreserved": true,
+    "manifestPreserved": true,
+    "mainActivityPreserved": true,
+    "headUnchanged": true,
+    "indexEmpty": true
+  },
+  "limitations": [
+    "First-cold raster peak 126.264ms remains; no claim of zero jank.",
+    "Android 12+ and iOS not physically validated.",
+    "Video reduced by old device encoder; use PNG to evaluate full-resolution artwork.",
+    "Extreme landscape proportions need an official adapted artwork to preserve every element with cover."
+  ]
+}

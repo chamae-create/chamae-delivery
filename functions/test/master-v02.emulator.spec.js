@@ -12,7 +12,7 @@ const {beginPickup, signTicket, confirmPickup} = require("../courier-pickup");
 const {generateKeyPairSync} = require("node:crypto");
 let app; let db; let environment; let n = 0; let clock = Date.now();
 const admin = {uid: "master-admin", token: {roles: ["superadmin"]}};
-const auth = (uid) => ({uid, token: {firebase: {sign_in_provider: "password"}}});
+const auth = (uid) => ({uid, token: {email_verified: true, firebase: {sign_in_provider: "password"}}});
 before(async () => {
   const host = process.env.FIRESTORE_EMULATOR_HOST; assert.ok(host);
   const url = new URL(`http://${host}`); assert.ok(["localhost", "127.0.0.1", "[::1]"].includes(url.hostname));

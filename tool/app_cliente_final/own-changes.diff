@@ -1,0 +1,1079 @@
+diff --git a/tool/app_cliente_final/before/lib__screens__cart_screen.dart.before b/lib/screens/cart_screen.dart
+index c681d55..d2d467d 100644
+--- a/tool/app_cliente_final/before/lib__screens__cart_screen.dart.before
++++ b/lib/screens/cart_screen.dart
+@@ -4,7 +4,8 @@ import '../widgets/delivery_quote_summary.dart';
+ import 'package:flutter/material.dart';
+ import '../core/models.dart';
+ import '../core/theme.dart';
+-import '../core/store_hours.dart';
++import '../widgets/store_hours_builder.dart';
++import '../widgets/customer_feedback.dart';
+ import '../widgets/product_image.dart';
+ 
+ class CartScreen extends StatefulWidget {
+@@ -58,137 +59,163 @@ class _CartScreenState extends State<CartScreen> {
+   String money(double value) =>
+       'R\$ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
+   @override
+-  Widget build(BuildContext context) {
+-    final items = widget.items();
+-    final subtotal = items.fold(0.0, (sum, item) => sum + item.totalPrice);
+-    return Scaffold(
+-      appBar: AppBar(title: const Text('Seu carrinho')),
+-      body: items.isEmpty
+-          ? const Center(
+-              child: Padding(
+-                  padding: EdgeInsets.all(AppSpace.lg),
+-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+-                    Icon(Icons.shopping_bag_outlined,
+-                        size: 56, color: AppColors.textSecondary),
+-                    SizedBox(height: 16),
+-                    Text('Seu carrinho está vazio.'),
+-                    Text('Escolha suas bebidas e conveniência.'),
+-                  ])))
+-          : SingleChildScrollView(
+-              padding: CustomerVisual.pagePadding(context),
+-              child: Column(
+-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+-                  children: [
+-                    const CustomerSectionTitle(
+-                        title: 'Confira seu pedido',
+-                        subtitle: 'Revise seus itens antes de continuar.',
+-                        icon: Icons.shopping_bag_outlined),
+-                    if (widget.notice != null)
+-                      Padding(
+-                          padding: const EdgeInsets.only(bottom: 16),
+-                          child: Text(widget.notice!,
+-                              style: const TextStyle(color: AppColors.error))),
+-                    for (final item in items)
+-                      Card(
+-                          elevation: 0,
+-                          child: Padding(
+-                              padding: const EdgeInsets.all(AppSpace.md),
+-                              child: Column(children: [
+-                                Row(children: [
+-                                  SizedBox(
+-                                      width: 84,
+-                                      height: 100,
+-                                      child: ProductImage(url: item.imageUrl)),
+-                                  const SizedBox(width: 12),
+-                                  Expanded(
++  Widget build(BuildContext context) =>
++      StoreHoursBuilder(builder: (context, open, hoursLabel) {
++        final items = widget.items();
++        final subtotal = items.fold(0.0, (sum, item) => sum + item.totalPrice);
++        return Scaffold(
++          appBar: AppBar(title: const Text('Seu carrinho')),
++          body: SafeArea(
++              top: false,
++              child: items.isEmpty
++                  ? const Center(
++                      child: SingleChildScrollView(
++                          child: CustomerFeedback(
++                              title: 'Seu carrinho está vazio.',
++                              message: 'Escolha suas bebidas e conveniência.',
++                              icon: Icons.shopping_bag_outlined)))
++                  : CustomScrollView(slivers: [
++                      SliverPadding(
++                          padding: CustomerVisual.pagePadding(context),
++                          sliver: SliverMainAxisGroup(slivers: [
++                            SliverToBoxAdapter(
++                                child: Column(
++                                    crossAxisAlignment:
++                                        CrossAxisAlignment.stretch,
++                                    children: [
++                                  const CustomerSectionTitle(
++                                      title: 'Confira seu pedido',
++                                      subtitle:
++                                          'Revise seus itens antes de continuar.',
++                                      icon: Icons.shopping_bag_outlined),
++                                  if (widget.notice != null)
++                                    Padding(
++                                        padding:
++                                            const EdgeInsets.only(bottom: 16),
++                                        child: Text(widget.notice!,
++                                            style: const TextStyle(
++                                                color: AppColors.error))),
++                                ])),
++                            SliverList.builder(
++                                itemCount: items.length,
++                                itemBuilder: (context, index) =>
++                                    _cartItem(items[index])),
++                            SliverToBoxAdapter(
++                                child: Column(
++                                    crossAxisAlignment:
++                                        CrossAxisAlignment.stretch,
++                                    children: [
++                                  const SizedBox(height: 16),
++                                  const CustomerSectionTitle(
++                                      title: 'Resumo do pedido',
++                                      icon: Icons.receipt_long_outlined),
++                                  Container(
++                                      decoration: CustomerVisual.panel(),
++                                      padding: const EdgeInsets.all(20),
+                                       child: Column(
+                                           crossAxisAlignment:
+-                                              CrossAxisAlignment.start,
++                                              CrossAxisAlignment.stretch,
+                                           children: [
+-                                        Text(item.name,
+-                                            style: const TextStyle(
+-                                                fontWeight: FontWeight.w700)),
+-                                        Text('${money(item.price)} por unidade',
++                                            if (widget.destination != null)
++                                              DeliveryQuoteSummary(
++                                                  controller: _delivery,
++                                                  subtotal: subtotal)
++                                            else ...[
++                                              _line(
++                                                  'Produtos', money(subtotal)),
++                                              _line(
++                                                  'Taxa de serviço',
++                                                  money((subtotal * .01 * 100)
++                                                          .round() /
++                                                      100)),
++                                              _line(
++                                                  'Produtos e serviço',
++                                                  money(subtotal +
++                                                      (subtotal * .01 * 100)
++                                                              .round() /
++                                                          100)),
++                                              _line('Entrega',
++                                                  'A calcular após confirmar o endereço'),
++                                            ],
++                                          ])),
++                                  const SizedBox(height: 24),
++                                  if (!open)
++                                    Padding(
++                                        padding:
++                                            const EdgeInsets.only(bottom: 16),
++                                        child: Text(hoursLabel,
+                                             style: const TextStyle(
+-                                                color:
+-                                                    AppColors.textSecondary)),
+-                                        Text(money(item.totalPrice),
+-                                            style: const TextStyle(
+-                                                color: AppColors.darkGold,
+-                                                fontSize: 20,
+-                                                fontWeight: FontWeight.w900)),
+-                                      ])),
+-                                ]),
+-                                Row(
+-                                    mainAxisAlignment: MainAxisAlignment.end,
+-                                    children: [
+-                                      IconButton(
+-                                          tooltip: 'Remover ${item.name}',
+-                                          icon:
+-                                              const Icon(Icons.delete_outline),
+-                                          onPressed: () => setState(() =>
+-                                              widget.change(
+-                                                  item.id, -item.quantity))),
+-                                      IconButton(
+-                                          tooltip: 'Diminuir quantidade',
+-                                          icon: const Icon(Icons.remove),
+-                                          onPressed: () => setState(() =>
+-                                              widget.change(item.id, -1))),
+-                                      Text('${item.quantity}',
+-                                          semanticsLabel:
+-                                              '${item.quantity} unidades'),
+-                                      IconButton(
+-                                          tooltip: 'Aumentar quantidade',
+-                                          icon: const Icon(Icons.add),
+-                                          onPressed: () => setState(
+-                                              () => widget.change(item.id, 1))),
+-                                    ]),
+-                              ]))),
+-                    const SizedBox(height: 16),
+-                    const CustomerSectionTitle(
+-                        title: 'Resumo do pedido',
+-                        icon: Icons.receipt_long_outlined),
+-                    Container(
+-                        decoration: CustomerVisual.panel(),
+-                        padding: const EdgeInsets.all(20),
+-                        child: Column(
+-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+-                            children: [
+-                              if (widget.destination != null)
+-                                DeliveryQuoteSummary(
+-                                    controller: _delivery, subtotal: subtotal)
+-                              else ...[
+-                                _line('Produtos', money(subtotal)),
+-                                _line(
+-                                    'Taxa de serviço',
+-                                    money(
+-                                        (subtotal * .01 * 100).round() / 100)),
+-                                _line(
+-                                    'Produtos e serviço',
+-                                    money(subtotal +
+-                                        (subtotal * .01 * 100).round() / 100)),
+-                                _line('Entrega',
+-                                    'A calcular após confirmar o endereço'),
+-                              ],
+-                            ])),
+-                    const SizedBox(height: 24),
+-                    if (!isStoreOpen())
+-                      Padding(
+-                          padding: const EdgeInsets.only(bottom: 16),
+-                          child: Text(storeHoursLabel(),
+-                              style: const TextStyle(
+-                                  fontWeight: FontWeight.w700))),
+-                    ElevatedButton(
+-                        onPressed: isStoreOpen() &&
+-                                (widget.destination == null ||
+-                                    (!_delivery.loading &&
+-                                        _delivery.value != null))
+-                            ? widget.checkout
+-                            : null,
+-                        child: const Text('Continuar para entrega')),
++                                                fontWeight: FontWeight.w700))),
++                                  ElevatedButton(
++                                      onPressed: open &&
++                                              (widget.destination == null ||
++                                                  (!_delivery.loading &&
++                                                      _delivery.value != null))
++                                          ? widget.checkout
++                                          : null,
++                                      child:
++                                          const Text('Continuar para entrega')),
++                                  const SizedBox(height: 12),
++                                  const Text(
++                                      'O total será conferido ao confirmar o pedido.',
++                                      textAlign: TextAlign.center,
++                                      style: TextStyle(
++                                          color: AppColors.textSecondary)),
++                                  if (!open)
++                                    const Padding(
++                                        padding: EdgeInsets.only(top: 12),
++                                        child: Text(
++                                            'O catálogo continua disponível. Os pedidos voltam às 08:00 (MS).')),
++                                ])),
++                          ])),
++                    ])),
++        );
++      });
++
++  Widget _cartItem(CartItem item) => Card(
++      elevation: 0,
++      child: Padding(
++          padding: const EdgeInsets.all(AppSpace.md),
++          child: Column(children: [
++            Row(children: [
++              SizedBox(
++                  width: 84,
++                  height: 100,
++                  child: ProductImage(url: item.imageUrl)),
++              const SizedBox(width: 12),
++              Expanded(
++                  child: Column(
++                      crossAxisAlignment: CrossAxisAlignment.start,
++                      children: [
++                    Text(item.name,
++                        style: const TextStyle(fontWeight: FontWeight.w700)),
++                    Text('${money(item.price)} por unidade',
++                        style: const TextStyle(color: AppColors.textSecondary)),
++                    Text(money(item.totalPrice),
++                        style: const TextStyle(
++                            color: AppColors.darkGold,
++                            fontSize: 20,
++                            fontWeight: FontWeight.w900)),
+                   ])),
+-    );
+-  }
++            ]),
++            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
++              IconButton(
++                  tooltip: 'Remover ${item.name}',
++                  icon: const Icon(Icons.delete_outline),
++                  onPressed: () =>
++                      setState(() => widget.change(item.id, -item.quantity))),
++              IconButton(
++                  tooltip: 'Diminuir quantidade',
++                  icon: const Icon(Icons.remove),
++                  onPressed: () => setState(() => widget.change(item.id, -1))),
++              Text('${item.quantity}',
++                  semanticsLabel: '${item.quantity} unidades'),
++              IconButton(
++                  tooltip: 'Aumentar quantidade',
++                  icon: const Icon(Icons.add),
++                  onPressed: () => setState(() => widget.change(item.id, 1))),
++            ]),
++          ])));
+ 
+   Widget _line(String label, String value) => Padding(
+         padding: const EdgeInsets.symmetric(vertical: 8),
+diff --git a/tool/app_cliente_final/before/lib__screens__checkout_screen.dart.before b/lib/screens/checkout_screen.dart
+index e6230ec..b98b689 100644
+--- a/tool/app_cliente_final/before/lib__screens__checkout_screen.dart.before
++++ b/lib/screens/checkout_screen.dart
+@@ -1,4 +1,6 @@
+ import '../widgets/customer_visual.dart';
++import '../widgets/customer_feedback.dart';
++import '../widgets/store_hours_builder.dart';
+ import '../widgets/product_image.dart';
+ import 'dart:async';
+ import 'package:flutter/material.dart';
+@@ -960,6 +962,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
+             context,
+             MaterialPageRoute(
+                 builder: (_) => TrackingScreen(
++                    showConfirmation: true,
+                     orderId: created.orderId,
+                     documentId: created.reference.id)));
+         return;
+@@ -981,6 +984,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
+               context,
+               MaterialPageRoute(
+                 builder: (context) => TrackingScreen(
++                  showConfirmation: true,
+                   orderId: created.orderId,
+                   documentId: created.reference.id,
+                 ),
+@@ -1024,6 +1028,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
+         context,
+         MaterialPageRoute(
+           builder: (context) => TrackingScreen(
++            showConfirmation: true,
+             orderId: created.orderId,
+             documentId: created.reference.id,
+           ),
+@@ -1065,43 +1070,54 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
+         ],
+       );
+   @override
+-  Widget build(BuildContext context) {
++  Widget build(BuildContext context) =>
++      StoreHoursBuilder(builder: _buildScreen);
++
++  Widget _buildScreen(BuildContext context, bool storeOpen, String hoursLabel) {
+     if (_pendingOrder != null && !_isLoading) {
+       return Scaffold(
+         appBar: AppBar(title: const Text('Seu pedido')),
+         body: SafeArea(
+-            child: Padding(
+-                padding: const EdgeInsets.all(24),
+-                child: Column(
+-                    mainAxisAlignment: MainAxisAlignment.center,
+-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+-                    children: [
+-                      const Icon(Icons.receipt_long_outlined, size: 64),
+-                      const SizedBox(height: 24),
+-                      const Text(
+-                          'Seu pedido foi iniciado. Confira a confirmação para continuar.',
+-                          textAlign: TextAlign.center),
+-                      const SizedBox(height: 24),
+-                      ElevatedButton(
+-                          onPressed: _pendingPayload?['pixRequested'] == true
+-                              ? _iniciarPagamentoPixReal
+-                              : _gravarPedidoFirestore,
+-                          child: Text(_pendingPayload?['pixRequested'] == true
+-                              ? 'Retomar PIX'
+-                              : 'Verificar pedido')),
+-                      TextButton(
+-                          onPressed: _revisePending,
+-                          child: const Text('Revisar sacola antes de enviar')),
+-                    ]))),
++            child: SingleChildScrollView(
++                child: Padding(
++                    padding: const EdgeInsets.all(24),
++                    child: Column(
++                        mainAxisAlignment: MainAxisAlignment.center,
++                        crossAxisAlignment: CrossAxisAlignment.stretch,
++                        children: [
++                          const Icon(Icons.receipt_long_outlined, size: 64),
++                          const SizedBox(height: 24),
++                          const Text(
++                              'Seu pedido foi iniciado. Confira a confirmação para continuar.',
++                              textAlign: TextAlign.center),
++                          const SizedBox(height: 24),
++                          ElevatedButton(
++                              onPressed:
++                                  _pendingPayload?['pixRequested'] == true
++                                      ? _iniciarPagamentoPixReal
++                                      : _gravarPedidoFirestore,
++                              child: Text(
++                                  _pendingPayload?['pixRequested'] == true
++                                      ? 'Retomar PIX'
++                                      : 'Verificar pedido')),
++                          TextButton(
++                              onPressed: _revisePending,
++                              child:
++                                  const Text('Revisar sacola antes de enviar')),
++                        ])))),
+       );
+     }
+     return Scaffold(
+       appBar: AppBar(title: const Text('Finalizar Pedido')),
+-      persistentFooterButtons:
+-          !isStoreOpen() ? [Text(storeHoursLabel())] : null,
++      persistentFooterButtons: !storeOpen ? [Text(hoursLabel)] : null,
+       body: _isLoading
+           ? const Center(
+-              child: CircularProgressIndicator(color: AppTheme.primaryYellow))
++              child: SingleChildScrollView(
++                  child: CustomerFeedback(
++                      title: 'Conferindo os detalhes do seu pedido',
++                      message:
++                          'Aguarde por aqui. Seu carrinho continua guardado.',
++                      loading: true)))
+           : SingleChildScrollView(
+               padding: CustomerVisual.pagePadding(context),
+               child: Column(
+@@ -1112,6 +1128,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
+                       subtitle:
+                           'Seu endereço, seus itens e a forma de pagamento.',
+                       icon: Icons.shopping_bag_outlined),
++                  if (!storeOpen)
++                    const Padding(
++                        padding: EdgeInsets.only(bottom: 16),
++                        child: Text(
++                            'O catálogo continua disponível. Os pedidos voltam às 08:00 (MS).')),
+                   if (!_verified) ...[
+                     const Text(
+                         'Sua sessão precisa estar atualizada para comprar.'),
+@@ -1121,11 +1142,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
+                   ],
+                   if (_quoting) const LinearProgressIndicator(),
+                   if (_quoteError != null)
+-                    MaterialBanner(content: Text(_quoteError!), actions: [
+-                      TextButton(
+-                          onPressed: _refreshQuote,
+-                          child: const Text('Tentar novamente'))
+-                    ]),
++                    CustomerFeedback(
++                        title: _quoteError!,
++                        message:
++                            'Confira o endereço e tente calcular a entrega novamente.',
++                        icon: Icons.local_shipping_outlined,
++                        onRetry: _refreshQuote),
+                   const Text('Entrega',
+                       style:
+                           TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+@@ -1258,13 +1280,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
+                                               fontSize: 14)),
+                                       const SizedBox(height: 4),
+                                       Text(
+-                                          'R\$ ${item.price.toStringAsFixed(2)} un',
++                                          'R\$ ${item.price.toStringAsFixed(2).replaceAll('.', ',')} un',
+                                           style: const TextStyle(
+                                               color: AppColors.textSecondary,
+                                               fontSize: 12)),
+                                       const SizedBox(height: 4),
+                                       Text(
+-                                          '${item.quantity}x • R\$ ${item.totalPrice.toStringAsFixed(2)}',
++                                          '${item.quantity}x • R\$ ${item.totalPrice.toStringAsFixed(2).replaceAll('.', ',')}',
+                                           style: const TextStyle(
+                                               color: AppColors.darkGold,
+                                               fontWeight: FontWeight.w900,
+@@ -1703,7 +1725,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
+                       shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(12)),
+                     ),
+-                    onPressed: _quoting || _quote == null || !isStoreOpen()
++                    onPressed: _quoting || _quote == null || !storeOpen
+                         ? null
+                         : () {
+                             if (!_validarDadosCliente()) return;
+diff --git a/tool/app_cliente_final/before/lib__screens__customer_profile_screen.dart.before b/lib/screens/customer_profile_screen.dart
+index 360a7ff..5f6b77d 100644
+--- a/tool/app_cliente_final/before/lib__screens__customer_profile_screen.dart.before
++++ b/lib/screens/customer_profile_screen.dart
+@@ -1,5 +1,6 @@
+ import '../widgets/customer_order_history_card.dart';
+ import '../widgets/customer_visual.dart';
++import '../widgets/customer_feedback.dart';
+ import '../widgets/delivery_pin_card.dart';
+ import 'package:cloud_firestore/cloud_firestore.dart';
+ import 'package:firebase_auth/firebase_auth.dart';
+@@ -36,10 +37,18 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
+   late Future<CustomerOnboardingState>? _state = _repository?.load();
+   bool _busy = false;
+   String? _error;
++  void _reloadProfile() {
++    final state = _repository?.load();
++    setState(() {
++      _state = state;
++    });
++  }
++
+   Future<void> _logout() async {
+     final confirmed = await showDialog<bool>(
+         context: context,
+         builder: (ctx) => AlertDialog(
++                scrollable: true,
+                 title: const Text('Sair da conta?'),
+                 content: const Text(
+                     'Seus pedidos e seu carrinho continuarão vinculados a esta conta.'),
+@@ -133,6 +142,13 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
+                             const CustomerSectionTitle(
+                                 title: 'Minha conta',
+                                 icon: Icons.person_outline_rounded),
++                            if (snapshot.connectionState ==
++                                ConnectionState.waiting)
++                              const CustomerFeedback(
++                                  title: 'Buscando os dados da sua conta',
++                                  message:
++                                      'Seu perfil já vai aparecer por aqui.',
++                                  loading: true),
+                             ListTile(
+                                 shape: RoundedRectangleBorder(
+                                     borderRadius: BorderRadius.circular(20),
+@@ -167,11 +183,13 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
+                                   subtitle: Text(
+                                       'Data declarada: ${dob.split('-').reversed.join('/')}')),
+                             if (snapshot.hasError)
+-                              TextButton(
+-                                  onPressed: () => setState(
+-                                      () => _state = _repository?.load()),
+-                                  child: const Text(
+-                                      'Tentar carregar dados novamente')),
++                              CustomerFeedback(
++                                title: 'Não foi possível atualizar seu perfil.',
++                                message:
++                                    'Confira sua conexão e tente novamente. Seus dados não foram apagados.',
++                                icon: Icons.cloud_off_outlined,
++                                onRetry: _reloadProfile,
++                              ),
+                             if (snapshot.data != null &&
+                                 !snapshot.data!.acceptedCurrent &&
+                                 _repository != null)
+@@ -185,8 +203,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
+                                                   repository: _repository!,
+                                                   onComplete: () {
+                                                     Navigator.pop(context);
+-                                                    setState(() => _state =
+-                                                        _repository!.load());
++                                                    _reloadProfile();
+                                                   }))),
+                                   child: const Text(
+                                       'Conferir documentos atualizados')),
+diff --git a/tool/app_cliente_final/before/lib__screens__home_screen.dart.before b/lib/screens/home_screen.dart
+index c2c3573..add6251 100644
+--- a/tool/app_cliente_final/before/lib__screens__home_screen.dart.before
++++ b/lib/screens/home_screen.dart
+@@ -53,6 +53,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
+   DeliveryQuoteController? _deliveryQuote;
+   String _selectedCurrency = 'BRL';
+   Timer? _hoursTimer;
++  late bool _storeWasOpen;
+   CustomerWorkspace? _workspace;
+   bool _workspaceReady = true;
+   String? _persistenceError;
+@@ -79,8 +80,12 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
+             .collection('products')
+             .snapshots()
+             .map((s) => s.docs.map(Product.fromFirestore).toList());
++    _storeWasOpen = isStoreOpen();
+     _hoursTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+-      if (mounted) setState(() {});
++      final open = isStoreOpen();
++      if (mounted && open != _storeWasOpen) {
++        setState(() => _storeWasOpen = open);
++      }
+     });
+   }
+ 
+@@ -105,9 +110,9 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
+       case 'PYG':
+         return 'G\$ ${converted.toStringAsFixed(0)}';
+       case 'USD':
+-        return 'US\$ ${converted.toStringAsFixed(2)}';
++        return 'US\$ ${converted.toStringAsFixed(2).replaceAll('.', ',')}';
+       default:
+-        return 'R\$ ${converted.toStringAsFixed(2)}';
++        return 'R\$ ${converted.toStringAsFixed(2).replaceAll('.', ',')}';
+     }
+   }
+ 
+@@ -369,7 +374,11 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
+                                         ? () => update(() => quantity--)
+                                         : null,
+                                     icon: const Icon(Icons.remove)),
+-                                Text('$quantity'),
++                                Semantics(
++                                    liveRegion: true,
++                                    label: 'Quantidade selecionada: $quantity',
++                                    child: ExcludeSemantics(
++                                        child: Text('$quantity'))),
+                                 IconButton(
+                                     tooltip: 'Aumentar quantidade',
+                                     onPressed: quantity < product.stock
+@@ -792,14 +801,29 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
+                   ])),
+           ]));
+ 
+-  Widget _commerceImage(Product product) => DecoratedBox(
+-      decoration: const BoxDecoration(
+-          color: AppTheme.darkBg,
+-          image: DecorationImage(
++  // Only explicitly beverage/ice categories use the ice artwork. Mixed
++  // convenience categories do not imply cold storage for each product.
++  bool _coldArtwork(Product product) => const {
++        'cervejas',
++        'energéticos',
++        'refrigerantes & sucos',
++        'água',
++        'gelo',
++      }.contains(product.category.trim().toLowerCase());
++
++  BoxDecoration _productBackdrop(Product product) => BoxDecoration(
++      color: AppTheme.darkBg,
++      gradient: _coldArtwork(product) ? null : CustomerVisual.charcoal,
++      image: !_coldArtwork(product)
++          ? null
++          : const DecorationImage(
+               image: ResizeImage(
+                   AssetImage('assets/images/home/commerce_backdrop.png'),
+                   width: 600),
+-              fit: BoxFit.cover)),
++              fit: BoxFit.cover));
++
++  Widget _commerceImage(Product product) => DecoratedBox(
++      decoration: _productBackdrop(product),
+       child: Padding(
+           padding: const EdgeInsets.all(8),
+           child: _buildProductImage(product.imageUrl)));
+@@ -816,11 +840,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
+             child: InkWell(
+               onTap: () => _showProduct(product),
+               child: Ink(
+-                  decoration: const BoxDecoration(
+-                      image: DecorationImage(
+-                          image: AssetImage(
+-                              'assets/images/home/commerce_backdrop.png'),
+-                          fit: BoxFit.cover)),
++                  decoration: _productBackdrop(product),
+                   child: Stack(children: [
+                     Positioned(
+                         top: 6,
+diff --git a/tool/app_cliente_final/before/lib__screens__tracking_screen.dart.before b/lib/screens/tracking_screen.dart
+index a3908ff..0b6434d 100644
+--- a/tool/app_cliente_final/before/lib__screens__tracking_screen.dart.before
++++ b/lib/screens/tracking_screen.dart
+@@ -11,8 +11,13 @@ import 'tracking_view.dart';
+ class TrackingScreen extends StatefulWidget {
+   final String orderId;
+   final String? documentId;
++  final bool showConfirmation;
+ 
+-  const TrackingScreen({super.key, required this.orderId, this.documentId});
++  const TrackingScreen(
++      {super.key,
++      required this.orderId,
++      this.documentId,
++      this.showConfirmation = false});
+ 
+   @override
+   State<TrackingScreen> createState() => _TrackingScreenState();
+@@ -65,6 +70,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
+   Widget build(BuildContext context) => TrackingView(
+         key: ValueKey(widget.documentId ?? widget.orderId),
+         orderId: widget.orderId,
++        showConfirmation: widget.showConfirmation,
+         orderStream: _stream,
+         onRetry: () => setState(() {
+           _stream = _watch();
+diff --git a/tool/app_cliente_final/before/lib__screens__tracking_view.dart.before b/lib/screens/tracking_view.dart
+index 7edebe2..d19814c 100644
+--- a/tool/app_cliente_final/before/lib__screens__tracking_view.dart.before
++++ b/lib/screens/tracking_view.dart
+@@ -1,5 +1,7 @@
+ import '../core/theme.dart';
+ import '../widgets/customer_visual.dart';
++import '../widgets/customer_feedback.dart';
++import '../widgets/order_confirmation.dart';
+ import '../widgets/order_notification_card.dart';
+ import '../widgets/delivery_pin_card.dart';
+ import 'package:flutter/material.dart';
+@@ -9,20 +11,38 @@ import 'package:cloud_firestore/cloud_firestore.dart';
+ import '../widgets/pix_payment_dialog.dart';
+ import 'customer_profile_screen.dart';
+ 
+-class TrackingView extends StatelessWidget {
++class TrackingView extends StatefulWidget {
+   final String orderId;
+ 
+   final Stream<Map<String, dynamic>?> orderStream;
+   final VoidCallback onBack;
+   final VoidCallback? onRetry;
++  final bool showConfirmation;
+   const TrackingView({
+     super.key,
+     required this.orderId,
+     required this.orderStream,
+     required this.onBack,
+     this.onRetry,
++    this.showConfirmation = false,
+   });
+ 
++  @override
++  State<TrackingView> createState() => _TrackingViewState();
++}
++
++class _TrackingViewState extends State<TrackingView> {
++  bool _confirmationDismissed = false;
++  String get orderId => widget.orderId;
++  VoidCallback get onBack => widget.onBack;
++  VoidCallback? get onRetry => widget.onRetry;
++
++  @override
++  void didUpdateWidget(TrackingView oldWidget) {
++    super.didUpdateWidget(oldWidget);
++    if (oldWidget.orderId != widget.orderId) _confirmationDismissed = false;
++  }
++
+   @override
+   Widget build(BuildContext context) {
+     return Scaffold(
+@@ -32,97 +52,124 @@ class TrackingView extends StatelessWidget {
+           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
+         ),
+         leading: IconButton(
++          tooltip: 'Voltar',
+           icon: const Icon(Icons.arrow_back),
+           onPressed: onBack,
+         ),
+       ),
+       body: StreamBuilder<Map<String, dynamic>?>(
+-        stream: orderStream,
++        stream: widget.orderStream,
+         builder: (context, snapshot) {
+           if (snapshot.hasError) {
+             return Center(
+-                child: Column(mainAxisSize: MainAxisSize.min, children: [
+-              const Text('Não foi possível acompanhar o pedido.'),
+-              if (onRetry != null)
+-                TextButton(
+-                    onPressed: onRetry, child: const Text('Tentar novamente')),
+-            ]));
++                child: SingleChildScrollView(
++                    child: CustomerFeedback(
++                        title: 'Não foi possível acompanhar o pedido.',
++                        message:
++                            'Confira sua conexão e tente novamente. Essa falha não confirma o cancelamento do pedido.',
++                        icon: Icons.cloud_off_outlined,
++                        onRetry: onRetry)));
+           }
+           if (snapshot.connectionState == ConnectionState.waiting) {
+             return const Center(
+-              child: CircularProgressIndicator(color: Color(0xFFFFCC00)),
+-            );
++                child: SingleChildScrollView(
++                    child: CustomerFeedback(
++                        title: 'Buscando seu pedido',
++                        message: 'Só um instante para conferir as novidades.',
++                        loading: true)));
+           }
+           final data = snapshot.data;
+           if (data == null) {
+-            return const Center(
+-              child: Text('Pedido indisponível para esta sessão.'),
+-            );
++            return Center(
++                child: SingleChildScrollView(
++                    child: CustomerFeedback(
++                        title: 'Pedido indisponível para esta sessão.',
++                        message:
++                            'Confira se você entrou com a conta usada na compra.',
++                        icon: Icons.receipt_long_outlined,
++                        onRetry: onRetry)));
+           }
+ 
+           final status = (data['status'] ?? 'Novo').toString();
++          if (widget.showConfirmation &&
++              !_confirmationDismissed &&
++              canPresentOrderConfirmation(data)) {
++            return OrderConfirmationView(
++                orderId: orderId,
++                data: data,
++                statusLabel: customerStatus(status),
++                onTrack: () => setState(() => _confirmationDismissed = true));
++          }
++          final pendingValidation =
++              data['financialValidationStatus'] != 'validated' &&
++                  ['Novo', 'Aguardando pagamento'].contains(status);
++          final needsReview = data['financialValidationStatus'] == 'rejected' ||
++              ['Revisão financeira', 'Revisão de estoque'].contains(status);
+           final courier = data['courierUid'] is String &&
+                   (data['courierUid'] as String).trim().isNotEmpty &&
+                   data['courierName'] is String &&
+                   (data['courierName'] as String).trim().isNotEmpty
+               ? (data['courierName'] as String).trim()
+-              : status == 'Concluído' || status == 'Cancelado'
+-                  ? 'Entregador não informado'
+-                  : 'Aguardando atribuição';
+-          final address = (data['address'] ?? 'Centro - Ponta Porã').toString();
+-          final double total = ((data['totalBRL'] ?? 0.0) as num).toDouble();
++              : [
++                  'Novo',
++                  'Em Separação',
++                  'Aguardando Retirada',
++                  'Aguardando pagamento'
++                ].contains(status)
++                  ? 'Aguardando atribuição'
++                  : 'Entregador não informado';
++          final address = data['address']?.toString().trim().isNotEmpty == true
++              ? data['address'].toString()
++              : 'Endereço não informado';
++          final total =
++              data['totalBRL'] is num && (data['totalBRL'] as num).isFinite
++                  ? (data['totalBRL'] as num).toDouble()
++                  : null;
+ 
+-          int currentStep = 0;
+-          if (status == 'Em Separação') currentStep = 1;
+-          if (status == 'Aguardando Retirada') currentStep = 2;
+-          if (status == 'Saiu para Entrega') currentStep = 3;
+-          if (status == 'Concluído') currentStep = 4;
++          final currentStep = pendingValidation || needsReview
++              ? -1
++              : switch (status) {
++                  'Novo' => 0,
++                  'Em Separação' || 'Aguardando Retirada' => 1,
++                  'Saiu para Entrega' => 2,
++                  'Concluído' => 3,
++                  _ => -1,
++                };
+ 
+           return SingleChildScrollView(
+             padding: CustomerVisual.pagePadding(context),
+             child: Column(
+               crossAxisAlignment: CrossAxisAlignment.stretch,
+               children: [
+-                CustomerHero(
+-                    title: customerStatus(status),
+-                    subtitle: 'Pedido $orderId',
+-                    icon: status == 'Concluído'
+-                        ? Icons.check_circle_outline
+-                        : status == 'Cancelado'
+-                            ? Icons.cancel_outlined
+-                            : Icons.two_wheeler_rounded),
++                Semantics(
++                    liveRegion: true,
++                    child: CustomerHero(
++                        title: needsReview
++                            ? 'Vamos conferir seu pedido'
++                            : pendingValidation && status == 'Novo'
++                                ? 'Conferindo seu pedido'
++                                : customerStatus(status),
++                        subtitle: 'Pedido $orderId',
++                        icon: status == 'Concluído'
++                            ? Icons.check_circle_outline
++                            : status == 'Cancelado'
++                                ? Icons.cancel_outlined
++                                : Icons.two_wheeler_rounded)),
+                 const SizedBox(height: 12),
+-                Card(
+-                    child: Padding(
+-                        padding: const EdgeInsets.all(16),
+-                        child: Column(
+-                            crossAxisAlignment: CrossAxisAlignment.start,
+-                            children: [
+-                              const Text('Resumo do pedido',
+-                                  style:
+-                                      TextStyle(fontWeight: FontWeight.w800)),
+-                              const SizedBox(height: 8),
+-                              if (data['itemsList'] is List)
+-                                for (final item in (data['itemsList'] as List)
+-                                    .whereType<Map>())
+-                                  Text(
+-                                      '${item['quantity'] ?? 1} × ${item['name'] ?? 'Produto'}'),
+-                              const Divider(),
+-                              Text((data['paymentMethod'] ?? '')
+-                                      .toString()
+-                                      .startsWith('Maquininha')
+-                                  ? 'Cartão na entrega'
+-                                  : (data['paymentMethod'] ?? 'Pagamento')
+-                                      .toString()),
+-                              Text(data['paymentStatus'] == 'Pago'
+-                                  ? 'Pagamento confirmado'
+-                                  : data['pixRequested'] == true
+-                                      ? 'Aguardando pagamento'
+-                                      : 'Pagamento na entrega'),
+-                            ]))),
++                if (pendingValidation || needsReview)
++                  CustomerFeedback(
++                      title: needsReview
++                          ? 'Seu pedido precisa de atenção'
++                          : 'Estamos conferindo os detalhes',
++                      message: needsReview
++                          ? 'A confirmação não foi concluída. Confira o pagamento e fale com a loja pelo pedido quando essa opção estiver disponível.'
++                          : 'Aguarde a confirmação por aqui antes de fazer outro pedido.',
++                      icon: Icons.receipt_long_outlined),
++                CustomerOrderSummary(data: data),
+                 if (data['pixRequested'] == true &&
+                     data['paymentStatus'] != 'Pago' &&
+                     status != 'Cancelado' &&
++                    total != null &&
+                     data['_documentId'] is String)
+                   ElevatedButton.icon(
+                       icon: const Icon(Icons.pix),
+@@ -136,7 +183,6 @@ class TrackingView extends StatelessWidget {
+                               orderId: orderId,
+                               totalBRL: total,
+                               onPaid: () async {}))),
+-                // Mapa em Proporções Mobile
+                 if (data['financialValidationStatus'] == 'validated' &&
+                     data['_documentId'] is String)
+                   CustomerChatEntry(order: data),
+@@ -174,11 +220,13 @@ class TrackingView extends StatelessWidget {
+                             style: TextStyle(
+                               fontSize: 11,
+                               fontWeight: FontWeight.w900,
+-                              color: Colors.grey,
++                              color: AppColors.textSecondary,
+                             ),
+                           ),
+                           Text(
+-                            'Total: R\$ ${total.toStringAsFixed(2)}',
++                            total == null || pendingValidation
++                                ? 'Total em confirmação'
++                                : 'Total: ${customerMoney(total)}',
+                             style: const TextStyle(
+                               fontWeight: FontWeight.w900,
+                               fontSize: 16,
+@@ -193,7 +241,6 @@ class TrackingView extends StatelessWidget {
+                           for (final (index, label) in const [
+                             'Pedido recebido',
+                             'Em separação',
+-                            'Aguardando retirada',
+                             'Saiu para entrega',
+                             'Entregue'
+                           ].indexed)
+@@ -207,14 +254,19 @@ class TrackingView extends StatelessWidget {
+                                           : Icons.radio_button_unchecked,
+                                       color: index <= currentStep
+                                           ? AppColors.darkGold
+-                                          : Colors.grey),
++                                          : AppColors.textSecondary),
+                                   const SizedBox(width: 12),
+                                   Expanded(
+-                                      child: Text(label,
+-                                          style: TextStyle(
+-                                              fontWeight: index == currentStep
+-                                                  ? FontWeight.w800
+-                                                  : FontWeight.w400))),
++                                      child: Semantics(
++                                          label:
++                                              '$label: ${index < currentStep ? 'concluída' : index == currentStep ? 'etapa atual' : 'aguardando'}',
++                                          excludeSemantics: true,
++                                          child: Text(label,
++                                              style: TextStyle(
++                                                  fontWeight:
++                                                      index == currentStep
++                                                          ? FontWeight.w800
++                                                          : FontWeight.w400)))),
+                                 ])),
+                         ]),
+                     ],
+@@ -259,7 +311,7 @@ class TrackingView extends StatelessWidget {
+                               'Destino: $address',
+                               style: const TextStyle(
+                                 fontSize: 11,
+-                                color: Colors.grey,
++                                color: AppColors.textSecondary,
+                               ),
+                             ),
+                           ],
+@@ -268,6 +320,10 @@ class TrackingView extends StatelessWidget {
+                     ],
+                   ),
+                 ),
++                const SizedBox(height: 16),
++                const Text(
++                    'Acompanhe as etapas por aqui. A localização do entregador ao vivo ainda não está disponível.',
++                    style: TextStyle(color: AppColors.textSecondary)),
+               ],
+             ),
+           );
+diff --git a/tool/app_cliente_final/before/lib__widgets__product_image.dart.before b/lib/widgets/product_image.dart
+index 1fa4f1b..b048f8a 100644
+--- a/tool/app_cliente_final/before/lib__widgets__product_image.dart.before
++++ b/lib/widgets/product_image.dart
+@@ -2,32 +2,69 @@ import 'dart:convert';
+ import 'package:flutter/material.dart';
+ import '../core/theme.dart';
+ 
+-class ProductImage extends StatelessWidget {
++class ProductImage extends StatefulWidget {
+   final String url;
+   const ProductImage({super.key, required this.url});
+ 
+-  Widget get placeholder => const ColoredBox(
+-        color: AppTheme.lightBg,
+-        child: Center(
+-            child: Icon(Icons.local_drink_outlined,
+-                size: 44, color: AppColors.textSecondary)),
+-      );
++  @override
++  State<ProductImage> createState() => _ProductImageState();
++}
++
++class _ProductImageState extends State<ProductImage> {
++  ImageProvider? _image;
+ 
+   @override
+-  Widget build(BuildContext context) {
++  void initState() {
++    super.initState();
++    _resolve();
++  }
++
++  @override
++  void didUpdateWidget(ProductImage oldWidget) {
++    super.didUpdateWidget(oldWidget);
++    if (oldWidget.url != widget.url) _resolve();
++  }
++
++  void _resolve() {
++    _image = null;
++    final url = widget.url;
+     if (url.startsWith('data:image')) {
+       try {
+-        return Image.memory(base64Decode(url.split(',').last),
+-            fit: BoxFit.contain, errorBuilder: (_, __, ___) => placeholder);
++        _image = MemoryImage(base64Decode(url.split(',').last));
+       } catch (_) {
+-        return placeholder;
++        // A malformed image must not take the catalog down.
+       }
++    } else if (['http', 'https'].contains(Uri.tryParse(url)?.scheme)) {
++      _image = NetworkImage(url);
+     }
+-    if (Uri.tryParse(url)?.hasScheme != true) return placeholder;
+-    return Image.network(url,
+-        fit: BoxFit.contain,
+-        frameBuilder: (_, child, frame, sync) =>
+-            frame != null || sync ? child : placeholder,
+-        errorBuilder: (_, __, ___) => placeholder);
++  }
++
++  Widget _placeholder({bool loading = false}) => Semantics(
++      label: loading
++          ? 'Carregando imagem do produto'
++          : 'Imagem do produto indisponível',
++      child: const ColoredBox(
++        color: AppTheme.lightBg,
++        child: Center(
++            child: Icon(Icons.image_outlined,
++                size: 44, color: AppColors.textSecondary)),
++      ));
++
++  @override
++  Widget build(BuildContext context) {
++    if (_image == null) return _placeholder();
++    return LayoutBuilder(builder: (context, constraints) {
++      final width = constraints.hasBoundedWidth
++          ? (constraints.maxWidth * MediaQuery.devicePixelRatioOf(context))
++              .ceil()
++              .clamp(1, 1600)
++          : 720;
++      return Image(
++          image: ResizeImage.resizeIfNeeded(width, null, _image!),
++          fit: BoxFit.contain,
++          frameBuilder: (_, child, frame, sync) =>
++              frame != null || sync ? child : _placeholder(loading: true),
++          errorBuilder: (_, __, ___) => _placeholder());
++    });
+   }
+ }

@@ -21,6 +21,16 @@ const br = DeliveryAddress(
 const py = DeliveryAddress(
     latitude: -20.01, longitude: -50.01, countryCode: 'PY', confirmed: true);
 void main() {
+  DeliveryQuote validQuote(double fee, String digit) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    return DeliveryQuote(fee, digit * 64, 'routeBands',
+        distanceMeters: 1200,
+        version: 'test',
+        routingProvider: 'synthetic',
+        quotedAtMs: now - 1000,
+        expiresAtMs: now + 60000);
+  }
+
   Map<String, dynamic> response() => {
         'mode': 'routeBands',
         'deliveryFee': 7.25,
@@ -105,11 +115,11 @@ void main() {
     final second = state.refresh(py);
     expect(state.value, isNull);
     expect(state.loading, isTrue);
-    q.requests[1].complete(const DeliveryQuote(21, 'py', 'routeBands'));
+    q.requests[1].complete(validQuote(21, 'b'));
     await second;
-    q.requests[0].complete(const DeliveryQuote(6, 'br', 'routeBands'));
+    q.requests[0].complete(validQuote(6, 'a'));
     await first;
-    expect(state.value!.id, 'py');
+    expect(state.value!.id, 'b' * 64);
     expect(state.value!.fee, 21);
   });
   testWidgets(
@@ -117,20 +127,20 @@ void main() {
       (tester) async {
     final q = PendingQuoter();
     final state = DeliveryQuoteController(q);
-    addTearDown(state.dispose);
     final initial = state.refresh(br);
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(
             body: DeliveryQuoteSummary(controller: state, subtotal: 100))));
     await tester.pump();
     expect(find.text('Calculando entrega...'), findsOneWidget);
-    q.requests.last.complete(const DeliveryQuote(6, 'first', 'routeBands'));
+    q.requests.last.complete(validQuote(6, 'a'));
     await initial;
     await tester.pump();
-    expect(find.text('Entrega R\$ 6,00'), findsOneWidget);
+    expect(find.text('Frete: R\$ 6,00'), findsOneWidget);
     expect(find.text('Produtos'), findsOneWidget);
     expect(find.text('Taxa de serviço'), findsOneWidget);
-    expect(find.text('R\$ 107,00'), findsOneWidget);
+    expect(find.text('R\$ 106,00'), findsOneWidget);
+    expect(find.text('R\$ 1,00'), findsNothing);
     final outside = state.refresh(py);
     q.requests.last.completeError(const DeliveryQuoteException(
         'Este endereço está fora da área de entrega disponível no momento.'));
@@ -141,13 +151,15 @@ void main() {
         find.text(
             'Este endereço está fora da área de entrega disponível no momento.'),
         findsOneWidget);
-    expect(find.text('Entrega R\$ 6,00'), findsNothing);
+    expect(find.text('Frete: R\$ 6,00'), findsNothing);
     expect(find.text('A calcular'), findsOneWidget);
     await tester.tap(find.text('Tentar calcular entrega novamente'));
     await tester.pump();
-    q.requests.last.complete(const DeliveryQuote(21, 'retry', 'routeBands'));
+    q.requests.last.complete(validQuote(21, 'c'));
     await tester.pumpAndSettle();
-    expect(find.text('Entrega R\$ 21,00'), findsOneWidget);
+    expect(find.text('Frete: R\$ 21,00'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    state.dispose();
   });
   test('network failure never keeps stale or zero quote', () async {
     final q = PendingQuoter();

@@ -6,6 +6,7 @@ const {createHash} = require("node:crypto");
 const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {Timestamp, FieldValue} = require("firebase-admin/firestore");
 const {authorize, readyForDispatch} = require("./courier-assignment");
+const {requireCourierIdentity} = require("./courier-authorization");
 const {courierUid, isAssignableCourier,
   planCourierDelivery, writeCourierDelivery} =
     require("./courier-deliveries");
@@ -51,9 +52,13 @@ function authorizeSettlement(request) {
  * @return {Promise<Object>} Receipt.
  */
 async function moveOrder(db, request, operation, resolveReservation,
-    checkFinancial) {
-  const actorUid = authorize(request);
-  const reason = operation === "complete" ? requireContingency(request) : null;
+    checkFinancial, internal = {}) {
+  // Internal transaction capability supplied only by the authenticated F03 handler.
+  // Callable payloads cannot supply this argument or create an Admin transaction.
+  const courierCompletion = operation === "complete" && internal.transaction &&
+    internal.courierUid === request.auth?.uid && /^[a-f0-9]{64}$/.test(internal.fingerprint || "");
+  const actorUid = courierCompletion ? requireCourierIdentity(request) : authorize(request);
+  const reason = operation === "complete" && !courierCompletion ? requireContingency(request) : null;
   const data = payload(request, operation === "complete" ?
     ["orderId", "requestId", "contingencyReason", "confirmation",
       "deliveryConfirmed", "collectionConfirmed", "expectedDeliveryRevision"] :
@@ -67,14 +72,15 @@ async function moveOrder(db, request, operation, resolveReservation,
   const auditRef = db.collection("courierDeliveryAudit").doc();
   const ledgerRef = db.doc(`orderOperationRequests/${digest(
       `${actorUid}:${data.requestId}`)}`);
-  const fingerprint = digest(reason ? JSON.stringify([operation, id, reason,
+  const fingerprint = courierCompletion ? internal.fingerprint : digest(reason ? JSON.stringify([operation, id, reason,
     data.deliveryConfirmed, data.collectionConfirmed,
     data.expectedDeliveryRevision]) :
     `${operation}:${id}`);
   const contingencyRef = db.collection("operationalContingencyAudit").doc();
   const next = operation === "separate" ? "Em Separação" : "Concluído";
   const before = operation === "separate" ? "Novo" : "Saiu para Entrega";
-  return db.runTransaction(async (tx) => {
+  const transact = courierCompletion ? (work) => work(internal.transaction) : (work) => db.runTransaction(work);
+  return transact(async (tx) => {
     const receipt = await tx.get(ledgerRef);
     if (receipt.exists) {
       const legacyReplay = operation === "complete" &&
@@ -114,6 +120,10 @@ async function moveOrder(db, request, operation, resolveReservation,
       reject("Pedido sem validação financeira oficial. Revisão necessária.");
     }
     checkFinancial(order, financial.data());
+    if (operation === "complete" && !courierCompletion && order.paymentStatus !== "Pago") {
+      await require("./delivery-collection-contract").assertSupervisedCollection(tx, db, order,
+          id, financial.data(), internal.checkDeliveryPayment);
+    }
     const previous = await tx.get(deliveryRef);
     const uid = courierUid(order.courierUid);
     let registered = false;
@@ -153,13 +163,16 @@ async function moveOrder(db, request, operation, resolveReservation,
     if (operation === "complete" && plan.revoked) {
       reject("Rota inválida. Revise o pedido antes de concluir.");
     }
+    if (operation === "complete") {
+      await require("./age-delivery-policy").assertOrderRecipient(tx, db, order, {orderId: id, assignmentId: order.courierAssignmentId, courierUid: uid});
+    }
     // The shared reservation resolver performs the last reads before writes.
     if (operation === "complete" &&
         order.stockReservationStatus === "reserved") {
       await resolveReservation(tx, ref, id, true);
     }
     if (operation === "complete") {
-      auditContingency(tx, contingencyRef, request, "complete", order,
+      if (!courierCompletion) auditContingency(tx, contingencyRef, request, "complete", order,
           {status: next});
       if (incident && order.deliveryIncidentStatus !== "resolved") {
         const version = order.deliveryIncidentRevision + 1;
@@ -258,6 +271,7 @@ async function settleCourier(db, request, checkFinancial) {
       const order = orders[i].data();
       const official = finances[i].data();
       const assigned = courierUid(order.courierUid);
+      if (order.h03OfferId || (await tx.get(db.doc(`courierRemunerationOrders/${ids[i]}`))).exists) reject("H03_SETTLEMENT_REQUIRED");
       if (!assigned || order.status !== "Concluído" ||
           !(order.completedAt instanceof Timestamp) ||
           order.paymentStatus !== "Pago" ||
@@ -320,7 +334,8 @@ function createOrderOperations(db, helpers) {
     chamaeIniciarSeparacao: onCall(options, (request) => moveOrder(db, request,
         "separate", helpers.resolveReservation, helpers.checkFinancial)),
     chamaeConcluirEntrega: onCall(options, (request) => moveOrder(db, request,
-        "complete", helpers.resolveReservation, helpers.checkFinancial)),
+        "complete", helpers.resolveReservation, helpers.checkFinancial,
+        {checkDeliveryPayment: helpers.checkDeliveryPayment})),
     chamaeRegistrarAcertoMotoboy: onCall(options, (request) =>
       settleCourier(db, request, helpers.checkFinancial)),
   };

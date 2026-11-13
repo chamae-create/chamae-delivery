@@ -10,10 +10,12 @@ const {ownProfile, reviewCourier, courierOperation} = require("../courier-approv
 const {isAssignableCourier} = require("../courier-deliveries");
 const {changeCourier} = require("../courier-assignment");
 let app; let db; let environment; let sequence = 0;
-const auth = (uid, roles = []) => ({uid, token: {roles, firebase: {sign_in_provider: "password"}}});
+const auth = (uid, roles = []) => ({uid, token: {email_verified: true, roles,
+  firebase: {sign_in_provider: "password"}}});
 const operator = auth("reviewer", ["superadmin"]);
 const fields = {profilePhoto: "fixture-selfie", name: "Ana Exemplo", phone: "67900000000", city: "Ponta Pora",
   vehicleType: "motorcycle"};
+const {seedCourierPolicy} = require("./courier-policy-fixture");
 const denied = (code) => (error) => error.code === code;
 before(async () => {
   const host = process.env.FIRESTORE_EMULATOR_HOST;
@@ -36,6 +38,7 @@ after(async () => {
 async function applicant() {
   const uid = `applicant-${++sequence}`;
   const identity = auth(uid);
+  await seedCourierPolicy(db, uid, Timestamp.now());
   await db.doc(`courierProfilePhotos/${uid}`).set({verified: true, reference: fields.profilePhoto});
   const profile = await ownProfile(db, {auth: identity, data: fields}, "register");
   const ref = db.doc(`couriers/${uid}`);

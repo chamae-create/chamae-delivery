@@ -45,7 +45,7 @@ async function fixture(status = "pendingApproval", pendingEventIds = []) {
     profilePhoto: `courier-photos/${uid}/selfie.png`, vehiclePlate: "TEST0000", driverLicense: "synthetic-cnh",
     vehicleDescription: "Synthetic motorcycle", city: "Fixture City"};
   await db.doc(`couriers/${uid}`).set(profile);
-  const identity = {uid, token: {auth_time: Math.floor(Date.now() / 1000),
+  const identity = {uid, token: {email_verified: false, auth_time: Math.floor(Date.now() / 1000),
     firebase: {sign_in_provider: "password"}}};
   const request = {auth: identity, data: {expectedUid: uid,
     confirmation: "EXCLUIR MINHA CONTA", requestId: "f02-request-id-0001", pendingEventIds}};
@@ -296,4 +296,48 @@ test("existing financial handler can settle a closed courier once without restor
   assert.equal((await db.doc(`orders/${id}`).get()).data().courierPaid, true);
   assert.deepEqual((await db.doc(`orderFinancials/${id}`).get()).data(), financial);
   assert.equal((await db.doc(`couriers/${f.uid}`).get()).data().administrativeState, "closed");
+});
+
+
+test("F02 erases consent recursively; retries preserve foreign UID and financial history", async () => {
+  const {courierPolicyFixture} = require("./courier-policy-fixture");
+  const {acceptDocuments} = require("../courier-policy");
+  const f = await fixture();
+  const accept = async (policy) => {
+    await db.doc("courierPolicies/current").set(policy);
+    await acceptDocuments(db, {auth: f.identity, data: {policyRevision: policy.revision,
+      policyHash: policy.contentHash, termsVersion: policy.termsVersion, privacyVersion: policy.privacyVersion,
+      acceptTerms: true, acknowledgePrivacy: true}});
+  };
+  await accept(courierPolicyFixture());
+  const policy = courierPolicyFixture({revision: "TEST-ONLY-2", termsVersion: "TEST-ONLY-2"});
+  await accept(policy);
+  const eventRef = db.collection("courierConsentEvents/" + f.uid + "/events");
+  assert.equal((await eventRef.get()).size, 2);
+  await db.doc("courierPolicyAcceptances/unrelated-courier").set({policyHash: "FOREIGN-TEST-HASH"});
+  await db.doc("courierConsentEvents/unrelated-courier/events/foreign-event").set({accepted: true});
+  const retained = {courierUid: f.uid, amountMinor: 12345, currency: "BRL", settled: false};
+  await db.doc("courierSettlements/consent-retained-" + f.uid).set(retained);
+  await f.submit();
+  let interrupted = false;
+  const failingDb = Object.create(db);
+  failingDb.recursiveDelete = async (ref, ...args) => {
+    if (!interrupted && ref.path === "courierConsentEvents/" + f.uid) {
+      interrupted = true; throw new Error("SYNTHETIC-CONSENT-CLEANUP-INTERRUPTION");
+    }
+    return db.recursiveDelete(ref, ...args);
+  };
+  await assert.rejects(processCourierClosure(failingDb, auth, storage, f.uid), /COURIER_CLOSURE_RETRY_REQUIRED/);
+  assert.equal(interrupted, true);
+  assert.equal((await f.job()).data().status, "processing");
+  await f.process(); await f.process();
+  assert.equal((await f.job()).data().status, "completed");
+  assert.equal((await db.doc("courierPolicyAcceptances/" + f.uid).get()).exists, false);
+  assert.equal((await eventRef.get()).empty, true);
+  assert.equal((await db.doc("courierConsentEvents/" + f.uid).get()).exists, false);
+  assert.equal((await db.doc("courierPolicyAcceptances/unrelated-courier").get()).data().policyHash,
+      "FOREIGN-TEST-HASH");
+  assert.equal((await db.doc("courierConsentEvents/unrelated-courier/events/foreign-event").get()).exists, true);
+  assert.deepEqual((await db.doc("courierSettlements/consent-retained-" + f.uid).get()).data(), retained);
+  assert.deepEqual((await db.doc("courierPolicies/current").get()).data(), policy);
 });

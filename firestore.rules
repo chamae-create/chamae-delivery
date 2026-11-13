@@ -36,7 +36,9 @@ service cloud.firestore {
 
     function activeCourier() {
       let profile = get(/databases/$(database)/documents/couriers/$(request.auth.uid)).data;
-      return profile.get('role', '') == 'courier'
+      return (request.auth.token.get('firebase', {}).get('sign_in_provider', '') != 'password'
+          || request.auth.token.get('email_verified', false) == true)
+        && profile.get('role', '') == 'courier'
         && profile.get('approvalStatus', '') == 'approved'
         && profile.get('administrativeState', '') == 'active'
         && profile.get('enabled', true) != false
@@ -66,6 +68,14 @@ service cloud.firestore {
           || provider in ['google.com', 'apple.com']);
     }
 
+    function validNavigationAge(value, policy) {
+      return value is map && value.keys().hasOnly(['countryCode', 'minimumAge', 'declared'])
+        && value.get('declared', false) == true && value.get('countryCode', '') in ['BR', 'PY']
+        && value.get('minimumAge', 0) is int && value.minimumAge <= 120
+        && value.minimumAge >= (value.countryCode == 'BR' ? 18 : 20)
+        && value.minimumAge == policy.get('minimumAgeByCountry', {}).get(value.countryCode, 0);
+    }
+
     function currentCustomerConsent() {
       let policy = get(/databases/$(database)/documents/customerPolicies/current).data;
       let profile = get(/databases/$(database)/documents/customerProfiles/$(request.auth.uid)).data;
@@ -74,7 +84,8 @@ service cloud.firestore {
         && !policy.privacyVersion.lower().matches('.*draft.*')
         && !policy.alcoholVersion.lower().matches('.*draft.*')
         && profile.get('acceptedAt', null) is timestamp
-        && profile.get('birthDate', '') is string && profile.birthDate.size() == 10
+        && ((profile.get('birthDate', '') is string && profile.get('birthDate', '').size() == 10)
+          || validNavigationAge(profile.get('navigationAgeDeclaration', {}), policy))
         && profile.get('termsVersion', '') == policy.termsVersion
         && profile.get('privacyVersion', '') == policy.privacyVersion
         && profile.get('alcoholVersion', '') == policy.alcoholVersion
@@ -127,6 +138,12 @@ service cloud.firestore {
         && confirmedDestination(data)
         && verifiedCustomerIdentity()
         && data.get('customerFlowVersion', 0) == 2
+        && data.get('splitPayment', false) == false
+        && (data.get('paymentParts', null) == null || data.paymentParts == [])
+        && data.paymentMethod != 'Pagamento dividido'
+        && (data.paymentMethod != 'Dinheiro' || data.get('cashCurrency', 'BRL') == 'BRL')
+        // PY commerce remains closed pending territorial/fiscal authorization.
+        && data.deliveryAddress.countryCode == 'BR'
         && currentCustomerConsent()
         && data.keys().hasAll(['id', 'customerUid', 'customerName', 'itemsList',
           'totalBRL', 'paymentMethod', 'paymentStatus', 'status', 'courierPaid', 'createdAt'])
@@ -205,9 +222,21 @@ service cloud.firestore {
     }
     match /customerPolicies/{id} {
       // Only the onboarding configuration, including an absent current document.
-      allow get: if signedIn() && id == 'current';
+      allow get: if id == 'current' && (signedIn()
+        || (resource.data.get('published', false) == true && resource.data.get('draft', true) == false));
       allow list, write: if false;
     }
+    match /courierApprovalAudit/{id} {
+      allow read: if isSuperadmin() && !isCourierAccount();
+      allow write: if false;
+    }
+    match /courierPolicies/{id} {
+      allow get: if id == 'current'
+        && resource.data.get('published', false) == true && resource.data.get('draft', true) == false;
+      allow list, write: if false;
+    }
+    match /courierPolicyAcceptances/{uid} { allow read, write: if false; }
+    match /courierConsentEvents/{uid}/events/{id} { allow read, write: if false; }
     match /customerProfiles/{uid} {
       allow get: if namedAccount() && request.auth.uid == uid && !isCourierAccount();
       // Consent, birth date and verification are exclusively backend-owned.

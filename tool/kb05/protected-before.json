@@ -1,0 +1,50 @@
+﻿[
+    {
+        "Path":  "pubspec.yaml",
+        "Hash":  "FBCD1ED55F46783A515C73A7056C3DF094561233A46AF7118CD30FF0056171B6"
+    },
+    {
+        "Path":  "pubspec.lock",
+        "Hash":  "78A59519E1BB1C9761FADB58F4EF16E1E4215DD21B06CE83020A95F1EB477C63"
+    },
+    {
+        "Path":  "functions/package-lock.json",
+        "Hash":  "C7741EF3CAF08CEF7AFBC38575460C84AB26AAF7B05D5BB3C90781A6CFE140FF"
+    },
+    {
+        "Path":  "functions/order-acceptance.js",
+        "Hash":  "4FE8EEA940321B4995829616182E8F80E0F8897185141CF5C3F1167933651D7D"
+    },
+    {
+        "Path":  "functions/destination-country.js",
+        "Hash":  "36F3DD2C4F4886D8557A4E98C9A575681C163E92526D2524CFAE7803F570C8CA"
+    },
+    {
+        "Path":  "functions/delivery-service.js",
+        "Hash":  "EB268F4794675D537802CC8F71ED7D13329269EE46B1A6241CA61AD6A169F9F8"
+    },
+    {
+        "Path":  "functions/delivery-pricing.js",
+        "Hash":  "7FD520E0A81AB2D486BCEE5E4DFBF86C56C6BDF64EAD4DA73E57C0F1718B0AB9"
+    },
+    {
+        "Path":  "functions/config/delivery-pricing-initial.json",
+        "Hash":  "53B748AAAB63C1198126A3EDA6ECCAFF56DCF392D303A5A9BBEF645B9C635B4B"
+    },
+    {
+        "Path":  "functions/customer-account.js",
+        "Hash":  "C372B9748029E51164F5201D32B01322F604A72670C75A40D239C570987BEC4A"
+    },
+    {
+        "Path":  "functions/customer-onboarding.js",
+        "Hash":  "EA2BF897295974141E2FD10B583131F2089585ECCBD4DBF6300E70FA81172300"
+    },
+    {
+        "Path":  "lib/data/customer_orders.dart",
+        "Hash":  "935654E15CE2E692FB26FD410D9B0F40988F2EA78CED083BF60937951EB18E69"
+    },
+    {
+        "Path":  "lib/core/order_confirmation_policy.dart",
+        "Hash":  "C75125E9425F4FE6AA78CCC2C776BA1DA6BB1A283D1BD19950969AC9C7AB9CE9"
+    }
+]

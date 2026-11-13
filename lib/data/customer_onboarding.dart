@@ -4,11 +4,51 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'customer_bootstrap.dart';
 
+class NavigationAgeDeclaration {
+  final String countryCode;
+  final int minimumAge;
+  const NavigationAgeDeclaration(this.countryCode, this.minimumAge);
+  Map<String, dynamic> toMap() => {
+        'countryCode': countryCode,
+        'minimumAge': minimumAge,
+        'declared': true,
+      };
+}
+
 class CustomerPolicy {
   final String revision, termsVersion, privacyVersion, alcoholVersion;
   final String termsText, privacyText, alcoholNotice, contentHash;
   final String? termsUrl, privacyUrl;
   final bool published, draft;
+  final Map<String, int> minimumAgeByCountry;
+  int? navigationMinimum(String country) {
+    final floor = {'BR': 18, 'PY': 20}[country];
+    final configured = minimumAgeByCountry[country];
+    return floor != null &&
+            configured != null &&
+            configured >= floor &&
+            configured <= 120
+        ? configured
+        : null;
+  }
+
+  bool legacyNavigationEligible(dynamic value) {
+    if (value is! String) return false;
+    final dob = parseBirthDate(value), minimum = navigationMinimum('BR');
+    if (dob == null || minimum == null) return false;
+    final now = DateTime.now().toUtc();
+    var age = now.year - dob.year;
+    if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
+      age--;
+    }
+    return age >= minimum;
+  }
+
+  bool validDeclaration(dynamic value) =>
+      value is Map &&
+      value['declared'] == true &&
+      navigationMinimum(value['countryCode']?.toString() ?? '') != null &&
+      value['minimumAge'] == navigationMinimum(value['countryCode']);
   const CustomerPolicy(
       {required this.revision,
       required this.termsVersion,
@@ -20,27 +60,40 @@ class CustomerPolicy {
       required this.contentHash,
       this.termsUrl,
       this.privacyUrl,
+      this.minimumAgeByCountry = const {'BR': 18, 'PY': 20},
       this.published = false,
       this.draft = true});
   factory CustomerPolicy.fromMap(Map<String, dynamic> map) => CustomerPolicy(
-      revision: map['revision']?.toString() ?? '',
-      termsVersion: map['termsVersion']?.toString() ?? '',
-      privacyVersion: map['privacyVersion']?.toString() ?? '',
-      alcoholVersion: map['alcoholVersion']?.toString() ?? '',
-      termsText: map['termsText']?.toString() ?? '',
-      privacyText: map['privacyText']?.toString() ?? '',
-      alcoholNotice: map['alcoholNotice']?.toString() ?? '',
-      contentHash: map['contentHash']?.toString() ?? '',
-      termsUrl: map['termsUrl'] as String?,
-      privacyUrl: map['privacyUrl'] as String?,
-      published: map['published'] == true,
-      draft: map['draft'] != false ||
-          [map['termsVersion'], map['privacyVersion'], map['alcoholVersion']]
-              .any((v) => v.toString().toLowerCase().contains('draft')));
+          minimumAgeByCountry: {
+            for (final entry in (map['minimumAgeByCountry'] is Map
+                    ? Map<String, dynamic>.from(map['minimumAgeByCountry'])
+                    : <String, dynamic>{})
+                .entries)
+              if (entry.value is int) entry.key: entry.value as int,
+          },
+          revision: map['revision']?.toString() ?? '',
+          termsVersion: map['termsVersion']?.toString() ?? '',
+          privacyVersion: map['privacyVersion']?.toString() ?? '',
+          alcoholVersion: map['alcoholVersion']?.toString() ?? '',
+          termsText: map['termsText']?.toString() ?? '',
+          privacyText: map['privacyText']?.toString() ?? '',
+          alcoholNotice: map['alcoholNotice']?.toString() ?? '',
+          contentHash: map['contentHash']?.toString() ?? '',
+          termsUrl: map['termsUrl'] as String?,
+          privacyUrl: map['privacyUrl'] as String?,
+          published: map['published'] == true,
+          draft: map['draft'] != false ||
+              [
+                map['termsVersion'],
+                map['privacyVersion'],
+                map['alcoholVersion']
+              ].any((v) => v.toString().toLowerCase().contains('draft')));
   // This override exists only to test the build-mode matrix. Runtime callers
   // always use the compile-time kDebugMode default (profile also stays blocked).
   bool allowsDevelopmentOnboarding({bool debugMode = kDebugMode}) =>
-      debugMode && draft;
+      debugMode &&
+      draft &&
+      const String.fromEnvironment('CHAMAE_ENV') != 'STAGING';
 
   bool canContinueOnboarding({bool debugMode = kDebugMode}) =>
       available || allowsDevelopmentOnboarding(debugMode: debugMode);
@@ -84,8 +137,8 @@ class CustomerOnboardingState {
   const CustomerOnboardingState(this.policy, this.profile);
   bool get acceptedCurrent =>
       policy.available &&
-      profile['birthDate'] is String &&
-      parseBirthDate(profile['birthDate']) != null &&
+      (policy.validDeclaration(profile['navigationAgeDeclaration']) ||
+          policy.legacyNavigationEligible(profile['birthDate'])) &&
       profile['termsVersion'] == policy.termsVersion &&
       profile['privacyVersion'] == policy.privacyVersion &&
       profile['alcoholVersion'] == policy.alcoholVersion &&
@@ -115,6 +168,8 @@ DateTime? parseBirthDate(String value) {
 abstract class CustomerOnboardingRepository {
   Future<CustomerOnboardingState> load();
   Future<void> accept(CustomerPolicy policy, String birthDate);
+  Future<void> acceptForNavigation(
+      CustomerPolicy policy, NavigationAgeDeclaration declaration);
 }
 
 class FirebaseCustomerOnboarding implements CustomerOnboardingRepository {
@@ -148,6 +203,30 @@ class FirebaseCustomerOnboarding implements CustomerOnboardingRepository {
             ? CustomerPolicy.fromMap(policy.data()!)
             : developmentCustomerPolicy,
         profile);
+  }
+
+  @override
+  Future<void> acceptForNavigation(
+      CustomerPolicy policy, NavigationAgeDeclaration declaration) async {
+    _check();
+    if (!policy.available || !policy.validDeclaration(declaration.toMap())) {
+      throw StateError(
+          'Confira a declaração etária e os documentos disponíveis.');
+    }
+    await FirebaseFunctions.instanceFor(region: 'southamerica-east1')
+        .httpsCallable('chamaeAceitarDocumentosCliente')
+        .call({
+      'navigationAgeDeclaration': declaration.toMap(),
+      'termsVersion': policy.termsVersion,
+      'privacyVersion': policy.privacyVersion,
+      'alcoholVersion': policy.alcoholVersion,
+      'policyRevision': policy.revision,
+      'policyHash': policy.contentHash,
+      'acceptTerms': true,
+      'acknowledgePrivacy': true,
+      'acknowledgeAlcohol': true,
+    }).timeout(const Duration(seconds: 15));
+    _check();
   }
 
   @override

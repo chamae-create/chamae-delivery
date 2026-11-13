@@ -1,0 +1,78 @@
+[
+  {
+    "path": "pubspec.yaml",
+    "unchanged": true
+  },
+  {
+    "path": "pubspec.lock",
+    "unchanged": true
+  },
+  {
+    "path": "functions/package-lock.json",
+    "unchanged": true
+  },
+  {
+    "path": "functions/index.js",
+    "unchanged": true
+  },
+  {
+    "path": "firestore.rules",
+    "unchanged": true
+  },
+  {
+    "path": "functions/order-acceptance.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/destination-country.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/delivery-service.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/delivery-pricing.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/config/delivery-pricing-initial.json",
+    "unchanged": true
+  },
+  {
+    "path": "functions/order-operations.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/order-cancellation.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/delivery-contingency.js",
+    "unchanged": true
+  },
+  {
+    "path": "functions/customer-onboarding.js",
+    "unchanged": true
+  },
+  {
+    "path": "lib/data/customer_orders.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib/data/customer_workspace.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib/core/order_confirmation_policy.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib/screens/checkout_screen.dart",
+    "unchanged": true
+  },
+  {
+    "path": "lib/widgets/pix_payment_dialog.dart",
+    "unchanged": true
+  }
+]

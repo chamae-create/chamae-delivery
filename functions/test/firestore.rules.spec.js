@@ -279,10 +279,10 @@ for (const address of [{confirmed: false}, {countryCode: "US"},
       });
 }
 
-test("verified owner can use confirmed PY destination without a number",
+test("verified owner cannot create PY commerce before territorial authorization",
     async () => {
       const order = checkoutOrder();
-      await assertSucceeds(setDoc(doc(clients.authenticated(),
+      await assertFails(setDoc(doc(clients.authenticated(),
           "orders/confirmed-py"), {...order, deliveryAddress: {
         ...order.deliveryAddress, countryCode: "PY", noNumber: true, number: "",
       }}));
@@ -321,7 +321,7 @@ test("policy: authenticated get current only, never list or client writes",
       await assertSucceeds(getDoc(doc(db, "customerPolicies/current")));
       await assertFails(getDoc(doc(db, "customerPolicies/draft-private")));
       await assertFails(getDocs(collection(db, "customerPolicies")));
-      await assertFails(getDoc(doc(clients.unauthenticated(),
+      await assertSucceeds(getDoc(doc(clients.unauthenticated(),
           "customerPolicies/current")));
       await assertFails(setDoc(doc(db, "customerPolicies/new"),
           {published: true}));
@@ -476,7 +476,7 @@ for (const [name, overrides] of Object.entries({
     splitPaidBRL: 26, splitRemainingBRL: 0, splitChangeBRL: 0},
 })) {
   test(`checkout ${name}: owner can create the actual payload`, async () => {
-    await assertSucceeds(setDoc(doc(clients.authenticated(),
+    await (name === "dividido" ? assertFails : assertSucceeds)(setDoc(doc(clients.authenticated(),
         `orders/create-${name}`),
     checkoutOrder(overrides)));
   });
@@ -980,5 +980,69 @@ test("deny by default: nested paths and superadmin", async () => {
       await assertFails(setDoc(doc(db, target), {value: 1}));
       await assertFails(getDoc(doc(db, target)));
     }
+  }
+});
+
+
+test("public legal documents: only published current get, never drafts/list/private consent", async () => {
+  const {courierPolicyFixture} = require("./courier-policy-fixture");
+  const anon = clients.unauthenticated(); const signed = clients.authenticated();
+  await environment.withSecurityRulesDisabled(async (context) => {
+    await setDoc(doc(context.firestore(), "courierPolicies/current"), courierPolicyFixture());
+  });
+  for (const db of [anon, signed]) {
+    await assertSucceeds(getDoc(doc(db, "courierPolicies/current")));
+    await assertFails(getDocs(collection(db, "courierPolicies")));
+    await assertFails(getDoc(doc(db, "courierPolicies/private-draft")));
+    await assertFails(setDoc(doc(db, "courierPolicies/current"), {published: true, draft: false}));
+    for (const path of ["courierPolicyAcceptances/customer", "courierConsentEvents/customer/events/hash"]) {
+      await assertFails(getDoc(doc(db, path))); await assertFails(setDoc(doc(db, path), {acceptTerms: true}));
+    }
+  }
+  await environment.withSecurityRulesDisabled(async (context) => {
+    await updateDoc(doc(context.firestore(), "courierPolicies/current"), {draft: true});
+    await updateDoc(doc(context.firestore(), "customerPolicies/current"), {draft: true});
+  });
+  await assertFails(getDoc(doc(anon, "courierPolicies/current")));
+  await assertFails(getDoc(doc(signed, "courierPolicies/current")));
+  await assertFails(getDoc(doc(anon, "customerPolicies/current")));
+  await assertSucceeds(getDoc(doc(signed, "customerPolicies/current")), "legacy signed-in client read preserved");
+});
+
+
+test("courier review audit is readable only by named superadmin who is not a courier", async () => {
+  await environment.withSecurityRulesDisabled(async (context) => {
+    const db = context.firestore();
+    await setDoc(doc(db, "courierApprovalAudit/test-history"), {courierUid: "target", createdAt: Timestamp.now()});
+    await setDoc(doc(db, "couriers/dual-reviewer"), {role: "courier"});
+  });
+  const admin = environment.authenticatedContext("audit-admin", {roles: ["superadmin"],
+    firebase: {sign_in_provider: "password"}}).firestore();
+  const dual = environment.authenticatedContext("dual-reviewer", {roles: ["superadmin"],
+    firebase: {sign_in_provider: "password"}}).firestore();
+  await assertSucceeds(getDoc(doc(admin, "courierApprovalAudit/test-history")));
+  await assertSucceeds(getDocs(query(collection(admin, "courierApprovalAudit"), where("courierUid", "==", "target"))));
+  for (const db of [clients.unauthenticated(), clients.authenticated(), dual,
+    environment.authenticatedContext("ops-only", {roles: ["operations_admin"],
+      firebase: {sign_in_provider: "password"}}).firestore()]) {
+    await assertFails(getDoc(doc(db, "courierApprovalAudit/test-history")));
+    await assertFails(getDocs(collection(db, "courierApprovalAudit")));
+  }
+  await assertFails(setDoc(doc(admin, "courierApprovalAudit/forged"), {action: "approve"}));
+  await assertFails(updateDoc(doc(admin, "courierApprovalAudit/test-history"), {action: "approve"}));
+  await assertFails(deleteDoc(doc(admin, "courierApprovalAudit/test-history")));
+});
+
+test("sprint100: client cannot forge private age evidence or a delivery acknowledgement", async () => {
+  const db = clients.authenticated();
+  for(const collectionName of ["customerAgeVerifications", "ageVerificationSessions", "ageVerificationAudit", "deliveryAgeChecks", "deliveryAgeAudit"]){
+    await assertFails(setDoc(doc(db, collectionName, "customer"), {status:"approved",ageVerified:true,identityVerified:true}));
+    await assertFails(getDocs(collection(db, collectionName)));
+  }
+});
+test("sprint100: BRL-only and single-payment gates cannot be bypassed by direct writes", async () => {
+  for(const [id, patch] of Object.entries({foreignUsd:{cashCurrency:"USD"},foreignPyg:{cashCurrency:"PYG"},
+    splitFlag:{splitPayment:true},hiddenParts:{paymentParts:[{method:"Dinheiro",amountBRL:26}]}})){
+    await assertFails(setDoc(doc(clients.authenticated(), "orders", "sprint100-"+id), checkoutOrder(patch)));
   }
 });

@@ -1,0 +1,108 @@
+warning: in the working copy of 'android/app/build.gradle.kts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'android/local.properties', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'design/references/customer_app/official/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/.eslintrc.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/config/delivery-pricing-initial.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/courier-assignment.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/customer-onboarding.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/customer-security.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/delivery-pricing.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/delivery-service.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/index.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/operational-contingency.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/order-chat.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/order-operations.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/test/backend-fixture.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/test/delivery-contracts.spec.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/test/delivery-official.spec.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/test/delivery-radius.emulator.spec.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/test/final-operations.emulator.spec.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/test/financial.spec.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/test/firestore.rules.spec.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'functions/test/pilot.emulator.spec.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ios/Runner/GeneratedPluginRegistrant.m', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/core/models.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/data/customer_auth.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/data/customer_bootstrap.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/data/customer_orders.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/data/customer_workspace.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/screens/admin_screen.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/screens/cart_screen.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/screens/checkout_screen.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/screens/customer_profile_screen.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/screens/home_screen.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/screens/registration_screen.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/screens/tracking_screen.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/screens/tracking_view.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/widgets/chamae_logo.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/widgets/pix_payment_dialog.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/widgets/product_image.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/widgets/real_web_map.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/widgets/sponsor_video_banner.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pubspec.lock', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pubspec.yaml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'test/checkout_delivery_contract_test.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'test/checkout_web_test.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'test/customer_auth_test.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'test/customer_orders_test.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'test/customer_visual_freeze_test.dart', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'test/customer_visual_homologation_test.dart', LF will be replaced by CRLF the next time Git touches it
+ android/app/build.gradle.kts                       |   78 +-
+ .../flutter/plugins/GeneratedPluginRegistrant.java |    5 +
+ .../main/res/drawable-v21/launch_background.xml    |   13 +-
+ .../src/main/res/drawable/launch_background.xml    |   13 +-
+ android/app/src/main/res/values-night/styles.xml   |    8 +-
+ android/app/src/main/res/values/styles.xml         |    8 +-
+ android/local.properties                           |    6 +-
+ design/references/customer_app/official/README.md  |   34 +-
+ firestore.rules                                    |   41 +-
+ functions/.eslintrc.js                             |   19 +-
+ functions/config/delivery-pricing-initial.json     |  195 +--
+ functions/courier-assignment.js                    |    7 +
+ functions/customer-onboarding.js                   |    3 +
+ functions/customer-security.js                     |    2 +
+ functions/delivery-pricing.js                      |   28 +-
+ functions/delivery-service.js                      |   84 +-
+ functions/index.js                                 |  137 +-
+ functions/operational-contingency.js               |    7 +
+ functions/order-chat.js                            |    6 +
+ functions/order-operations.js                      |   57 +-
+ functions/package.json                             |    7 +-
+ functions/test/backend-fixture.js                  |    2 +
+ functions/test/delivery-contracts.spec.js          |   11 +-
+ functions/test/delivery-official.spec.js           |  107 +-
+ functions/test/delivery-radius.emulator.spec.js    |    7 +-
+ functions/test/final-operations.emulator.spec.js   |   12 +-
+ functions/test/financial.spec.js                   |  225 ++-
+ functions/test/firestore.rules.spec.js             |    7 +-
+ functions/test/pilot.emulator.spec.js              |   18 +-
+ ios/Runner/Base.lproj/LaunchScreen.storyboard      |    2 +-
+ ios/Runner/GeneratedPluginRegistrant.m             |    7 +
+ lib/core/models.dart                               |    8 +
+ lib/data/customer_auth.dart                        |   85 +-
+ lib/data/customer_bootstrap.dart                   |   10 +-
+ lib/data/customer_orders.dart                      |   35 +-
+ lib/data/customer_workspace.dart                   |   21 +-
+ lib/data/delivery_quote.dart                       |   57 +-
+ lib/screens/cart_screen.dart                       |  281 ++--
+ lib/screens/checkout_screen.dart                   |  106 +-
+ lib/screens/customer_profile_screen.dart           |   57 +-
+ lib/screens/customer_session_gate.dart             |   55 +-
+ lib/screens/home_screen.dart                       | 1467 +++++++++++---------
+ lib/screens/splash_screen.dart                     |  216 ++-
+ lib/screens/tracking_screen.dart                   |   12 +-
+ lib/screens/tracking_view.dart                     |  196 ++-
+ lib/widgets/pix_payment_dialog.dart                |   31 +-
+ lib/widgets/product_image.dart                     |   71 +-
+ lib/widgets/sponsor_video_banner.dart              |  183 ++-
+ pubspec.yaml                                       |    2 +
+ test/checkout_delivery_contract_test.dart          |   66 +-
+ test/checkout_web_test.dart                        |   12 +-
+ test/client_readiness_test.dart                    |   23 +-
+ test/customer_auth_test.dart                       |   10 +-
+ test/customer_orders_test.dart                     |    9 +-
+ test/customer_visual_freeze_test.dart              |    6 +-
+ test/customer_visual_homologation_test.dart        |    3 +
+ test/delivery_quote_state_test.dart                |   43 +
+ 57 files changed, 2717 insertions(+), 1504 deletions(-)

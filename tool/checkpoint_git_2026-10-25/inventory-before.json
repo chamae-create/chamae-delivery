@@ -1,0 +1,4001 @@
+{
+  "status": [
+    {
+      "status": " M",
+      "path": "android/app/build.gradle.kts"
+    },
+    {
+      "status": " M",
+      "path": "android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java"
+    },
+    {
+      "status": " M",
+      "path": "android/app/src/main/res/drawable-v21/launch_background.xml"
+    },
+    {
+      "status": " M",
+      "path": "android/app/src/main/res/drawable/launch_background.xml"
+    },
+    {
+      "status": " M",
+      "path": "android/app/src/main/res/values-night/styles.xml"
+    },
+    {
+      "status": " M",
+      "path": "android/app/src/main/res/values/styles.xml"
+    },
+    {
+      "status": " M",
+      "path": "android/local.properties"
+    },
+    {
+      "status": " M",
+      "path": "design/references/customer_app/official/README.md"
+    },
+    {
+      "status": " M",
+      "path": "firestore.rules"
+    },
+    {
+      "status": " M",
+      "path": "functions/.eslintrc.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/config/delivery-pricing-initial.json"
+    },
+    {
+      "status": " M",
+      "path": "functions/courier-assignment.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/customer-onboarding.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/customer-security.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/delivery-pricing.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/delivery-service.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/index.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/operational-contingency.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/order-chat.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/order-operations.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/package.json"
+    },
+    {
+      "status": " M",
+      "path": "functions/test/backend-fixture.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/test/delivery-contracts.spec.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/test/delivery-official.spec.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/test/delivery-radius.emulator.spec.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/test/final-operations.emulator.spec.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/test/financial.spec.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/test/firestore.rules.spec.js"
+    },
+    {
+      "status": " M",
+      "path": "functions/test/pilot.emulator.spec.js"
+    },
+    {
+      "status": " M",
+      "path": "ios/Runner/Base.lproj/LaunchScreen.storyboard"
+    },
+    {
+      "status": " M",
+      "path": "ios/Runner/GeneratedPluginRegistrant.m"
+    },
+    {
+      "status": " M",
+      "path": "lib/core/models.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/data/customer_auth.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/data/customer_bootstrap.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/data/customer_orders.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/data/customer_workspace.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/data/delivery_quote.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/screens/admin_screen.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/screens/cart_screen.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/screens/checkout_screen.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/screens/customer_profile_screen.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/screens/customer_session_gate.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/screens/home_screen.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/screens/registration_screen.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/screens/splash_screen.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/screens/tracking_screen.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/screens/tracking_view.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/widgets/chamae_logo.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/widgets/pix_payment_dialog.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/widgets/product_image.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/widgets/real_web_map.dart"
+    },
+    {
+      "status": " M",
+      "path": "lib/widgets/sponsor_video_banner.dart"
+    },
+    {
+      "status": " M",
+      "path": "pubspec.yaml"
+    },
+    {
+      "status": " M",
+      "path": "test/checkout_delivery_contract_test.dart"
+    },
+    {
+      "status": " M",
+      "path": "test/checkout_web_test.dart"
+    },
+    {
+      "status": " M",
+      "path": "test/client_readiness_test.dart"
+    },
+    {
+      "status": " M",
+      "path": "test/customer_auth_test.dart"
+    },
+    {
+      "status": " M",
+      "path": "test/customer_orders_test.dart"
+    },
+    {
+      "status": " M",
+      "path": "test/customer_visual_freeze_test.dart"
+    },
+    {
+      "status": " M",
+      "path": "test/customer_visual_homologation_test.dart"
+    },
+    {
+      "status": " M",
+      "path": "test/delivery_quote_state_test.dart"
+    },
+    {
+      "status": "??",
+      "path": "android/app/src/main/res/drawable-nodpi/splash_gold.png"
+    },
+    {
+      "status": "??",
+      "path": "android/app/src/main/res/values-night-v31/styles.xml"
+    },
+    {
+      "status": "??",
+      "path": "android/app/src/main/res/values-v31/styles.xml"
+    },
+    {
+      "status": "??",
+      "path": "android/key.properties.example"
+    },
+    {
+      "status": "??",
+      "path": "assets/images/home/commerce_backdrop.png"
+    },
+    {
+      "status": "??",
+      "path": "assets/images/home/logo_transparent.png"
+    },
+    {
+      "status": "??",
+      "path": "assets/images/splash/chamae_official_gold_2026_10_21.jpeg"
+    },
+    {
+      "status": "??",
+      "path": "design/references/customer_app/official/baseline_manifest.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/APP-CLIENTE-CONSOLIDACAO-FINAL-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/CORRECAO-TESTES-CHECKOUT-2026-10-25.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/EXCLUSAO-CONTA-E-CONFIRMACAO-PEDIDO-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/KB-03-HORARIO-PAIS-BACKEND-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/KB-04-CANCELAMENTO-COMPENSACOES-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/KB-05-CONTINGENCIA-ENTREGA-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/KB-06-PRIVACIDADE-APPLE-CONTA-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/KB-07-ANDROID-SIGNING-BUILD-2026-10-25.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/app_cliente_final_2026-10-24/carrinho.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/app_cliente_final_2026-10-24/categorias.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/app_cliente_final_2026-10-24/checkout.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/app_cliente_final_2026-10-24/confirmacao.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/app_cliente_final_2026-10-24/home.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/app_cliente_final_2026-10-24/perfil.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/app_cliente_final_2026-10-24/produto.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/app_cliente_final_2026-10-24/tracking-progresso.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/app_cliente_final_2026-10-24/tracking.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/frete_ponta_a_ponta_2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_official_visual_audit_2026-10-21.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/README.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/capture_inventory.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/cart-state.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/catalog.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/categories-preview.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/empty.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/error.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/home.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/large-text.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/no-address.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/popular.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/promotions.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/quote-error.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/home_visual_sprint_2026-10-21/search.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/README.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/actual_app_splash.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/cold_01_metrics.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/cold_01_start.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/cold_02_metrics.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/cold_02_start.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/cold_sequence.mp4"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/error_retry.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/official_splash.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/reduced_motion.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/reopen_no_replay.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/reopen_start.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/sequence_start.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_final_correction_2026-10-21/validation.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/README.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/cold_01_metrics.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/cold_01_start.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/cold_02_metrics.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/cold_02_start.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/cold_sequence.mp4"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/comparison.html"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/error_retry.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/official_splash.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/reduced_motion.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/reopen_no_replay.png"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/reopen_start.txt"
+    },
+    {
+      "status": "??",
+      "path": "docs/splash_official_validation_2026-10-21/sequence_start.txt"
+    },
+    {
+      "status": "??",
+      "path": "firebase.account-test.json"
+    },
+    {
+      "status": "??",
+      "path": "firebase.frete-test.json"
+    },
+    {
+      "status": "??",
+      "path": "functions/customer-account-state.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/customer-account.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/customer-provider-revocation.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/delivery-contingency-state.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/delivery-contingency.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/destination-country.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/order-acceptance.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/order-cancellation-state.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/order-cancellation.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/customer-account.emulator.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/customer-account.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/customer-privacy.emulator.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/customer-provider-revocation.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/delivery-contingency.emulator.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/delivery-contingency.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/delivery-fixture.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/delivery-pricing-fixture.json"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/operational-fixture.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/order-acceptance.emulator.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/order-acceptance.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/order-cancellation.emulator.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "functions/test/order-cancellation.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "lib/core/order_confirmation_policy.dart"
+    },
+    {
+      "status": "??",
+      "path": "lib/data/customer_account.dart"
+    },
+    {
+      "status": "??",
+      "path": "lib/data/customer_local_privacy.dart"
+    },
+    {
+      "status": "??",
+      "path": "lib/screens/customer_account_closure_screen.dart"
+    },
+    {
+      "status": "??",
+      "path": "lib/widgets/customer_feedback.dart"
+    },
+    {
+      "status": "??",
+      "path": "lib/widgets/order_confirmation.dart"
+    },
+    {
+      "status": "??",
+      "path": "lib/widgets/store_hours_builder.dart"
+    },
+    {
+      "status": "??",
+      "path": "test/app_client_final_test.dart"
+    },
+    {
+      "status": "??",
+      "path": "test/app_client_final_visual_test.dart"
+    },
+    {
+      "status": "??",
+      "path": "test/customer_account_cycle_test.dart"
+    },
+    {
+      "status": "??",
+      "path": "test/customer_privacy_test.dart"
+    },
+    {
+      "status": "??",
+      "path": "test/home_visual_sprint_test.dart"
+    },
+    {
+      "status": "??",
+      "path": "test/order_acceptance_test.dart"
+    },
+    {
+      "status": "??",
+      "path": "test/splash_official_test.dart"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/firestore.rules.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/functions__customer-onboarding.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/functions__customer-security.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/functions__delivery-service.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/functions__index.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/functions__order-chat.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/lib__data__customer_auth.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/lib__data__customer_orders.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/lib__data__customer_workspace.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/lib__screens__customer_profile_screen.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/lib__screens__tracking_screen.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/lib__widgets__order_confirmation.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/before/lib__widgets__pix_payment_dialog.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/account_cycle/protected-before.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/assets-contrast.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/before/lib__screens__cart_screen.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/before/lib__screens__checkout_screen.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/before/lib__screens__customer_profile_screen.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/before/lib__screens__home_screen.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/before/lib__screens__tracking_screen.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/before/lib__screens__tracking_view.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/before/lib__widgets__product_image.dart.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/build-proof.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/address_empty_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/cart_1440.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/cart_320.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/cart_360.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/cart_390.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/cart_430.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/cart_768.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/cart_empty_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/categories_1440.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/categories_320.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/categories_360.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/categories_390.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/categories_430.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/categories_768.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/checkout_1440.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/checkout_320.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/checkout_360.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/checkout_390.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/checkout_430.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/checkout_768.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/confirmation_390.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/confirmation_cta_390.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/home_1440.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/home_320.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/home_360.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/home_390.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/home_430.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/home_768.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/home_empty_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/home_error_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/home_loading_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/login_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/login_error_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/onboarding_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/onboarding_footer_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/product_1440.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/product_320.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/product_360.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/product_390.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/product_430.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/product_768.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/product_footer_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/profile_1440.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/profile_320.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/profile_360.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/profile_390.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/profile_430.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/profile_768.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/profile_footer_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/splash_error_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/splash_loading_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/tracking_1440.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/tracking_320.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/tracking_360.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/tracking_390.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/tracking_390_final.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/tracking_430.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/tracking_768.0.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/tracking_error_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/tracking_footer_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/tracking_loading_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/tracking_progress_390.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/captures/tracking_unavailable_360.png"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/own-changes.diff"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/preservation.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/app_cliente_final/preserved-before.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/checkout_test_fixes_2026-10-25/checkout_delivery_contract_test.before.dart.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/checkout_test_fixes_2026-10-25/client_readiness_test.before.dart.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/checkout_test_fixes_2026-10-25/final-evidence.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/checkout_test_fixes_2026-10-25/protected-after.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/checkout_test_fixes_2026-10-25/protected-before.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/docs__HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/docs__HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/firestore.rules.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/functions__.eslintrc.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/functions__delivery-service.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/functions__index.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/functions__test__delivery-fixture.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/functions__test__delivery-official.spec.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/functions__test__delivery-radius.emulator.spec.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/functions__test__final-operations.emulator.spec.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/functions__test__financial.spec.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/functions__test__firestore.rules.spec.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/before/functions__test__pilot.emulator.spec.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb03/protected-before.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb04/before/docs__HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb04/before/docs__HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb04/before/functions__.eslintrc.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb04/before/functions__index.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb04/before/functions__package.json.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb04/before/functions__test__financial.spec.js.before"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb04/protected-before.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/firestore.rules"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/functions/.eslintrc.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/functions/courier-assignment.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/functions/index.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/functions/operational-contingency.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/functions/order-cancellation.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/functions/order-operations.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/functions/package.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/functions/test/final-operations.emulator.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/functions/test/financial.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/functions/test/order-cancellation.emulator.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/panel-operational_contingency.dart.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/before/pilot.emulator.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/checklist-consistency.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/delivery_contingency_test.dart.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/operational_contingency.dart.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/protected-after.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb05/protected-before.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/functions/.eslintrc.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/functions/customer-account-state.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/functions/customer-account.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/functions/package.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/functions/test/customer-account.emulator.spec.js"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/lib/core/models.dart.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/lib/data/customer_account.dart.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/lib/data/customer_auth.dart.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/lib/data/customer_bootstrap.dart.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/lib/main.dart.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/lib/screens/customer_account_closure_screen.dart.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/before/lib/screens/customer_session_gate.dart.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/checklist-consistency.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/final-evidence.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/protected-after.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/protected-before.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/retomada-2026-10-25/checklist-consistency.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/retomada-2026-10-25/code-after.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/retomada-2026-10-25/code-before.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/retomada-2026-10-25/final-evidence.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb06/retomada-2026-10-25/protected.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb07/before/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb07/before/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb07/before/app.build.gradle.kts.txt"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb07/checklist-consistency.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb07/final-evidence.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb07/gradle-validation.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb07/guard-evidence.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb07/protected-after.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb07/protected-before.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb07/secrets-audit.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/kb07/signing-preflight-result.json"
+    },
+    {
+      "status": "??",
+      "path": "tool/visual_device/capture.ps1"
+    },
+    {
+      "status": "??",
+      "path": "tool/visual_home/capture.ps1"
+    },
+    {
+      "status": "??",
+      "path": "tool/visual_home/main.dart"
+    },
+    {
+      "status": "??",
+      "path": "tool/visual_splash/capture.ps1"
+    },
+    {
+      "status": "??",
+      "path": "tool/visual_splash/main.dart"
+    }
+  ],
+  "tracked": [
+    ".firebaserc",
+    ".gitignore",
+    ".metadata",
+    "README.md",
+    "analysis_options.yaml",
+    "android/.gitignore",
+    "android/app/build.gradle.kts",
+    "android/app/google-services.json",
+    "android/app/src/debug/AndroidManifest.xml",
+    "android/app/src/main/AndroidManifest.xml",
+    "android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java",
+    "android/app/src/main/kotlin/br/com/loumak/chamae/MainActivity.kt",
+    "android/app/src/main/res/drawable-v21/launch_background.xml",
+    "android/app/src/main/res/drawable/launch_background.xml",
+    "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+    "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+    "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+    "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+    "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+    "android/app/src/main/res/values-night/styles.xml",
+    "android/app/src/main/res/values/styles.xml",
+    "android/app/src/profile/AndroidManifest.xml",
+    "android/build.gradle.kts",
+    "android/gradle.properties",
+    "android/gradle/wrapper/gradle-wrapper.properties",
+    "android/local.properties",
+    "android/settings.gradle.kts",
+    "assets/images/logo.png",
+    "assets/images/pitstop_promo.gif",
+    "assets/images/pitstop_promo.mp4",
+    "assets/images/splash_bg.png",
+    "codemagic.yaml",
+    "design/references/customer_app/official/01_categories_reference.jpeg",
+    "design/references/customer_app/official/02_home_reference.jpeg",
+    "design/references/customer_app/official/03_cart_reference.jpeg",
+    "design/references/customer_app/official/04_checkout_reference.jpeg",
+    "design/references/customer_app/official/05_tracking_reference.jpeg",
+    "design/references/customer_app/official/06_product_reference.jpeg",
+    "design/references/customer_app/official/07_profile_reference.jpeg",
+    "design/references/customer_app/official/README.md",
+    "docs/android_toolchain_google_oauth_2026-10-18.md",
+    "docs/app_cliente_final_readiness_2026-10-18.md",
+    "docs/app_cliente_fluxo_oficial_auditoria_2026-10-18.md",
+    "docs/app_cliente_store_checklist_2026-10-18.md",
+    "docs/chamae_ux_1810_frete_30km_auditoria.md",
+    "docs/chamae_ux_1810_frete_30km_readiness.md",
+    "docs/codemagic_ios_setup.md",
+    "docs/config/customer_documents.draft.json",
+    "docs/config/firebase_legacy/README.md",
+    "docs/customer_order_access.md",
+    "docs/customer_visual_freeze_with_references_2026-10-20.md",
+    "docs/customer_visual_homologation_2026-10-20.md",
+    "docs/customer_visual_real_device_homologation_2026-10-20.md",
+    "docs/firestore_rules_audit.md",
+    "docs/flutterfire_mobile_configuration_2026-10-18.md",
+    "docs/frete_google_routes_final_readiness_2026-10-19.md",
+    "docs/frete_raio_operacional_readiness_2026-10-19.md",
+    "docs/git_checkpoint_audit_2026-10-20.md",
+    "docs/git_checkpoint_execution_2026-10-20.md",
+    "docs/google_authentication_audit_2026-10-18.md",
+    "docs/post_login_firestore_audit_2026-10-19.md",
+    "docs/production_identifiers_migration_2026-10-18.md",
+    "docs/visual_homologation_real_device_2026-10-20/analyze_result.txt",
+    "docs/visual_homologation_real_device_2026-10-20/build_apk_result.txt",
+    "docs/visual_homologation_real_device_2026-10-20/capture_inventory.json",
+    "docs/visual_homologation_real_device_2026-10-20/local_cart-footer.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_cart.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_catalog.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_categories.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_chat-keyboard-footer.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_chat-keyboard.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_chat-merchant-footer.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_chat-merchant.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_chat.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_checkout-footer.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_checkout.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_history.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_home.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_home_products.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_map-footer.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_map.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_orders.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-creating.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-error.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-expired.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-footer.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-paid.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-qr.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-retry.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-waiting.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_product-footer.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_product.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_profile-footer.png",
+    "docs/visual_homologation_real_device_2026-10-20/local_profile.png",
+    "docs/visual_homologation_real_device_2026-10-20/preservation.json",
+    "docs/visual_homologation_real_device_2026-10-20/references_inventory.json",
+    "docs/visual_homologation_real_device_2026-10-20/test_result.txt",
+    "docs/visual_homologation_real_device_2026-10-20/tests_result.txt",
+    "firebase.json",
+    "firebase.pilot.json",
+    "firebase.post_login.json",
+    "firestore.indexes.json",
+    "firestore.rules",
+    "functions/.eslintrc.js",
+    "functions/.gitignore",
+    "functions/catalog-commercial-policy.js",
+    "functions/config/delivery-pricing-initial.json",
+    "functions/courier-assignment.js",
+    "functions/courier-deliveries.js",
+    "functions/courier-dispatch-contract.js",
+    "functions/customer-identity.js",
+    "functions/customer-onboarding.js",
+    "functions/customer-security.js",
+    "functions/delivery-pin.js",
+    "functions/delivery-pricing.js",
+    "functions/delivery-service.js",
+    "functions/docs/courier-assignment.md",
+    "functions/docs/courier-deliveries.md",
+    "functions/docs/customer-auth-onboarding.md",
+    "functions/docs/operational-flow.md",
+    "functions/docs/order-chat-and-printing.md",
+    "functions/docs/pilot.md",
+    "functions/google-routes-provider.js",
+    "functions/index.js",
+    "functions/operational-contingency.js",
+    "functions/order-chat.js",
+    "functions/order-operations.js",
+    "functions/order-printing.js",
+    "functions/package-lock.json",
+    "functions/package.json",
+    "functions/scripts/audit-orders.js",
+    "functions/test/audit-orders.spec.js",
+    "functions/test/backend-fixture.js",
+    "functions/test/courier-assignment.emulator.spec.js",
+    "functions/test/courier-assignment.spec.js",
+    "functions/test/courier-deliveries.emulator.spec.js",
+    "functions/test/courier-deliveries.spec.js",
+    "functions/test/customer-onboarding.spec.js",
+    "functions/test/customer-policy-fixture.js",
+    "functions/test/delivery-contracts.spec.js",
+    "functions/test/delivery-official.spec.js",
+    "functions/test/delivery-radius.emulator.spec.js",
+    "functions/test/final-operations.emulator.spec.js",
+    "functions/test/financial.spec.js",
+    "functions/test/firestore.rules.spec.js",
+    "functions/test/order-chat.emulator.spec.js",
+    "functions/test/order-operations.spec.js",
+    "functions/test/pilot.emulator.spec.js",
+    "ios/.gitignore",
+    "ios/Flutter/AppFrameworkInfo.plist",
+    "ios/Flutter/Debug.xcconfig",
+    "ios/Flutter/Generated.xcconfig",
+    "ios/Flutter/Release.xcconfig",
+    "ios/Flutter/ephemeral/flutter_lldb_helper.py",
+    "ios/Flutter/ephemeral/flutter_lldbinit",
+    "ios/Flutter/ephemeral/flutter_native_integration.env",
+    "ios/Flutter/flutter_export_environment.sh",
+    "ios/Podfile",
+    "ios/Runner.xcodeproj/project.pbxproj",
+    "ios/Runner.xcodeproj/project.xcworkspace/contents.xcworkspacedata",
+    "ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+    "ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings",
+    "ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme",
+    "ios/Runner.xcworkspace/contents.xcworkspacedata",
+    "ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+    "ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings",
+    "ios/Runner/AppDelegate.swift",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png",
+    "ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json",
+    "ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png",
+    "ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png",
+    "ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png",
+    "ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md",
+    "ios/Runner/Base.lproj/LaunchScreen.storyboard",
+    "ios/Runner/Base.lproj/Main.storyboard",
+    "ios/Runner/GeneratedPluginRegistrant.h",
+    "ios/Runner/GeneratedPluginRegistrant.m",
+    "ios/Runner/GoogleService-Info.plist",
+    "ios/Runner/Info.plist",
+    "ios/Runner/Runner-Bridging-Header.h",
+    "ios/Runner/SceneDelegate.swift",
+    "ios/RunnerTests/RunnerTests.swift",
+    "lib/core/cart_validation.dart",
+    "lib/core/catalog.dart",
+    "lib/core/catalog_commercial_policy.dart",
+    "lib/core/models.dart",
+    "lib/core/store_hours.dart",
+    "lib/core/theme.dart",
+    "lib/core/utils.dart",
+    "lib/data/customer_auth.dart",
+    "lib/data/customer_bootstrap.dart",
+    "lib/data/customer_location.dart",
+    "lib/data/customer_onboarding.dart",
+    "lib/data/customer_orders.dart",
+    "lib/data/customer_verification.dart",
+    "lib/data/customer_workspace.dart",
+    "lib/data/delivery_quote.dart",
+    "lib/data/geocoded_address.dart",
+    "lib/data/order_attempt.dart",
+    "lib/data/order_notifications.dart",
+    "lib/data/restore_customer_cart.dart",
+    "lib/data/reverse_geocode.dart",
+    "lib/data/reverse_geocode_native.dart",
+    "lib/data/reverse_geocode_web.dart",
+    "lib/firebase_options.dart",
+    "lib/main.dart",
+    "lib/order_chat.dart",
+    "lib/screens/address_destination_screen.dart",
+    "lib/screens/address_map_screen.dart",
+    "lib/screens/admin_screen.dart",
+    "lib/screens/cart_screen.dart",
+    "lib/screens/checkout_screen.dart",
+    "lib/screens/customer_login_screen.dart",
+    "lib/screens/customer_onboarding_screen.dart",
+    "lib/screens/customer_profile_screen.dart",
+    "lib/screens/customer_session_gate.dart",
+    "lib/screens/home_screen.dart",
+    "lib/screens/legal_document_screen.dart",
+    "lib/screens/motoboy_screen.dart",
+    "lib/screens/registration_screen.dart",
+    "lib/screens/splash_screen.dart",
+    "lib/screens/tracking_screen.dart",
+    "lib/screens/tracking_view.dart",
+    "lib/widgets/chamae_logo.dart",
+    "lib/widgets/customer_chat_entry.dart",
+    "lib/widgets/customer_order_history_card.dart",
+    "lib/widgets/customer_visual.dart",
+    "lib/widgets/delivery_pin_card.dart",
+    "lib/widgets/delivery_quote_summary.dart",
+    "lib/widgets/order_notification_card.dart",
+    "lib/widgets/pix_payment_dialog.dart",
+    "lib/widgets/pix_payment_presentation.dart",
+    "lib/widgets/product_image.dart",
+    "lib/widgets/real_web_map.dart",
+    "lib/widgets/sponsor_video_banner.dart",
+    "linux/flutter/generated_plugin_registrant.cc",
+    "linux/flutter/generated_plugin_registrant.h",
+    "linux/flutter/generated_plugins.cmake",
+    "macos/Flutter/GeneratedPluginRegistrant.swift",
+    "macos/Flutter/ephemeral/Flutter-Generated.xcconfig",
+    "macos/Flutter/ephemeral/flutter_export_environment.sh",
+    "macos/Flutter/ephemeral/flutter_native_integration.env",
+    "pubspec.lock",
+    "pubspec.yaml",
+    "test/address_flow_test.dart",
+    "test/catalog_test.dart",
+    "test/checkout_delivery_contract_test.dart",
+    "test/checkout_web_test.dart",
+    "test/client_readiness_test.dart",
+    "test/customer_auth_test.dart",
+    "test/customer_flow_test.dart",
+    "test/customer_location_test.dart",
+    "test/customer_orders_test.dart",
+    "test/customer_premium_components_test.dart",
+    "test/customer_visual_freeze_test.dart",
+    "test/customer_visual_homologation_test.dart",
+    "test/customer_visual_states_test.dart",
+    "test/delivery_quote_state_test.dart",
+    "test/google_login_test.dart",
+    "test/order_attempt_test.dart",
+    "test/order_chat_test.dart",
+    "test/order_notification_test.dart",
+    "test/pix_payment_presentation_test.dart",
+    "test/production_firebase_configuration_test.dart",
+    "test/restore_customer_cart_test.dart",
+    "test/support/customer_flow_fakes.dart",
+    "test/workspace_cart_test.dart",
+    "tool/chrome_test_assets.mjs",
+    "tool/visual_device/README.md",
+    "tool/visual_device/local_qr.dart",
+    "tool/visual_device/main.dart",
+    "tool/visual_freeze/build_results.json",
+    "tool/visual_freeze/check_results.json",
+    "tool/visual_freeze/preservation_final.json",
+    "tool/visual_freeze/protected_hashes.json",
+    "tool/visual_homologation/after/cart_1440.0.png",
+    "tool/visual_homologation/after/cart_320.0.png",
+    "tool/visual_homologation/after/categories_1440.0.png",
+    "tool/visual_homologation/after/categories_320.0.png",
+    "tool/visual_homologation/after/checkout_1440.0.png",
+    "tool/visual_homologation/after/checkout_320.0.png",
+    "tool/visual_homologation/after/home_1440.0.png",
+    "tool/visual_homologation/after/home_320.0.png",
+    "tool/visual_homologation/after/product_1440.0.png",
+    "tool/visual_homologation/after/product_320.0.png",
+    "tool/visual_homologation/after/profile_1440.0.png",
+    "tool/visual_homologation/after/profile_320.0.png",
+    "tool/visual_homologation/after/tracking_1440.0.png",
+    "tool/visual_homologation/after/tracking_320.0.png",
+    "tool/visual_homologation/build_results.json",
+    "tool/visual_homologation/check_results.json",
+    "tool/visual_homologation/original_capture_inventory.json",
+    "tool/visual_homologation/preservation.json",
+    "tool/visual_homologation/supplementary/address_empty_360.png",
+    "tool/visual_homologation/supplementary/cart_empty_360.png",
+    "tool/visual_homologation/supplementary/home_empty_360.png",
+    "tool/visual_homologation/supplementary/home_error_360.png",
+    "tool/visual_homologation/supplementary/home_loading_360.png",
+    "tool/visual_homologation/supplementary/login_360.png",
+    "tool/visual_homologation/supplementary/login_error_360.png",
+    "tool/visual_homologation/supplementary/onboarding_360.png",
+    "tool/visual_homologation/supplementary/onboarding_footer_360.png",
+    "tool/visual_homologation/supplementary/profile_footer_360.png",
+    "tool/visual_homologation/supplementary/splash_error_360.png",
+    "tool/visual_homologation/supplementary/splash_loading_360.png",
+    "tool/visual_homologation/supplementary/tracking_error_360.png",
+    "tool/visual_homologation/supplementary/tracking_loading_360.png",
+    "tool/visual_homologation/supplementary/tracking_unavailable_360.png",
+    "web/favicon.png",
+    "web/icons/Icon-192.png",
+    "web/icons/Icon-512.png",
+    "web/icons/Icon-maskable-192.png",
+    "web/icons/Icon-maskable-512.png",
+    "web/index.html",
+    "web/manifest.json"
+  ],
+  "baseline": {
+    ".firebaserc": "43abb6fbd2bc489069ac3370a015d0dce10b524b7d636ce718da471d89b88288",
+    ".gitignore": "0bafdd23c8469350db0179ab545a44fa047d6015b73f6b7852c1f3ec3d02465d",
+    ".metadata": "efc9d830c3d630092d3c8bc4c749c4586e14b9de6d3003e763d1bebe5e7bd923",
+    "README.md": "8d65fe10fe70ff7980fb6e52c941c27de93a90f2c11d0d310ee7136580be94a4",
+    "analysis_options.yaml": "98d70dd5a9033911f40e2e7f3ff9d74618e2aa13652990efe860ed0fe1cedfa9",
+    "android/.gitignore": "c9af75dbc2c8aa867476a09426c80b178c4aeed8b9393ae48503eedfa3273d71",
+    "android/app/build.gradle.kts": "0f1808fe0f508c9f4bcde5c1df7d37931fb8d84fb7f94ad41a406616d705083f",
+    "android/app/google-services.json": "b75c1f1d4ae7bd5074201415d0f9fb642a67bdd9bd1ce7117744e56dbbd52ca5",
+    "android/app/src/debug/AndroidManifest.xml": "b01a4541a8144c15bc617bab7eb267c99fa1476368fbbda5a12cdbf4e316a34c",
+    "android/app/src/main/AndroidManifest.xml": "cd6dc3bcfe569bca2a5118e8c40f4d76c5a1ee5e19bb4850ceffbcf96364e00c",
+    "android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java": "efa8831641dfcf291ca64f3b07690fe446036d39d797acff90685b59947f75aa",
+    "android/app/src/main/kotlin/br/com/loumak/chamae/MainActivity.kt": "361db61e81d20e7d4e95e2de46086b0413b47019ac991d2af05f9483a3b95108",
+    "android/app/src/main/res/drawable-v21/launch_background.xml": "d74fef903916a0c8be0f50ae1928f3defae6a3f0ddf75306fb2101b1408993ad",
+    "android/app/src/main/res/drawable/launch_background.xml": "d74fef903916a0c8be0f50ae1928f3defae6a3f0ddf75306fb2101b1408993ad",
+    "android/app/src/main/res/mipmap-hdpi/ic_launcher.png": "6a7c8f0d703e3682108f9662f813302236240d3f8f638bb391e32bfb96055fef",
+    "android/app/src/main/res/mipmap-mdpi/ic_launcher.png": "c7c0c0189145e4e32a401c61c9bdc615754b0264e7afae24e834bb81049eaf81",
+    "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png": "e14aa40904929bf313fded22cf7e7ffcbf1d1aac4263b5ef1be8bfce650397aa",
+    "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png": "4d470bf22d5c17d84edc5f82516d1ba8a1c09559cd761cefb792f86d9f52b540",
+    "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": "3c34e1f298d0c9ea3455d46db6b7759c8211a49e9ec6e44b635fc5c87dfb4180",
+    "android/app/src/main/res/values-night/styles.xml": "28977fce4ce697b06ddd1e0d728e98944c17de91b29dc05cd4f42cbaac4323a1",
+    "android/app/src/main/res/values/styles.xml": "05b6f4b63d76f394be31d438874ddd4ab04cc0b130699db7a55df2a3dec2cb46",
+    "android/app/src/profile/AndroidManifest.xml": "b01a4541a8144c15bc617bab7eb267c99fa1476368fbbda5a12cdbf4e316a34c",
+    "android/build.gradle.kts": "218f400e3fff31c9c986a2535dfb974560e1b4d33cc27b7c1fee96a2b7e44454",
+    "android/gradle.properties": "7714698de712a7872e371f0dbae626c255fc83ac1c15e52e7cd9fcaa241b5092",
+    "android/gradle/wrapper/gradle-wrapper.properties": "594a00250ef7a36609a01f3263bf5ed63963afaf9ca9f82f2cd1de0f6f056383",
+    "android/local.properties": "3e0e8636dae38c1b4d2c1f150f7121f7dd66481e3ec4071efe999e46be89f70a",
+    "android/settings.gradle.kts": "9b3bfa8d4a1c4c0d96a863751a2c0f2ecfa1a36d576cf05059f1e757faf3fddf",
+    "assets/images/logo.png": "8e15275e286f6e972fe85a74fc8e2a68857c2452b9799dcb1f66c4ff42f30a11",
+    "assets/images/pitstop_promo.gif": "bcab83133c8c2c1bbbcd291e49191e56df0f2c1234e9f517de58ec1f80d0b1ff",
+    "assets/images/pitstop_promo.mp4": "77878bd730c6c3c9c8d8cf373b248a4afc280af7b4493148849d1cb8d6a4353c",
+    "assets/images/splash_bg.png": "397fa09a5d238fbce345800624eeaf1475f0e3ab5a71d021e8002d8b86f023a3",
+    "codemagic.yaml": "68f4066bdbdf6b56e0ad8a707d931c1b0579dfa1bdab7d2c949f7b881b0efba9",
+    "design/references/customer_app/official/01_categories_reference.jpeg": "71b4cb5b895f6d86080403c69fafc62f32467fd3c78797c9fc8aabdf12a73fc0",
+    "design/references/customer_app/official/02_home_reference.jpeg": "07629e2c7059536415059d65474e7e8d1ebde995799c6a1ee7f649f107c6bcf9",
+    "design/references/customer_app/official/03_cart_reference.jpeg": "96ba919d266645d6a56b5e5d3d841dbb4693f1a1d45dd93808f4cc193abf5574",
+    "design/references/customer_app/official/04_checkout_reference.jpeg": "80f8ce8d0ffa647316bd7feff00438e6bdd4b1f585f1e710383b285b95ee6bde",
+    "design/references/customer_app/official/05_tracking_reference.jpeg": "bd120031d4e4e9279bf6a2ae71293c6da6416c3666298bcf8e25279abfba8c5b",
+    "design/references/customer_app/official/06_product_reference.jpeg": "e02a9bf6234d4466ff00492db27959d290ded971a40f2a410d5af5bd10a9e8e5",
+    "design/references/customer_app/official/07_profile_reference.jpeg": "a22008ee5aec82bdc43d89c93970f28ae40c3e341da09b9c203fdcac152d8f29",
+    "design/references/customer_app/official/README.md": "960ff373e641d3b98071f51de9e93872076324218fff4274d68b175d7290511f",
+    "docs/android_toolchain_google_oauth_2026-10-18.md": "dbce40028b0edbfa81069e9b45b15bcfc3acda5383d91bf698606a84a5360fcf",
+    "docs/app_cliente_final_readiness_2026-10-18.md": "56e6b66f4ffe932ea2ed63a7a921a5ab8c713365d44a98ceef1cc2c63496c726",
+    "docs/app_cliente_fluxo_oficial_auditoria_2026-10-18.md": "d38c41866a305665a32318d167af1ca940380446b3f96f94943b1ca72f116210",
+    "docs/app_cliente_store_checklist_2026-10-18.md": "95c15ab041032e462ad95bb54f8042dc95ebe3be067edd248cac82846a6cad58",
+    "docs/chamae_ux_1810_frete_30km_auditoria.md": "4082d97933af2614e13bdf0b67be9c33b4b54a8bc3cbb216673583788fb08f18",
+    "docs/chamae_ux_1810_frete_30km_readiness.md": "56b534e6b4e0f423bc0652c18e6f6734d391e232c94928fcb5aec45500923a89",
+    "docs/codemagic_ios_setup.md": "21b4989f8764f9181c6ed5a35ac367415ed46ca6a96915a491ec9fef43de87a4",
+    "docs/config/customer_documents.draft.json": "f371e4e99dd269eec236acde491b87680d804b6af515c353f2f7a2c9e3ac18dd",
+    "docs/config/firebase_legacy/README.md": "6bbb6190505c953a2ab2b502e606abef277716cde186c68bd0b9c19ee91ba0d5",
+    "docs/customer_order_access.md": "1e584395306ba34a9f98122646827a26ac4285574411970dee621a0a841c7fdc",
+    "docs/customer_visual_freeze_with_references_2026-10-20.md": "b1745359c998e37e3d51335bf2b60929b00c2d75ddf1cab7dd1f42af2864f790",
+    "docs/customer_visual_homologation_2026-10-20.md": "3f56695d4d1ca6e6ad78b064b4d048a4a47f66755948e2232a07803388892817",
+    "docs/customer_visual_real_device_homologation_2026-10-20.md": "56d905f1d85df98a55f248af56ef90a901841b28caf1da4de066fdc29e06a940",
+    "docs/firestore_rules_audit.md": "9083fde35664db5e7942b2f10c51945d105f7a865108c5ba0724f4cecde954df",
+    "docs/flutterfire_mobile_configuration_2026-10-18.md": "c13c204a6fe05373a29a6deaa2164c3501dca47c95d6a1c829a9e11a692fb7a5",
+    "docs/frete_google_routes_final_readiness_2026-10-19.md": "a75872215c4ccb8f62dca872f0d7175faf15de3850618816eac20529aa0f451c",
+    "docs/frete_raio_operacional_readiness_2026-10-19.md": "fd2fd7cb3fc79d22e4781e0c501ce4051859197e12c7288335b3bb14c7829295",
+    "docs/git_checkpoint_audit_2026-10-20.md": "fcaf0f341694e61b5c47bcfcfb1bf854b04430b4df958d2571c39f8aff32cc0a",
+    "docs/git_checkpoint_execution_2026-10-20.md": "1b00d6c5a717c571b09cc11b83fce82f407158ddd72022f96f54c4e846db19c8",
+    "docs/google_authentication_audit_2026-10-18.md": "1a80a5a8864b37ed708bc058a4202d8086e62434f33637d39c9b1f097459cf0a",
+    "docs/post_login_firestore_audit_2026-10-19.md": "5b8f9c3f1a0619979b9e1fa4e13252301c0048e6d160f21c90082fd63a7cf148",
+    "docs/production_identifiers_migration_2026-10-18.md": "989f7f4818f4cb3c8df71fffe8fe089fa7ffe3af3e502cade6c123e887850368",
+    "docs/visual_homologation_real_device_2026-10-20/analyze_result.txt": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "docs/visual_homologation_real_device_2026-10-20/build_apk_result.txt": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "docs/visual_homologation_real_device_2026-10-20/capture_inventory.json": "b34c6cc433e676c56c048816b98aed469d8856cef93953e104c8dd0e2a970da0",
+    "docs/visual_homologation_real_device_2026-10-20/local_cart-footer.png": "66e48551841be2a2d0486fae9d296320d63c4f1cdd104fbddbd15b9dbc016e38",
+    "docs/visual_homologation_real_device_2026-10-20/local_cart.png": "9860be15affa2452c306000ab1384da68e39ef8d8727abf51ec12e4b8848d805",
+    "docs/visual_homologation_real_device_2026-10-20/local_catalog.png": "b1f58a2fcbfa1a2050263b684dafb4b22c702ca1ce8970099b96797ef1604abc",
+    "docs/visual_homologation_real_device_2026-10-20/local_categories.png": "d624e668be444673d0f19108755ebc9eafa3d19edb5a2f34792f83a1e365aad2",
+    "docs/visual_homologation_real_device_2026-10-20/local_chat-keyboard-footer.png": "cc6f2559f740870425110b74b3a19f720aceee1ec63c986b9c1c84a3708e8487",
+    "docs/visual_homologation_real_device_2026-10-20/local_chat-keyboard.png": "720a1f2f2aeb0d20f8344f2ed6a4d382f5f176b99376d012d5f9b596ee9305a2",
+    "docs/visual_homologation_real_device_2026-10-20/local_chat-merchant-footer.png": "931c20533227263a48ab793ebe830cd2026633ffae4b1c2c69bb024e0fa29936",
+    "docs/visual_homologation_real_device_2026-10-20/local_chat-merchant.png": "c16a811033b81d8ef0fa18c1e6905102dd3870c384afdd1957e7cd982e17fc3c",
+    "docs/visual_homologation_real_device_2026-10-20/local_chat.png": "331a83880012841337f972ca6a18a0a064563ad46eb41a5f9476227515b37c73",
+    "docs/visual_homologation_real_device_2026-10-20/local_checkout-footer.png": "216c0defad3161f1d018e05d79c4607bbbccf1bc111466b9412efd8666a542c3",
+    "docs/visual_homologation_real_device_2026-10-20/local_checkout.png": "1f4e94bffab1d8c6df195df6681bfaa208b34731086cb0eb06491d2350cecebc",
+    "docs/visual_homologation_real_device_2026-10-20/local_history.png": "b720b4e9f1c2166a06c3a737c63de28dc92683bf1a0cf81ce8185fee6a3101f4",
+    "docs/visual_homologation_real_device_2026-10-20/local_home.png": "599af64063c15e741ad777b543f7b77945b974ad0bd842154665deabe7ccd84e",
+    "docs/visual_homologation_real_device_2026-10-20/local_home_products.png": "6d1fa04489db66a0c95c790a68e092ee282afda23fb766d36d30da5e68e16f62",
+    "docs/visual_homologation_real_device_2026-10-20/local_map-footer.png": "3d847aa9eb0fe38f423428bfb881d74cead40b8ed3be69ec3aa1a07e8e3b0288",
+    "docs/visual_homologation_real_device_2026-10-20/local_map.png": "ce4e99cdddb32c114e03ad9b342f9e8f23c0741a8ed831ff22525e8a3841d60d",
+    "docs/visual_homologation_real_device_2026-10-20/local_orders.png": "572274ffd88c0bff87bf7543282bc5c0914b4431aadeeb55bfe34b5f3c5fec95",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-creating.png": "828aabea29c45380ce9f12ae11555f2f5af201403409b8d7ba4911c00cef228d",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-error.png": "dc87d42327d272e7c03b3a3e627d634b37918e8ecf6e166fbd5483234f27a0b8",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-expired.png": "40b6787922c7778ddac50f4a37a3524caa65483f57291a4e080cd308244c0881",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-footer.png": "a3b0618409deb65d5ef4db21c3d007909c66aaab77151b1cb3753c9586d36659",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-paid.png": "db71af34cdf43780f6b1b899cd6155132133b38486fb347bc142c6adbe4bf4a1",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-qr.png": "271ef8f29164f30166164c065dc249afdce180092ad083a9cc72634fc0f04ade",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-retry.png": "e376efae4fd300235f2c1cb983a746d3c95ab7f298575aa1e42277f34a80a8ab",
+    "docs/visual_homologation_real_device_2026-10-20/local_pix-waiting.png": "e242c2be7bc15c36dd579f0e59c0d2566580e3b955e95f0556a7702b06a95951",
+    "docs/visual_homologation_real_device_2026-10-20/local_product-footer.png": "b41e3aefc3f7a52543ce733b9198970af9d7b8cc3ebb2b6030ae5d54595cc4fd",
+    "docs/visual_homologation_real_device_2026-10-20/local_product.png": "0ccf6a8ec874d530370234079f446105a61f20a85fb323f0fdff45780081a653",
+    "docs/visual_homologation_real_device_2026-10-20/local_profile-footer.png": "b452093defa8e1596c5763f306b7de0318305fadda01e0889fc93f516d501712",
+    "docs/visual_homologation_real_device_2026-10-20/local_profile.png": "92234ae70111cd3eab215b8e80bba994154e9ef9575b2a94dc2dfcaa5a18d177",
+    "docs/visual_homologation_real_device_2026-10-20/preservation.json": "58fb4fb163436133a7cc8feb5dd108eb390a9d56bddedb5a2f9a6cc4438c5ed2",
+    "docs/visual_homologation_real_device_2026-10-20/references_inventory.json": "da180bcfdcab9a5287589021a0de3d1ae1cb925ae9102d5499c9eedd5b95341e",
+    "docs/visual_homologation_real_device_2026-10-20/test_result.txt": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "docs/visual_homologation_real_device_2026-10-20/tests_result.txt": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "firebase.json": "80c6d40e31a9faecd8338c5cd18a4c0982dbcb4f82f0fbb35aa9b3f01e2fb523",
+    "firebase.pilot.json": "f68f419393554f7fea55b7877036d637dedfef3bc4eb2c3f7ad2befbbadfe2de",
+    "firebase.post_login.json": "7f258434d15d70be6dc74720a4e605e60c6864eb018c7001f8fd5dba3e3e7936",
+    "firestore.indexes.json": "7df6fec99634d0e2e74b91bc4e4305e5ecfaeb4a4b71e582bac94e0c0bd04e3e",
+    "firestore.rules": "d428eb314b4e246563f1e8d3275a5be6c6bf6d84d9e9117947558e1f0d534415",
+    "functions/.eslintrc.js": "8397249b032366155b6b103eae007a983ede249bc751d9375dcdd3a990991432",
+    "functions/.gitignore": "e7c878f1962b5d93d05eb30ef6cb9f15afd803595a5d47208c7d62c10213d3a9",
+    "functions/catalog-commercial-policy.js": "a09381085056574ec19d15920b11efc77c4073b02b943347563166817d11e1af",
+    "functions/config/delivery-pricing-initial.json": "53b748aaab63c1198126a3eda6eccaff56dcf392d303a5a9bbef645b9c635b4b",
+    "functions/courier-assignment.js": "88d8f09660fb676a135d947ce7563f8cf4252662745b8a9630181680b575b703",
+    "functions/courier-deliveries.js": "21283bd853df1c371c07220d9f5701218776d08c7a104dbc010e9d11754d470c",
+    "functions/courier-dispatch-contract.js": "859167872c4b28291755cc6661bfa142188a7cafc7180f5d692a156e151ac025",
+    "functions/customer-identity.js": "9d4d18779c913bef208e8a3645e379fad692ef1a5e5ee480118d57f6e146e3a8",
+    "functions/customer-onboarding.js": "ea2bf897295974141e2fd10b583131f2089585eccbd4dbf6300e70fa81172300",
+    "functions/customer-security.js": "238f07251988a84ed7b0a3a5d86dafa5b6e0186a74cbb95394c6186985e64f5b",
+    "functions/delivery-pin.js": "ab6c947e2a26f994642aea4a6e764cb006c34707d9d9fb938f56efc41d624970",
+    "functions/delivery-pricing.js": "7fd520e0a81ab2d486bcee5e4dfbf86c56c6bdf64ead4da73e57c0f1718b0ab9",
+    "functions/delivery-service.js": "eb268f4794675d537802cc8f71ed7d13329269ee46b1a6241ca61ad6a169f9f8",
+    "functions/docs/courier-assignment.md": "46e32e6e3356eff0bc5870738ff0922b633a3679dc4a69d7f51df1795f979daa",
+    "functions/docs/courier-deliveries.md": "38d9bb0c8e0b07a3d494b9b315b28c35b5279e91e43fcc7ea6afd7e8656d0f1d",
+    "functions/docs/customer-auth-onboarding.md": "51d8a46df20610995daf523e75adb3ba74eda738fd877ceda6a9a18f00fab36b",
+    "functions/docs/operational-flow.md": "bf27e799886e554d85c8fafe1d004681dbd0878892c15d8fc5826638dfc67cc6",
+    "functions/docs/order-chat-and-printing.md": "a4afad5a82047ee4dc60df329a47f18d1235a7ff6d4d98b74caf511b3151ad57",
+    "functions/docs/pilot.md": "df51d53ffefff7849d825f3511c55ea349180db6684d49570b984063d60e38b7",
+    "functions/google-routes-provider.js": "054d4eecdb0d2959a93d94f0b690467b69f972b9376618b54d3dd30004a23bd1",
+    "functions/index.js": "446f6a08fc840e5af3ed30707d22c7daa1c03a3ee0d30137996896a5af62210b",
+    "functions/operational-contingency.js": "fe36cc99d8370e1c9ac1f68af3e73ea1d4d59b7dd22982821d0c6ca2eb52c754",
+    "functions/order-chat.js": "3fb7c9cf4a3d53d867ece1f539823c3164e3cefde7370984c0859da46fcea8a4",
+    "functions/order-operations.js": "8f9076646cb098a2c851c6235f8255cfa307f1171df5bc1249a34664ca455a17",
+    "functions/order-printing.js": "ae48e4a9ed83e6aaefa33891610d49e93785bc970b54eb7b64f38ac399a17832",
+    "functions/package-lock.json": "c7741ef3caf08cef7afbc38575460c84ab26aaf7b05d5bb3c90781a6cfe140ff",
+    "functions/package.json": "ed62940d5cfc2d50496e8cdec3c260479f59e1c6b80f610fef90339ccd21ebd2",
+    "functions/scripts/audit-orders.js": "3019828419eb6012c8b5bd9150dfbdefad72a43a03a62ff163e4517f2f1e815f",
+    "functions/test/audit-orders.spec.js": "be1815b09f8cfc2f0d91e56f6423d75f6b8f1b51059a07aa25a9855ae7366f59",
+    "functions/test/backend-fixture.js": "203670ec4ea9cc8ecdb4f815bb889badb52a423bd0ec5748574dff39996e832e",
+    "functions/test/courier-assignment.emulator.spec.js": "8c7be497d981709de8ef3c60a9165db9fd8c4c595ce7380658d87d7f83b233fe",
+    "functions/test/courier-assignment.spec.js": "a4776efd7d1bf7952545eee3554dd9be7b18f34ef0674fccdac2aad2443f7f1b",
+    "functions/test/courier-deliveries.emulator.spec.js": "2eaebec94270642e801402e242e985deb5a319e8acce4a83972f3b3950a39e87",
+    "functions/test/courier-deliveries.spec.js": "684302201e1236fc1af615813a2ec72b7a4c4051bcc22ee4ef2303a5062ae204",
+    "functions/test/customer-onboarding.spec.js": "85806976c22247b96b9113508dd6ec4f71a2d829726508b997ced04a29c5b080",
+    "functions/test/customer-policy-fixture.js": "d266ff69d18f45ef2ef1bdce6fd491a1d316a2b4ba3d2ac2ba45bab19a6912fb",
+    "functions/test/delivery-contracts.spec.js": "1272cfc5991e33d7119aaa1f01ba71490a12abd8beef9138c9e8af9750b3d381",
+    "functions/test/delivery-official.spec.js": "55144010ece2c9fea83077891b790c8c401fe457480b460a9e9dd6aca51e0b58",
+    "functions/test/delivery-radius.emulator.spec.js": "18e12606d6016c38f094443efce0bad93b904f4e5316cda9f22bf9e10008768d",
+    "functions/test/final-operations.emulator.spec.js": "d0024339496554799a02ddf5b048859be7ce030790aa86518e66fa69892462b4",
+    "functions/test/financial.spec.js": "09e3471b1852b63c33dc70d3b8a7c50a1b7322090d325bc8adb0f8002f31f730",
+    "functions/test/firestore.rules.spec.js": "c0747ccbe02a42e18126196a374911dc11da2273902c4ba89dfa996ebab36ff4",
+    "functions/test/order-chat.emulator.spec.js": "2d4a515d7ce3437cc585a28017279c9c2a3a3f6f86c3a4783cf1014d15b924c5",
+    "functions/test/order-operations.spec.js": "91a0a3024d89ee4f68a03b41843c7d3333b92c694d14bc7e3bf4b7d794023ef2",
+    "functions/test/pilot.emulator.spec.js": "8b8cd9ccd5c5ce67fc071824d8d4dbe1631c3596753264f8ca284f5146fbbbbf",
+    "ios/.gitignore": "e85b4db8ba6ed14708e5f7d3c60336e5a3067ce11329b84aa8ba5d98603ee253",
+    "ios/Flutter/AppFrameworkInfo.plist": "e51cfa76fca1ae586244b43bf97423577315d2906394c1e7768ef43b8d23e161",
+    "ios/Flutter/Debug.xcconfig": "0252d55e8f79bda3b6f336b9523c740fe59d4d1b806e6398a906132b1734b309",
+    "ios/Flutter/Generated.xcconfig": "d3fc2cc364ca389da258f4c5f43f51ae4e86605063814b1becc3b3cc0166479e",
+    "ios/Flutter/Release.xcconfig": "f1a2e46792280a99f79c4c2775df5817c2ab803d2c0d928ccf4e3c59721faca2",
+    "ios/Flutter/ephemeral/flutter_lldb_helper.py": "05cfe3977fdee593efad2049a4f62d374e55c69cedc8aabeee5566b37acb8384",
+    "ios/Flutter/ephemeral/flutter_lldbinit": "eaec5f5268e3a5024d9703046f4097701107d574d0de7a2d8d81f0bf4644a333",
+    "ios/Flutter/ephemeral/flutter_native_integration.env": "d10783f15e65158bfa69e78e2dd798ab587a1dc64dbb16c6b40012409cb29566",
+    "ios/Flutter/flutter_export_environment.sh": "a7056d0521631534fefa6ab199658ddac7ea6dd248f9af0da7d794baa55d7977",
+    "ios/Podfile": "8de3c3b8fafebee4390431eaed94848dff6c6cdbdc6542ca6ac47a0ec698e98b",
+    "ios/Runner.xcodeproj/project.pbxproj": "2aaf0fcc58e68f34304b0ca8c9eaebb7985db826d02654ace1d319a471eab6eb",
+    "ios/Runner.xcodeproj/project.xcworkspace/contents.xcworkspacedata": "ac28b35c2b940210bec0fff8e424b07fd0efe9112ab178a10533583f251a386c",
+    "ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist": "d557c2c32fc6258ec28981fa45dc847b76c9968beb90a2e26d13ef9c4ea45c30",
+    "ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings": "dd64c0308ab2971c456871b990b24a008bdc3ece09833e8dbe9675e33a496e74",
+    "ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme": "a46c0d064503db8bf9f452b492c61fdf76f9febb8894005fe30b2facec21e550",
+    "ios/Runner.xcworkspace/contents.xcworkspacedata": "706a4c812f2a1e220e6785c27580020d58048e2ae4d30d1280f3c43344ce6b38",
+    "ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist": "d557c2c32fc6258ec28981fa45dc847b76c9968beb90a2e26d13ef9c4ea45c30",
+    "ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings": "dd64c0308ab2971c456871b990b24a008bdc3ece09833e8dbe9675e33a496e74",
+    "ios/Runner/AppDelegate.swift": "bf45e912c0cf52f2cdac11b58189c1999a5364d701dcfba7234fcff9ac299ccb",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json": "5f8b941b774bde4496d73347c1f79cbdd786bb76fbdab9ed1f3f0cb78a0fb0d3",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png": "7770183009e914112de7d8ef1d235a6a30c5834424858e0d2f8253f6b8d31926",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png": "cab10a0d391ec5bc09ef50ce49e8ad401cee7ef03707ec0923a222c5c2b3d212",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png": "b9ad02cf6576a04d1b6806ac02a2431481b448dd0c2e505ce25842d1f7c4730b",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png": "c6e6d3b215ae744a9c391f4c4d44157eff5e739d6ad6c39f9bfa5df66dddd267",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png": "5dee24dc104ac76dc162e42ae0beb163d426bf365562ee28ba7b3ad368559a60",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png": "a9b21eb6f4271385655a8771f76e29eef8c1107d7879cbcfc567e6619d1f716a",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png": "e677d701ffe4af7bc2935098d6b3984cc9ab7ace573e6900955a5535b12410cf",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png": "b9ad02cf6576a04d1b6806ac02a2431481b448dd0c2e505ce25842d1f7c4730b",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png": "7c61c42fc7b657d9cf314d32a4ec458f0647c3aaf360be1b9377857266ec2499",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png": "19be171481dc71a0b2803ebcd01dd8b0c5fd5778dee34c0a3cabc948c225f24e",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png": "19be171481dc71a0b2803ebcd01dd8b0c5fd5778dee34c0a3cabc948c225f24e",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png": "4209a49e44a92ec40a327d3455eb1b1c153ee83d75de1c2be0a12ab18b2ff9de",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png": "836c918cb613249eba0483a6b02fa3df3c1c0a89a315ee4d3b88509b83c7ab73",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png": "41c7d42f6e61f8fe7f30b1ffa2256aecbc9682be06d18c4a3062043e1a2e547c",
+    "ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png": "5d7e5bdf01b93802bc973345b3a78c038907147625035952a08a115a563b7f81",
+    "ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json": "fbd112a9f3b541a1d811f71ac8e4fe68b6176687d973a5f4d99b7aa4a722e94e",
+    "ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20",
+    "ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20",
+    "ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20",
+    "ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md": "853ac958e2416fe2540f6f61165283a3618b71a7ba5f85f65ac41c2158dfcd21",
+    "ios/Runner/Base.lproj/LaunchScreen.storyboard": "7699053d23c29ee264c3e516d7a5e42c22493a6c20bfcc5c74bd54f481bcd34f",
+    "ios/Runner/Base.lproj/Main.storyboard": "dcea4686c02065e56217fd19fcfb73d7509b41872e7486126149d47a18559363",
+    "ios/Runner/GeneratedPluginRegistrant.h": "a5f88cc6415d2e639d2cb549348b84e02a7fdd0261603b0063abef6fa11f075a",
+    "ios/Runner/GeneratedPluginRegistrant.m": "b62573293909a022eac903e85742d07a40f410b5b2b9f41bacb57ff2e8fa4c2d",
+    "ios/Runner/GoogleService-Info.plist": "25d96da182ee2a1b218576c94541ec75206212ed20267c4b0cbd015e20e0bac4",
+    "ios/Runner/Info.plist": "fc79a836865f55d9c8e9149a46247997ce113f1c0097ef5d2384452ae1aaa20f",
+    "ios/Runner/Runner-Bridging-Header.h": "efe657d8b27f7f8595a0d416bffb33fe7d93bd2869d81f7353b556c439d7a1a7",
+    "ios/Runner/SceneDelegate.swift": "edce811c671ca0a6ccb14753e14e16deb0d89a0adf4f1b685e362d87d8f4c366",
+    "ios/RunnerTests/RunnerTests.swift": "c0e04141287eb7f9c9f3d31cf5be8cb626a9ea71351206c9121578e8b8f480c3",
+    "lib/core/cart_validation.dart": "67b54764f155e088bec48339f8064f489f5e9ab35a175ae063fd47909d7c8556",
+    "lib/core/catalog.dart": "2f06a96140f471fbe980b23a41d43b8581e00d3791e942dbdf8997af804b9105",
+    "lib/core/catalog_commercial_policy.dart": "c76ac6385c172699660ec34dab744f32e609fe36fc55b4b9bd3e1fe9d23f83ec",
+    "lib/core/models.dart": "9674fc7710e2a0199d3960a34753333100429b4ea1f1c2dfb7f449d584933197",
+    "lib/core/store_hours.dart": "1a5eab395805d06e1d328af82bf5f52a6b28ce9e889a897890b257961140ab59",
+    "lib/core/theme.dart": "7f201f22cf36e2524414bc3621d4e849fa586971894b8b59b35c535c7cb20084",
+    "lib/core/utils.dart": "528776a1d618551ad2aa119838008acc00ac2bc83437d3e6d8fb9717ef5b7872",
+    "lib/data/customer_auth.dart": "9a337422012fab7666f8831a08ba6b6768e2562ef3adc834f7e2928ebe1b11d0",
+    "lib/data/customer_bootstrap.dart": "8d76c4023f7824211b57d1f40a5713170899f5b0912e16b343c2e4db527e1966",
+    "lib/data/customer_location.dart": "1e8dd181a4c36d9f7f8516e6644d95d4662a80cdea52b2e01f258ed14a2221c5",
+    "lib/data/customer_onboarding.dart": "f3568687249df7f2c0bb699c21d1ebcfcaed6ccee3576d48b8b5f72f2a827dcf",
+    "lib/data/customer_orders.dart": "935654e15ce2e692fb26fd410d9b0f40988f2ea78ced083bf60937951eb18e69",
+    "lib/data/customer_verification.dart": "7ffaf3ff518bfa575b9606fce5cfc923d6393dc42d7ddf8be9dd9448ef3b347e",
+    "lib/data/customer_workspace.dart": "9bda8df9940f52e25be01b48ef2022b6adbbbca0e4cf822f04f747c4f6c9f9f3",
+    "lib/data/delivery_quote.dart": "f9d3fd8b1aaa61a3c8fa7fa234244515ca580efc66a9a94969f1260cf9db6fb0",
+    "lib/data/geocoded_address.dart": "eb8fd1b5210a5c63e21e8df8724aee730225a98f9538edf3192c784f3baace81",
+    "lib/data/order_attempt.dart": "9642742e1327ffa82ddf1439a185bb428b321147dd915fdb6f1f643abb520b8e",
+    "lib/data/order_notifications.dart": "a3aecdea3b7b7e28b187547a0db63f6789ede0cfab3fc82a393bd3d0f7de01b5",
+    "lib/data/restore_customer_cart.dart": "b98d045ed5c90897d428f8eb76dd1d207ec45e0c378982dcd0ff50f0ecd56b77",
+    "lib/data/reverse_geocode.dart": "10f55e0bd82dbc51e7748e8e7ff050e95e6e505717c397b8eaadb2a5e0eb8185",
+    "lib/data/reverse_geocode_native.dart": "d1e9015d15dffa6653691d96dfe6234412157f241fe8fc9bfb05c3511d49bbed",
+    "lib/data/reverse_geocode_web.dart": "1b329b303195b95d048b2e30c218e8a976cec28b72869b2a158d5d6058d97593",
+    "lib/firebase_options.dart": "472b6d35cdcc2bc027bcbbb8238484f3d87c7aea4772938bcbe53324d07ddb02",
+    "lib/main.dart": "f5e8787b02df700949a221a49307405f8f36c2b1b3332c93505d4cda445c8681",
+    "lib/order_chat.dart": "59dea96f9f76adf0d64e0b7cb4b625b4a43bfd1d34ef76cbb4006e3a40fd837d",
+    "lib/screens/address_destination_screen.dart": "b7f6d506121c6e130a95c60159c9c6d6b24de52e41389925789beac7c6f1ec9a",
+    "lib/screens/address_map_screen.dart": "83d0027f8dcfc541b87e5611477f1dd6cda04ffaf3e5ead0380be5187e2ca9bf",
+    "lib/screens/admin_screen.dart": "ed44914bb57089856a035b291c24a1faf972075e582b6805b1339317be443ad4",
+    "lib/screens/cart_screen.dart": "ffb9150d762573560955cae17ddbf73cc6653c57f1594e0e5242408f452f9ba3",
+    "lib/screens/checkout_screen.dart": "ad03bb6c4fd3005ec872f6c5dd7b3c854418e2a738836335b21b4589eecd19b3",
+    "lib/screens/customer_login_screen.dart": "abfcd037d61889e95bf5d3631c4505a0b925b4191f4935fb543a88404f0a3259",
+    "lib/screens/customer_onboarding_screen.dart": "5fa193c803b3c96dafd946b8bac84ce90d2533cd9b7a09007cefdbc1b6956545",
+    "lib/screens/customer_profile_screen.dart": "638fc3fd6c24a4fd0074aeff4951cc1d0ef06cd6345cafeae840c025f1ab47e6",
+    "lib/screens/customer_session_gate.dart": "dbf25c9ac1758534d833007eb984308796be5ad4379997966d70700639388b8e",
+    "lib/screens/home_screen.dart": "4a6c8889ccc7b64b4fadb86ee0b8e0cf64226abbff33491d42837dc4e2ac6ad2",
+    "lib/screens/legal_document_screen.dart": "24f584cd307c82448d0d70602500d111094331e3d1433866ef9e359635fefc47",
+    "lib/screens/motoboy_screen.dart": "615149e0e8635e712e46670438469af1475b57cb8e0ef6543affa58546f7cbff",
+    "lib/screens/registration_screen.dart": "b61c319bdf3a4e1dd628759c5e85deeb6c72b7e89829c83e1b8ac37439cee9b0",
+    "lib/screens/splash_screen.dart": "78dcebe0ba0cb0eb3a773293c866ad671f068c482542d70c06d7ef6139a9795a",
+    "lib/screens/tracking_screen.dart": "54728a247e12ae6bcc2676e1bef256d64c6975f21536a39d836102160edbed47",
+    "lib/screens/tracking_view.dart": "1a6feade07c15e21507d08f9ee1bafe94c4e41f6871ad312269dc80e596205cd",
+    "lib/widgets/chamae_logo.dart": "d36f2a5a1a415652607bcb3dc62a6fad0cbd9f607b15d057eea71f6bc5da18c6",
+    "lib/widgets/customer_chat_entry.dart": "7a0913f88083762805fdb7a0ecaa8c56631093ad2f692458d2a3fbd035d4328e",
+    "lib/widgets/customer_order_history_card.dart": "0943d56f9495a1aee17d3db95ccfa2bd540bfea44334d168e9058d39a6bdcb27",
+    "lib/widgets/customer_visual.dart": "50b5a80142c854ac487679723d29f1259550f1ace729d18dcacfd3989e9c1f83",
+    "lib/widgets/delivery_pin_card.dart": "c4746f1bcf71f388d3654502f18a0f2949a00321899f8c6bb0c57e1d6175f4f8",
+    "lib/widgets/delivery_quote_summary.dart": "0c300520487bfc91742011242a494accf081c0fbf4b316f5a849403e2075908d",
+    "lib/widgets/order_notification_card.dart": "3b2952a9e25773a253d9923ab679d58f128afb44c2f392939a28b8f5113f5eac",
+    "lib/widgets/pix_payment_dialog.dart": "c7464711292bf1570fde4b5078a1ee42482d168b5831476bad16356326e3bd59",
+    "lib/widgets/pix_payment_presentation.dart": "ef19b6d08837f504f2e26340386d32ba3cd0c936104f84e40f55e4ba50a515a3",
+    "lib/widgets/product_image.dart": "935a06d4be36d3e1d3182bc78e9191bc7db9e487a7db2c58bbba77219de4b179",
+    "lib/widgets/real_web_map.dart": "c0a19e18ef910930d89f4573116f83c30a5f6eaac66b892fb009f0b169f24d05",
+    "lib/widgets/sponsor_video_banner.dart": "ef1901c8c1b91fc2c10a4e0279b8830146e81b8356a06e3448f5b76f12c477df",
+    "linux/flutter/generated_plugin_registrant.cc": "7861b227b10a10cc1d7643f82a246b7db35b503f2d9ff1d3c906136e6c260dce",
+    "linux/flutter/generated_plugin_registrant.h": "00f93bb5b1faefdede8f6065df327522900fb0b8efee86bacf424fd947ed14bb",
+    "linux/flutter/generated_plugins.cmake": "e03f251c12778bd5a5d1ae831ce0c8d057bcd94d239a1e4e0f7222075fa0bec7",
+    "macos/Flutter/GeneratedPluginRegistrant.swift": "8a3697e24eabf7401157baed47eda0af8d0dc03713c4283769c703bfdfe65beb",
+    "macos/Flutter/ephemeral/Flutter-Generated.xcconfig": "3e76078e585db99163b630756c9a2b76ea42e65efd554fb14048f5768e9d7ce5",
+    "macos/Flutter/ephemeral/flutter_export_environment.sh": "7e2ec6a68497b23a08e5654d5f22a8c17e7d34b5f6ac1fc7cb3a4d3dc47e75ac",
+    "macos/Flutter/ephemeral/flutter_native_integration.env": "21264fd50295fac7fc5d80a730617cf648181e7c417036dfc661f0946937228f",
+    "pubspec.lock": "78a59519e1bb1c9761fadb58f4ef16e1e4215dd21b06ce83020a95f1eb477c63",
+    "pubspec.yaml": "fbcd1ed55f46783a515c73a7056c3df094561233a46af7118cd30ff0056171b6",
+    "test/address_flow_test.dart": "be16e565a1d2b607b6761a4e5d330876756832bbdfca887194799efaef00062d",
+    "test/catalog_test.dart": "8db620db18f383aab3f229a0ba486f5cb33223d3df5b9fca9686d68dd3cd68fc",
+    "test/checkout_delivery_contract_test.dart": "08c20dfa16420b3841441a30ebc1821955876607f610c6e9926de35ad99a76ac",
+    "test/checkout_web_test.dart": "cfd88043a2d699c6b7b66b08203c275e3e565a0fb91f690f7077afa3269ad6a3",
+    "test/client_readiness_test.dart": "58eab2075df213540d0dd4c1599f3e4e480037c1ae4f9c4d26b7120b3efa8280",
+    "test/customer_auth_test.dart": "a70c918997e60ff46f0bd24637bff7db6f06b8a9961cf408d2c8fe1a828af50b",
+    "test/customer_flow_test.dart": "66b52cd00b357c14268d86114002230808ee7fb511ad406fb86db87add2c5faa",
+    "test/customer_location_test.dart": "c281334699e929d8f16cc671680ce2f84336097c6fb0edd0e2119841f6172941",
+    "test/customer_orders_test.dart": "17b6278b9f67c9f1c38511564df8b5de76a6c89af20ccce0d66ecdaed51126a5",
+    "test/customer_premium_components_test.dart": "8b0e93ca3e548fa8fcd90d541dcec3e323cb4a87e3a7d9f22ae93b066ce8ac64",
+    "test/customer_visual_freeze_test.dart": "9433e44c88b6e6aae42c4dd367fc08e88d89bfb93edff129cf488eb7966e0946",
+    "test/customer_visual_homologation_test.dart": "ed967280abd755db217af94d4c2c92df1a89f4db528c91b875d07304a7be339b",
+    "test/customer_visual_states_test.dart": "2f34c7794ec673efc4981732151a45899d0778b34da8fb02fa0f73ff53c282dd",
+    "test/delivery_quote_state_test.dart": "6cd950dc120d4536ec2b22e9b1336d02f4baaba071bdcb990066ee1475d0cf77",
+    "test/google_login_test.dart": "49238e289f06e4fdff17fdb1f8c4b8259307f1afd0729edb0ccc57e1fed25fe0",
+    "test/order_attempt_test.dart": "c7cd754f23515b49b362752087367466c5b24ed61f04a4452b94608f5cdfdd5d",
+    "test/order_chat_test.dart": "12eef558e9ad5d20c811bf1611203d554243ebdc4e5142fa44d7b40df7537486",
+    "test/order_notification_test.dart": "e633ebc6c899500df6947a5477da80c5423ac030ba25d9c0e54adbf81796a455",
+    "test/pix_payment_presentation_test.dart": "9eb52e8ad879bf1b288cf572e6158225b1e18025cc44fb28589cae8f62301cc3",
+    "test/production_firebase_configuration_test.dart": "9b791572bf6092863d7484c667168720d450b9527e706f501292982d16f1abef",
+    "test/restore_customer_cart_test.dart": "e6c34b28c26d5c83c9686506599b7513b9e643c05916aad6096b7954c383705a",
+    "test/support/customer_flow_fakes.dart": "37d5d57a27419fd40d59f5fa1e80a6c991095d1f7cbd7afb708e85fc1ab64eff",
+    "test/workspace_cart_test.dart": "bb25b2ba3e714a4ca7cd4ffb50f38416004260a694fb7b3570053a4b29f7b0f7",
+    "tool/chrome_test_assets.mjs": "9b6cd9f928ebbb5812452d8e86c7f6758c5eca3acd08176a7caf19d12b5bb394",
+    "tool/visual_device/README.md": "7f949e7a8d41d0b47364eb2f4d5305c7a7ec64951383f3bb1cfd3879f96bf2b8",
+    "tool/visual_device/local_qr.dart": "71a1d151ce9e8b8ae6db67798838a3c4021dec55fa63ca6102b8151eefa6f5d4",
+    "tool/visual_device/main.dart": "db0f6e9a3c46eb640412e7407a403c5fa0758c0098cc1dc057d0c8a5879237fb",
+    "tool/visual_freeze/build_results.json": "2c7a708773587b016b1981472176c78006e9e523e7e951b003d2fe68c1c05fc4",
+    "tool/visual_freeze/check_results.json": "ebc4601aa7135fd0554bce09cc6c6f96e66de02fe6862ccae35c0c680ff82e98",
+    "tool/visual_freeze/preservation_final.json": "a5712da5d55283aec9d5dca8070c36747576d273458f897a766aecca84c78d01",
+    "tool/visual_freeze/protected_hashes.json": "41ef9c987c699af3b802809b9612f6e805a4a7be19e0ad28812f490c2c2a13a5",
+    "tool/visual_homologation/after/cart_1440.0.png": "41e1aba20860fe95bdff1420f483434b1474ccf1d585500a48c046d6c673b892",
+    "tool/visual_homologation/after/cart_320.0.png": "3b5fdb997358043251f33577cb6d91a49aae57e692ac8d22ff130e736accc26a",
+    "tool/visual_homologation/after/categories_1440.0.png": "460f34c0bb97ac3370cf235ebc875f11469494639f0eeccd7fa4023c539f9309",
+    "tool/visual_homologation/after/categories_320.0.png": "234ad156d0b77d57d06ddb0aafbb8f75a622743848c0f2789566e55a449c6a6d",
+    "tool/visual_homologation/after/checkout_1440.0.png": "8e7c70b0a3cf28c842523cade145d29fce5190b294e47aca5e10eda511f033d7",
+    "tool/visual_homologation/after/checkout_320.0.png": "60f832ac26c2c73ca7688666a15211eb4d81cab7d7f31e595b3cb59c66b18739",
+    "tool/visual_homologation/after/home_1440.0.png": "d237c0e1f38b59532c920f20f6624890dbb56ed66e832dda311fcd246c737080",
+    "tool/visual_homologation/after/home_320.0.png": "bccf87b5192a13e138850af8247ff58f0b32d83c02abc425de1aaa92e68d4229",
+    "tool/visual_homologation/after/product_1440.0.png": "be5a9ee22e1eafdd4aa0d9e879fb7e999c75843c3c6c8902a4cb17ec9e19b5f2",
+    "tool/visual_homologation/after/product_320.0.png": "cb90120d6df2a46739b4e51edb783ce71f4d421b6fc0590c59be91c771df2d70",
+    "tool/visual_homologation/after/profile_1440.0.png": "dabfe55e6f4a87fd84638829ab8f5b1d32fff69cc835b6b0407430bdcfa23895",
+    "tool/visual_homologation/after/profile_320.0.png": "4d7f949704feb00e9dc120f3a0684c75d35f032360890e141030aa931d0a0a38",
+    "tool/visual_homologation/after/tracking_1440.0.png": "888fe82ac4fb35377dd6d1e849188fcc93b7e1912c074e8e95aba01df4c1235c",
+    "tool/visual_homologation/after/tracking_320.0.png": "aae5ad0361de7bec2a377330ccb1085dbacc69b2198d2b2c74ffdf40a10f878b",
+    "tool/visual_homologation/build_results.json": "2c7a708773587b016b1981472176c78006e9e523e7e951b003d2fe68c1c05fc4",
+    "tool/visual_homologation/check_results.json": "ebc4601aa7135fd0554bce09cc6c6f96e66de02fe6862ccae35c0c680ff82e98",
+    "tool/visual_homologation/original_capture_inventory.json": "f7420a6c917c3a554be0950f90fbcefcf0d55c76886543dfb1c3e5fbb3a76f2b",
+    "tool/visual_homologation/preservation.json": "6fc7e7b414010dba311dbde56f24cfaa8e4f05f738abc4c2df03ae4b0b1fc025",
+    "tool/visual_homologation/supplementary/address_empty_360.png": "50d5a1c30ef71e78bdcc1d37f2d967f7f72b2295d1955f5e51f23c04d524d8a3",
+    "tool/visual_homologation/supplementary/cart_empty_360.png": "b77ecdefae7675c80a66d55eae496c358eb3dc987e7609861aeb80164b1b2ff1",
+    "tool/visual_homologation/supplementary/home_empty_360.png": "1e91006e2e959b3a104100bfb95bd18216de05f06f376e2a84a13df1c18b0198",
+    "tool/visual_homologation/supplementary/home_error_360.png": "f83f840759de7e160c148effcecfabdf5adde591dd53d2402a634ecc04d226de",
+    "tool/visual_homologation/supplementary/home_loading_360.png": "b74d7d258dc7a74dcad76dd4be404ab6f7f45817fe2898dece50e87d017458c7",
+    "tool/visual_homologation/supplementary/login_360.png": "8b13ea586a7315fe6f17852fae4df22dff5ca95694d2cf0c39189e40fac51920",
+    "tool/visual_homologation/supplementary/login_error_360.png": "fb3724b11c8805b84e581261d16b06c2f183d0c308bf2f4d8683953f2cbc3382",
+    "tool/visual_homologation/supplementary/onboarding_360.png": "9b0b32b0e23391da749d73584bb116addd7f3d5c35745ad402ccdd725efc2c05",
+    "tool/visual_homologation/supplementary/onboarding_footer_360.png": "bea02338a130e52569d76db018d1a7303b61c7319908a1e0799ebec4056ad0e2",
+    "tool/visual_homologation/supplementary/profile_footer_360.png": "9699bd283cfb6d84ad5e9a0884dead116d1695f6d01b5897d292979f4441612a",
+    "tool/visual_homologation/supplementary/splash_error_360.png": "279d9295ca58d3eee167f471317192ec3a6109c8e48836eb8fa83e82632208b1",
+    "tool/visual_homologation/supplementary/splash_loading_360.png": "a80c077c10a4438dee215774a30643f9f2980140d2260f5c3c35a9e0bb00c970",
+    "tool/visual_homologation/supplementary/tracking_error_360.png": "8cdd2242ccf58da277f2a5e2c0e4e3ce1a3648cfc4f4fc9121f67720cbb17a38",
+    "tool/visual_homologation/supplementary/tracking_loading_360.png": "bdc65f6a514d2e991f17f10abd3052ed1a1c55cd24d956cd7054066c0b89d84c",
+    "tool/visual_homologation/supplementary/tracking_unavailable_360.png": "81d1e4387a66006b1b0267deb4bf576a779ada32c93bcdd2a476f4c460a20416",
+    "web/favicon.png": "7ab2525f4b86b65d3e4c70358a17e5a1aaf6f437f99cbcc046dad73d59bb9015",
+    "web/icons/Icon-192.png": "3dce99077602f70421c1c6b2a240bc9b83d64d86681d45f2154143310c980be3",
+    "web/icons/Icon-512.png": "baccb205ae45f0b421be1657259b4943ac40c95094ab877f3bcbe12cd544dcbe",
+    "web/icons/Icon-maskable-192.png": "d2c842e22a9f4ec9d996b23373a905c88d9a203b220c5c151885ad621f974b5c",
+    "web/icons/Icon-maskable-512.png": "6aee06cdcab6b2aef74b1734c4778f4421d2da100b0ff9e52b21b55240202929",
+    "web/index.html": "1beec2a78a48e00192546e787e12be82f6e660657bb451cd13336ede79da1d75",
+    "web/manifest.json": "d2ae0a89259994a51e7b5f40d3aeeda294fdbd7af1eb050dd374a397b5af7dc0",
+    "android/app/src/main/res/drawable-nodpi/splash_gold.png": "5f6d5ba0487d5f624af7f636c6d93a28d89e6299b57d8deec8565f16f0727f7f",
+    "android/app/src/main/res/values-night-v31/styles.xml": "4481fc2d303b3e3b2a781d9f60e646e06ecb3d31b182a1c01a58129b43a258da",
+    "android/app/src/main/res/values-v31/styles.xml": "2da115a72943bebd99fe38bacf6fc508a0484b44ed1f328ef0cac9d00ddd8d6a",
+    "android/key.properties.example": "8240d69aed53877b314ad696d04e5132d83eea7c2b86f571468f4392e0c2954f",
+    "assets/images/home/commerce_backdrop.png": "059bfb89151ea747d5ff22c422fb870557a315df56cb1fd120dd70fbc99ac397",
+    "assets/images/home/logo_transparent.png": "892f5214b6d49e47b9ee3b5fa8236bc8b1e47473c3af0e1799feaf7eb222b6d2",
+    "assets/images/splash/chamae_official_gold_2026_10_21.jpeg": "9dfae65937d04da00d2165c0e9a17148389811546c2ebc9e1df798ad9e464eda",
+    "design/references/customer_app/official/baseline_manifest.json": "0c0b07a6e213217b796b1bc0b5724003c60f32d4db74bdb5660e2d4bbc663e7d",
+    "docs/APP-CLIENTE-CONSOLIDACAO-FINAL-2026-10-24.md": "a23552acff31edc26fd6f658b53171d8d1327f5fccda9ebb646edded841542f1",
+    "docs/CORRECAO-TESTES-CHECKOUT-2026-10-25.md": "e2ea309845681ec43f10f243506392c667339c110f780ba36bf44f2f34971b00",
+    "docs/EXCLUSAO-CONTA-E-CONFIRMACAO-PEDIDO-2026-10-24.md": "1daeddf648e3e2f39dcb85c774d8208665795f366a15a34af4472ff6732b7d36",
+    "docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md": "83b22579b1c8f7dd5cf3af6dcdcf8e77e73192f3411f69198aa973f1aa9703c4",
+    "docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md": "d359d7f81d0b94b68af7331259eb06c74538ab79e5ce1e026e2a25daf278104c",
+    "docs/KB-03-HORARIO-PAIS-BACKEND-2026-10-24.md": "4d629f13ecf4bb8810fe4342ec137dfad28c34b6255cebe733e8ccece413e4a9",
+    "docs/KB-04-CANCELAMENTO-COMPENSACOES-2026-10-24.md": "c2ff9f5e020df329a6bec417fa88dbf8966aea2b9a83724821229a6229d25b80",
+    "docs/KB-05-CONTINGENCIA-ENTREGA-2026-10-24.md": "6bc204b8d23042a9d7ffdd9939811de0c7f3ffbcb85a630b373c3f65c1ca8079",
+    "docs/KB-06-PRIVACIDADE-APPLE-CONTA-2026-10-24.md": "5ac7a2ac913bca6f8f7f8b46eb092c14ddc321d81b63a9ebb658b3957a980ab2",
+    "docs/KB-07-ANDROID-SIGNING-BUILD-2026-10-25.md": "7622bfb34cbe4b0c57344303c31c957c93973796e9b049fe92cc4463e64d77bb",
+    "docs/app_cliente_final_2026-10-24/carrinho.png": "3cd0e57891ce9332790a64edff0957fd7283537e088cbb4a075a676ede8cb53a",
+    "docs/app_cliente_final_2026-10-24/categorias.png": "eeff8ace1ae5ae9615abdb8b96813377f88f19a9f8af5fcd99705e6617192375",
+    "docs/app_cliente_final_2026-10-24/checkout.png": "2e15daab2abe3ae5c0469775253169d9cafdda1af5f2ed6b6ef79229624f679d",
+    "docs/app_cliente_final_2026-10-24/confirmacao.png": "c4fc2c063e6690d02bff64fedaa31ac807176dc93afb6bc5697a134b3ffd6bef",
+    "docs/app_cliente_final_2026-10-24/home.png": "43b0f4de092cc004d11aa628b98a43b37e2b202b16f192a4bb2743d715cdc7be",
+    "docs/app_cliente_final_2026-10-24/perfil.png": "80cefe343eec1dd0754bab60de71f9f176492da3b96c530fe7afd5765b198049",
+    "docs/app_cliente_final_2026-10-24/produto.png": "8b80313db1e29f1983930757e266d0dda8a1a31819eda473446a89b0642d3ccb",
+    "docs/app_cliente_final_2026-10-24/tracking-progresso.png": "c3e4a952c91d6cf98e7d34fd0686202b815d77e455547618ce79bbbf8238c33a",
+    "docs/app_cliente_final_2026-10-24/tracking.png": "7d785fa00e88421cff9d51df5bfaffce62738b3611cdfb2d7d21455d8fed8a01",
+    "docs/frete_ponta_a_ponta_2026-10-24.md": "94bd8fe0679ee7c537b9f8b6452ccdd074920d07c48075238fc1c1eee89f49fb",
+    "docs/home_official_visual_audit_2026-10-21.md": "443dd307acdfd3106d2f3806c83ceae12f4269c6a78891614e0771548c9adc0c",
+    "docs/home_visual_sprint_2026-10-21/README.md": "236d5b8e3d64cfe2cbfc9b2edcfa0deea02a582213f5145c9baae2404456e110",
+    "docs/home_visual_sprint_2026-10-21/capture_inventory.json": "8d4174bc3d98f1560c17b2ffe91879d885d73ab3e316e448f171b29cebc7fcf8",
+    "docs/home_visual_sprint_2026-10-21/cart-state.png": "b30ae5ae58234c85865d7c550b89d071f3ac7d80982e5b7b00af82f60c3fe757",
+    "docs/home_visual_sprint_2026-10-21/catalog.png": "5f4e597afa507c8f28b312174eef9380ac9b34b9d8a64f24b9db8ef7e625315c",
+    "docs/home_visual_sprint_2026-10-21/categories-preview.png": "fd58bbac5606072f015a6edba9950b94c4718f19b352c2f24621c0fa68f20eac",
+    "docs/home_visual_sprint_2026-10-21/empty.png": "3b37e2fa76338b7c96a9834c8c519bdc6808a41798fe9b2993b8226d85b54117",
+    "docs/home_visual_sprint_2026-10-21/error.png": "db4629590eef4f90f6a407ecb2e63035cea0eaada9e05d01ee50ef96cfd9eb18",
+    "docs/home_visual_sprint_2026-10-21/home.png": "0b562d751fa0ea71575d0d4d0f8a80fcc9ca9f9d6837d800b0f9da04db0de99b",
+    "docs/home_visual_sprint_2026-10-21/large-text.png": "8b271ef4e5a8c4eb383abcdd74e09505d70fa136629979c621abfee0aa148d5e",
+    "docs/home_visual_sprint_2026-10-21/no-address.png": "a479f824c73188600afb748159930b6e1036329d29e1bcb7b545fd028fafa3ed",
+    "docs/home_visual_sprint_2026-10-21/popular.png": "ca8731147368319798a4361ddd31ca16b72c6b0c8c5736535cd70c4220e15d6b",
+    "docs/home_visual_sprint_2026-10-21/promotions.png": "07d9b798b21a0ef10557c1c5181f3114b6398ea82f2028d496c2b2806a97d48f",
+    "docs/home_visual_sprint_2026-10-21/quote-error.png": "7ac71d77f460f74da4e411b5cdc1847e88bc9eed54755db96a99754df9339fdf",
+    "docs/home_visual_sprint_2026-10-21/search.png": "33b31687ee8660e5c56dba67f140f0c4d1b141d8058708186fc8d17f932258d3",
+    "docs/splash_final_correction_2026-10-21/README.md": "dd095aa854b833a2fee90e00a6e2971eb24a43cfb84b7b3ec39f55a70c028f6f",
+    "docs/splash_final_correction_2026-10-21/actual_app_splash.png": "736efdbf8c085beefae31278b02c4c0a718829211d805f1c041095ccb50953ce",
+    "docs/splash_final_correction_2026-10-21/cold_01_metrics.png": "bc0001b90dd1888330cfc71a5d7f7012c8e075b04c0746e074a991f860a332b6",
+    "docs/splash_final_correction_2026-10-21/cold_01_start.txt": "0133973e14da8d58cc96e85d529dca0ea3dd83309e4f7492b0a669667c3336a7",
+    "docs/splash_final_correction_2026-10-21/cold_02_metrics.png": "334d43e58acbe341bb3d963c68a3fce80a684b9190ca66ae4f7d54726dd0381f",
+    "docs/splash_final_correction_2026-10-21/cold_02_start.txt": "f3f8e1aa3762640b08a5fa4de4885920177686c7ff624babe69a98656a64bf7f",
+    "docs/splash_final_correction_2026-10-21/cold_sequence.mp4": "c8c319d2fabb8fa92772a2e414da2a037559e059b3b1d58d95d13ded839f6611",
+    "docs/splash_final_correction_2026-10-21/error_retry.png": "723436695be1ac9e75e553d995ae8151c68411478eb4c6e086bbe5903038730d",
+    "docs/splash_final_correction_2026-10-21/official_splash.png": "59abe904e2989808d5db1af534e3389d95afb591077dfbd3f1269c750ed46475",
+    "docs/splash_final_correction_2026-10-21/reduced_motion.png": "df2e3082cb6ac7b94c0a7db084777bf343f5a645ea8a91610a5054fddc1a6685",
+    "docs/splash_final_correction_2026-10-21/reopen_no_replay.png": "d1f50e8d180d0cc5b1e7ff19135764a021d24320d818a38a124a681212814fd2",
+    "docs/splash_final_correction_2026-10-21/reopen_start.txt": "3cdd54f9851dd4f6beb98a8c4bed20500be5834db1503951f638d19526762a0e",
+    "docs/splash_final_correction_2026-10-21/sequence_start.txt": "9e92d1ea25d43fd438ded469b81e48074733e7b4382e93c4202bc1dbe2401315",
+    "docs/splash_final_correction_2026-10-21/validation.json": "60df370c0e7788cb56ae5f9e227bce6959ff1c669dfada5b371160b4532b861b",
+    "docs/splash_official_validation_2026-10-21/README.md": "3f79cbead711eab1e1bb8b932fdc36cfcbbad069b3e2e07da91362275847bb9e",
+    "docs/splash_official_validation_2026-10-21/cold_01_metrics.png": "02c52456acb1f4db4a47be8662abb261e826dfda2d2616e46816f98bbdb472da",
+    "docs/splash_official_validation_2026-10-21/cold_01_start.txt": "f3ba83b19c50b1ba4238690c57d3f2a0aade8bf4251dee7e5149638cb6b33a0e",
+    "docs/splash_official_validation_2026-10-21/cold_02_metrics.png": "7eac1b0cef4bdd5c97f9d80fdb2910a73abe5890ef4715396237c794ff8666a8",
+    "docs/splash_official_validation_2026-10-21/cold_02_start.txt": "20083e00077878ac3c26aee064c689d0967ca292278e2be61cb356d07c7b5356",
+    "docs/splash_official_validation_2026-10-21/cold_sequence.mp4": "51891c6d2db9104a8114f69bdb7577c48e5b6c24f255fe0f1137c7f05bf47412",
+    "docs/splash_official_validation_2026-10-21/comparison.html": "6e7e140d85907999851814e0363c458677988a0d03b493f8905782359ce48072",
+    "docs/splash_official_validation_2026-10-21/error_retry.png": "6821ec1d76d00389a1d90582a025b0a213bc875f75d2fe4fd6146d883569fa7d",
+    "docs/splash_official_validation_2026-10-21/official_splash.png": "1b1fe28bdb3af34d7db17b33ab6030733323a1df4e124087da5b33749b41565a",
+    "docs/splash_official_validation_2026-10-21/reduced_motion.png": "1b1fe28bdb3af34d7db17b33ab6030733323a1df4e124087da5b33749b41565a",
+    "docs/splash_official_validation_2026-10-21/reopen_no_replay.png": "0400e25c7d41dc465d277190a266b68583ba4f4275bfc534bc019d6b784fdf57",
+    "docs/splash_official_validation_2026-10-21/reopen_start.txt": "12c48557e6cb9db669c26263625420829b31f8791edf1a9a904765db483ca29d",
+    "docs/splash_official_validation_2026-10-21/sequence_start.txt": "c672166bd9c94fc094eb294cae4d5de0263c1db0d0288123e44f372244c7b319",
+    "firebase.account-test.json": "837ce4ce6eccbf13aea7dc326ebfc6a873ac808fc99db28611abc79b1bde58ca",
+    "firebase.frete-test.json": "e37b9bb19165c4a0d76a2cf9b5bc2d79f0095629c6e1705285e21b04f81b59ea",
+    "functions/customer-account-state.js": "6ad69f07bc75f00957e1b423b04992e0f46a2f8b0aec772eefe857c93f89dc2d",
+    "functions/customer-account.js": "2d983b729e5a7bd1fcd3c3c724c170f8964b683122c781fea8511fe2678c23a7",
+    "functions/customer-provider-revocation.js": "1f6ddd9611e844471766b6c5474289cd76b45e62b2743890c597cb76aa0111e0",
+    "functions/delivery-contingency-state.js": "eeb8298b6156de80fda254ef8eb21d934af48c77555121aafa0302ad08b58616",
+    "functions/delivery-contingency.js": "ce1a297922ce4b3de2cb05108ed1090cd3d6ef24bd4c9ca5ff8344067eb157d1",
+    "functions/destination-country.js": "36f3dd2c4f4886d8557a4e98c9a575681c163e92526d2524cfae7803f570c8ca",
+    "functions/order-acceptance.js": "4fe8eea940321b4995829616182e8f80e0f8897185141cf5c3f1167933651d7d",
+    "functions/order-cancellation-state.js": "dc5d41180f61b3dfcdccd48fb7f2b23c641f6de45addbbf4957da416a103112e",
+    "functions/order-cancellation.js": "243f2435ba4206f82196d32d5566494fe2226cfa6a40cf414f656d357ceb8124",
+    "functions/test/customer-account.emulator.spec.js": "a00dc6cc37e85b5236fc588f6790f01bc207aacfd52d5c0f36164e16a2d6e77d",
+    "functions/test/customer-account.spec.js": "fae0dbd2e61582ff31d2c79fefb7dd2a38818d16b841bfc2fa5d7861d8c094c4",
+    "functions/test/customer-privacy.emulator.spec.js": "3041d10b6c09572735e4ad955b5b89e247a55f880ae8cb883f1537e032060f41",
+    "functions/test/customer-provider-revocation.spec.js": "97c28711bdad86f78297034662687860a38cabc5b7d437613f5e7f94ed9c70e7",
+    "functions/test/delivery-contingency.emulator.spec.js": "2dcf00fe8cf28ec406a2326ec4b62f6194fb16dce1040e9a130dd66f4547826c",
+    "functions/test/delivery-contingency.spec.js": "c518ca68ee8399bcf5d292f9dca1e296f7e63d98c39832f7b83d2a6899405837",
+    "functions/test/delivery-fixture.js": "60c0fbfc4c9e5ceda67eb5892f6c749b469564306e13466ee075af9edf386bb0",
+    "functions/test/delivery-pricing-fixture.json": "28032b7596f563bea1dbda63ab9dc6000641353d05f77a628c12bd1cc338afa8",
+    "functions/test/operational-fixture.js": "74f20c3b251786f5b22399f2f76f6d435864e30c903df5b29fa728650c217997",
+    "functions/test/order-acceptance.emulator.spec.js": "c44c3f787a59ed23fa43e644c738eb2b60ad4d9cb68aee3cfa3fb18f76d5bee6",
+    "functions/test/order-acceptance.spec.js": "331899627a83d786fcac76efaa741c00159d302b986d9d8af12cbdd72a42723f",
+    "functions/test/order-cancellation.emulator.spec.js": "879f6caac29a611f14e37ed3e9535e23228fd51275d2b4f1717ba19ebd4aa5a3",
+    "functions/test/order-cancellation.spec.js": "dcecca5c1628ea0085d7c3b6fecb05bde97e2e3fae92d1a4ac51c3f0ff2c3826",
+    "lib/core/order_confirmation_policy.dart": "c75125e9425f4fe6aa78ccc2c776ba1da6bb1a283d1bd19950969ac9c7ab9ce9",
+    "lib/data/customer_account.dart": "d7f38632550770d1c5621665beaa58fcd5ecda243967cd46902b917d8b3b3674",
+    "lib/data/customer_local_privacy.dart": "fa1e9a87b7a2030ff012f51a0c048a8d817b2c1595dca1d2efaada1de0629d2e",
+    "lib/screens/customer_account_closure_screen.dart": "61a69ea3b7284348e426eba8bb1f0f109cf1732443cae419ddb7f9a1948b7e2c",
+    "lib/widgets/customer_feedback.dart": "9b35006632b775c8386d425c03155c5dc0e943c4bfa4a79928cebf8102220639",
+    "lib/widgets/order_confirmation.dart": "7aa73bbb12382108ff670018013efec7f0188bcd047a1d26ff23346cb32c7e4e",
+    "lib/widgets/store_hours_builder.dart": "eac8caf53257023c9e59d9c1a25c7c0b99bfab6b09cbca38d2c148f8b101e21b",
+    "test/app_client_final_test.dart": "170129b1c46e6799123db05aabb8400b3b77946ecdcdf20633dee0b486a19bae",
+    "test/app_client_final_visual_test.dart": "b50652bde6312f251c2b0897d418dda10f1f25acec3eb0cc9ec7e5aa2f01ad50",
+    "test/customer_account_cycle_test.dart": "4c751ed0c8c7060fa737b58f3d437361ac34d17657b02f557ab2583e987310bb",
+    "test/customer_privacy_test.dart": "1c6ce67d44d3a1b11b9dcfd9f49576ee7595047030024c6745643089077d2108",
+    "test/home_visual_sprint_test.dart": "67df662b07691f95511c47e165de7a2a19b27bb89cd5652b9f9aa6bcc33a8986",
+    "test/order_acceptance_test.dart": "c5a56f55eeae5fd8052d8962711fc17d1b2f574a2a103e0d9ee00945e5e6f48a",
+    "test/splash_official_test.dart": "e15ba059b44e703979856d9c01efb3246e39a3a7fc2dc7f132da36009777ec82",
+    "tool/account_cycle/before/firestore.rules.before": "400e993b1ea9636b1bec60437d8aaa172c47fcd46a5a8cf1eef5a6a7609f66e2",
+    "tool/account_cycle/before/functions__customer-onboarding.js.before": "d03c67f9dcd0825fe7e3f4e99c5532a08c999279f1600857c7f09b3c9fc553be",
+    "tool/account_cycle/before/functions__customer-security.js.before": "df6e150aebf5ee112078ae82a50bc652f9a9611f3665700040758df2882a1517",
+    "tool/account_cycle/before/functions__delivery-service.js.before": "aeaae9f2b4b63285b7a3ef32a69b50615bcd51b2b046cc5fbdef402a1e3b2ad8",
+    "tool/account_cycle/before/functions__index.js.before": "d6635e9c67cbf751b343ee502114b4e6291a96b5b110bd98ed761cbba747d03f",
+    "tool/account_cycle/before/functions__order-chat.js.before": "f24fd92d32afb261fd1a34f9876caf1ee7c0f923415af16494354163e79e191b",
+    "tool/account_cycle/before/lib__data__customer_auth.dart.before": "221e6e18a4282cd7a70946f33a8f09f370a455dc9d510de2411327a4338518d7",
+    "tool/account_cycle/before/lib__data__customer_orders.dart.before": "e8291a8effe4b5a66a1193c47e83453a7eb6169dff40c3e05cc6d189ed2689f3",
+    "tool/account_cycle/before/lib__data__customer_workspace.dart.before": "aaaaf4af2518ffafbddd5d95e2dbdaec9234d243678aec11863cb4737f120ada",
+    "tool/account_cycle/before/lib__screens__customer_profile_screen.dart.before": "eb826b44555bab0b81274e567dd27cc512ed5008710fa98a036f0d228571611d",
+    "tool/account_cycle/before/lib__screens__tracking_screen.dart.before": "3201b3db1759e1a5f3affe7c42d8d9b57201860811827a84d69711d4acd6bb5a",
+    "tool/account_cycle/before/lib__widgets__order_confirmation.dart.before": "b14d6f608490149e2fe693aea13d45362e8a715de92d606ae4db66c24a7f4eec",
+    "tool/account_cycle/before/lib__widgets__pix_payment_dialog.dart.before": "97534db931b580797b9f679b042561a4ab4f5de51d81d7b2d3028be8c6a46539",
+    "tool/account_cycle/protected-before.json": "beb59145d2d1a6497a5d07802be6ab0356ab6bd50028514f2f2b47876a7c974b",
+    "tool/app_cliente_final/assets-contrast.json": "0644e3ba483c614509884e4e7207e12bc8588d15ad17ec5b35f43ba04bb1cdcb",
+    "tool/app_cliente_final/before/lib__screens__cart_screen.dart.before": "1c501157194a680c54e8b31555e41795e32202d0bfc8a25d8aa51f415fca6f2e",
+    "tool/app_cliente_final/before/lib__screens__checkout_screen.dart.before": "3828219b15c20a32cb0c895600369fd1c9aeef5af17e7ed506588ba8f9ec720c",
+    "tool/app_cliente_final/before/lib__screens__customer_profile_screen.dart.before": "31aa5aaeb0497d75aa45d0daad70308c25a04690ed83e7fe896fa91510c62bbf",
+    "tool/app_cliente_final/before/lib__screens__home_screen.dart.before": "d6bba99d1b191aa0c66714f7baa8382464a4ae53b3aa9efbece6010b513f881e",
+    "tool/app_cliente_final/before/lib__screens__tracking_screen.dart.before": "ea67908e12c0269237e6e7c99aa96eed136f93264c467f90a20fa7c46b9bb4ed",
+    "tool/app_cliente_final/before/lib__screens__tracking_view.dart.before": "1d5fe9727277beaa55caea99cf1853967394be36c8f28542f2cb9fc512317886",
+    "tool/app_cliente_final/before/lib__widgets__product_image.dart.before": "016c2e8683ddebef6562c2be6223dc60e10fe19f785565e9eddd309220266e51",
+    "tool/app_cliente_final/build-proof.json": "218ac3e0b32ae0a68b8486633875796f0644736f524ea91fda53ecfaabd94dfc",
+    "tool/app_cliente_final/captures/address_empty_360.png": "50d5a1c30ef71e78bdcc1d37f2d967f7f72b2295d1955f5e51f23c04d524d8a3",
+    "tool/app_cliente_final/captures/cart_1440.0.png": "feda1a4627f61f6001257a2d455fdd75ea38c8259eef33cbf13a3e04e9914345",
+    "tool/app_cliente_final/captures/cart_320.0.png": "566c8a04d9721a8d41f4ac379988cdda381d396fc795a90500a40d741022f332",
+    "tool/app_cliente_final/captures/cart_360.0.png": "1f159900b5a0916bd62f83e922df32e1af2bf4978c46b4556a48455ad0c91e98",
+    "tool/app_cliente_final/captures/cart_390.0.png": "3cd0e57891ce9332790a64edff0957fd7283537e088cbb4a075a676ede8cb53a",
+    "tool/app_cliente_final/captures/cart_430.0.png": "590a0bae9dcc032e77da75a03982d1bfd1e2fa4e01a07f7c0ccddfea20c92b12",
+    "tool/app_cliente_final/captures/cart_768.0.png": "e3fb01ff82d4855642bfac96f7d4eb02972592aae5078c02c20e1c198b85f35d",
+    "tool/app_cliente_final/captures/cart_empty_360.png": "581816e3b8ef9a33b68d1408560d14cd52408aa33b73323cfa9fe50a24f211ee",
+    "tool/app_cliente_final/captures/categories_1440.0.png": "d0cf94917b7b33e4895f96427becefbefd10d14bdcb2800cdc395eaa23bd038e",
+    "tool/app_cliente_final/captures/categories_320.0.png": "c92db66f2444c29e8daaf087d600df3c56d0ef080557627abd1083fc15514295",
+    "tool/app_cliente_final/captures/categories_360.0.png": "3e46c45ddd6f7d3451ed4f155edcbdaa57f3a19e51e2b44e1b6d498bf7ce4c1a",
+    "tool/app_cliente_final/captures/categories_390.0.png": "eeff8ace1ae5ae9615abdb8b96813377f88f19a9f8af5fcd99705e6617192375",
+    "tool/app_cliente_final/captures/categories_430.0.png": "f4f3bdf091b862ef80a5f8babe33ef7829608ad9ba36edebad6a4c75a4572ff1",
+    "tool/app_cliente_final/captures/categories_768.0.png": "aceb1ac751f38be13ec4ef8c257e1ce250f9f9f700c44c5bd8ee1964dec7493e",
+    "tool/app_cliente_final/captures/checkout_1440.0.png": "de37a593531d3c35b15ad755f155852bb195b748ab1d0b67d42e2c7422c6c62f",
+    "tool/app_cliente_final/captures/checkout_320.0.png": "81babf75030c8c174313ebb4b95e4fc6585bef06dc5e0091df044d1558dcc7a2",
+    "tool/app_cliente_final/captures/checkout_360.0.png": "8a58780e21262795f960da7907598d4f4dba6b71a6a9e25f08a2f86d7d4b37f6",
+    "tool/app_cliente_final/captures/checkout_390.0.png": "2e15daab2abe3ae5c0469775253169d9cafdda1af5f2ed6b6ef79229624f679d",
+    "tool/app_cliente_final/captures/checkout_430.0.png": "9bd47ebe9088d6de9223b2f776bbf1a747f8c7920f6e0f7c20832c0fcaf8ae85",
+    "tool/app_cliente_final/captures/checkout_768.0.png": "a43fea158b195ff8e8c71bc0a191151e9157e0bc99e832c3647de5a8f69338ca",
+    "tool/app_cliente_final/captures/confirmation_390.png": "c4fc2c063e6690d02bff64fedaa31ac807176dc93afb6bc5697a134b3ffd6bef",
+    "tool/app_cliente_final/captures/confirmation_cta_390.png": "c4fc2c063e6690d02bff64fedaa31ac807176dc93afb6bc5697a134b3ffd6bef",
+    "tool/app_cliente_final/captures/home_1440.0.png": "d0f3e6112cb4379b93c10b7237d0570a55dd6367d4369c1d71dcfbaf05e8e4a7",
+    "tool/app_cliente_final/captures/home_320.0.png": "189068c851a5fc8f8b669dd3164c8d4aad529f50073e22563d4464c7da213034",
+    "tool/app_cliente_final/captures/home_360.0.png": "2503e623b662ca215e607a4bd08bc74ba561a3d544ec5085f0c84e43fe08d0b7",
+    "tool/app_cliente_final/captures/home_390.0.png": "43b0f4de092cc004d11aa628b98a43b37e2b202b16f192a4bb2743d715cdc7be",
+    "tool/app_cliente_final/captures/home_430.0.png": "16615b3cf7920a61b1693621b143a402e41200c5ac2612c7e0bb3b9d5b477011",
+    "tool/app_cliente_final/captures/home_768.0.png": "c09735d368b0540012bdb903bcc67fc73187e8a0c08201c3e9782b38d51d8b48",
+    "tool/app_cliente_final/captures/home_empty_360.png": "5d109c4138b29803ced625364b1c97426bd141dd866ae29b2d8fdd6c3a927e88",
+    "tool/app_cliente_final/captures/home_error_360.png": "57768d02fac8a9b491e33c5116a2d693e5f089b955123b762de8a6d3cb8b400a",
+    "tool/app_cliente_final/captures/home_loading_360.png": "3128362742bd96fab73d7b834a5ef27d26d2fea5555800f4b27cad261f767681",
+    "tool/app_cliente_final/captures/login_360.png": "8b13ea586a7315fe6f17852fae4df22dff5ca95694d2cf0c39189e40fac51920",
+    "tool/app_cliente_final/captures/login_error_360.png": "fb3724b11c8805b84e581261d16b06c2f183d0c308bf2f4d8683953f2cbc3382",
+    "tool/app_cliente_final/captures/onboarding_360.png": "9b0b32b0e23391da749d73584bb116addd7f3d5c35745ad402ccdd725efc2c05",
+    "tool/app_cliente_final/captures/onboarding_footer_360.png": "bea02338a130e52569d76db018d1a7303b61c7319908a1e0799ebec4056ad0e2",
+    "tool/app_cliente_final/captures/product_1440.0.png": "f1b49999938feba1b92204d497036068466c160be39801f19e389cad99623702",
+    "tool/app_cliente_final/captures/product_320.0.png": "24912d8037acd5698ab6277252c1886c6dd46ef51fb393adcfe83f5cb8406009",
+    "tool/app_cliente_final/captures/product_360.0.png": "ba390303a11bbcfe2694ed66a3419cf1a9da456871070ce457642bb10d52aba5",
+    "tool/app_cliente_final/captures/product_390.0.png": "8b80313db1e29f1983930757e266d0dda8a1a31819eda473446a89b0642d3ccb",
+    "tool/app_cliente_final/captures/product_430.0.png": "ad8f5ea9e4b4d12cf5bd00c145ee5cfea51da96391f8b5317d7ecffd0f1d2fcf",
+    "tool/app_cliente_final/captures/product_768.0.png": "8e6c552ab3907b0008e98caaf4e23373deba73b728c9e53a5b1c8ae22a60cba4",
+    "tool/app_cliente_final/captures/product_footer_360.png": "4b33a071927e1e322f1f2546aa546ed8ccd76c1f14c08b0dd63f5cac1c099428",
+    "tool/app_cliente_final/captures/profile_1440.0.png": "dabfe55e6f4a87fd84638829ab8f5b1d32fff69cc835b6b0407430bdcfa23895",
+    "tool/app_cliente_final/captures/profile_320.0.png": "4d7f949704feb00e9dc120f3a0684c75d35f032360890e141030aa931d0a0a38",
+    "tool/app_cliente_final/captures/profile_360.0.png": "13300a5bde13f0afd99c92c51acb835ab72be4db02bf6d5751659a38e663c8ce",
+    "tool/app_cliente_final/captures/profile_390.0.png": "80cefe343eec1dd0754bab60de71f9f176492da3b96c530fe7afd5765b198049",
+    "tool/app_cliente_final/captures/profile_430.0.png": "440f6afb323b4c4197f93d1963cee85402e164d8cbc745634c564200e30d67f7",
+    "tool/app_cliente_final/captures/profile_768.0.png": "801813c7dc68628840fb8a6a63cc5396bfd58ea0a1f97582ae7f66eb51c3dcd6",
+    "tool/app_cliente_final/captures/profile_footer_360.png": "9699bd283cfb6d84ad5e9a0884dead116d1695f6d01b5897d292979f4441612a",
+    "tool/app_cliente_final/captures/splash_error_360.png": "6f60027785f7f9519d1ae9d0dda59d3764c7a0355cbc71b0edea33c8e4bd9228",
+    "tool/app_cliente_final/captures/splash_loading_360.png": "345353b768981e810ee7e1b3c7d52f6b57c7c4777f3df52dd8e7ed56ed0db075",
+    "tool/app_cliente_final/captures/tracking_1440.0.png": "5be5c5eaf9f6b19d62f7ccc85022817bf59064a241397bfe483379a56be7a592",
+    "tool/app_cliente_final/captures/tracking_320.0.png": "60a43e5845844c2eba6c8cb3f88ad17a30314641840cc87a82d951ac96f581ef",
+    "tool/app_cliente_final/captures/tracking_360.0.png": "36fc9db14a0f5de5c82a53761271b33d862ae84a3f9180710bcae1decc3092e9",
+    "tool/app_cliente_final/captures/tracking_390.0.png": "ae95b05800a9df4cd8ad94f28f72b87f4be74ff3261d5b38f7e62db9363c44f2",
+    "tool/app_cliente_final/captures/tracking_390_final.png": "7d785fa00e88421cff9d51df5bfaffce62738b3611cdfb2d7d21455d8fed8a01",
+    "tool/app_cliente_final/captures/tracking_430.0.png": "d8bcb0dfa93193c741c054f93c2edbf6d51fc917cdcd4303b4ade94c441f56b8",
+    "tool/app_cliente_final/captures/tracking_768.0.png": "fa09c8e0ee0a4e9324f8dadbb1cf66a03e4839d6bf85e47e80a56e3feb358c01",
+    "tool/app_cliente_final/captures/tracking_error_360.png": "b8623eb85514c8eb1c27824c320d9a3a672c17854e90f960cab7662fb0352a19",
+    "tool/app_cliente_final/captures/tracking_footer_360.png": "25bc654187df0aa6680ff43e08334d5d98bce718063db093746d4a6a61eca97b",
+    "tool/app_cliente_final/captures/tracking_loading_360.png": "e20c36c572fcc45467a42eb60f2fcd3b902a11ba7c07249cc7e5f95c38ed958f",
+    "tool/app_cliente_final/captures/tracking_progress_390.png": "c3e4a952c91d6cf98e7d34fd0686202b815d77e455547618ce79bbbf8238c33a",
+    "tool/app_cliente_final/captures/tracking_unavailable_360.png": "f10d6d95c6c4793638d875e2bb79d1dd357b2df662e09622674e4a871d7b1137",
+    "tool/app_cliente_final/own-changes.diff": "9bad46d8752a77353c50d1c90374576ebb00b86700243178a8ac832bdfba0c9e",
+    "tool/app_cliente_final/preservation.json": "cc03913c3e42aea12047522e664d5a828d4a8aa1779f0d7aa5a9129e87d7bd51",
+    "tool/app_cliente_final/preserved-before.json": "af1b8e342f9427abdaad7e76d20d62fccc34fbbe5b176e7cbab40ad6fb7fa771",
+    "tool/checkout_test_fixes_2026-10-25/checkout_delivery_contract_test.before.dart.txt": "4b0f17299d9038834d5415a39e38aecbe66690bc83fb4887a5e1149edbb598cb",
+    "tool/checkout_test_fixes_2026-10-25/client_readiness_test.before.dart.txt": "76040e97320a0a3a8cd6e213ee09d9a98a41cfb3d77901bf4c0ff2c83c32f1fb",
+    "tool/checkout_test_fixes_2026-10-25/final-evidence.json": "982aa242cfaf101c82a08c7140796c0a3b4f21606f372392439e15c697854daf",
+    "tool/checkout_test_fixes_2026-10-25/protected-after.json": "2fe790cb1533a57ebeaac8284278780847d3084f93f66a5a3f1b7c0cbda34d7b",
+    "tool/checkout_test_fixes_2026-10-25/protected-before.json": "400e4c3bb6214c7f0bba2a7aa5b1032550b679b78b2a7694791de14294308187",
+    "tool/kb03/before/docs__HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md.before": "4a1c643fb8373b10d9b29bda691e891725946805c8d7ef4116ed8be411934ec3",
+    "tool/kb03/before/docs__HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md.before": "9860231f2cfa7ea4b5de25ce9be0b6527020363d1f136be4f979892bbd59c6f6",
+    "tool/kb03/before/firestore.rules.before": "fec85035cea1640fc0e09607a9e295fbcf1038d33e7e3da9ef247ed68bb0a49a",
+    "tool/kb03/before/functions__.eslintrc.js.before": "db4cfc6a068bf09370728e655edb75bf0f8605bda2fd57e8efa8ba729151108c",
+    "tool/kb03/before/functions__delivery-service.js.before": "856c017e644bd873f0117bed313c7591d7fe6aa472ba9d96e366bf026a6d9c5d",
+    "tool/kb03/before/functions__index.js.before": "4b5922ae76b6cc87e5bfbb24042a56b934316c28885e48d94d3d8dc1936c1a28",
+    "tool/kb03/before/functions__test__delivery-fixture.js.before": "b721460997ec38178cd5fee05d1d33a73a0c5571a69aa1e80b46ded162e6aaad",
+    "tool/kb03/before/functions__test__delivery-official.spec.js.before": "7578078b9a10d1fb9d52315a2243bbb03f35c433c78e85d951ffb57d9011a24e",
+    "tool/kb03/before/functions__test__delivery-radius.emulator.spec.js.before": "3daa3627c2dd9e03a0cc9fb5b02b27b8c0c1a71640bc158d9d8a9bfb50c72155",
+    "tool/kb03/before/functions__test__final-operations.emulator.spec.js.before": "3e97c2cb691e0ed8ab31b5e54b797f167e2079ab2419cc1f9776928784573546",
+    "tool/kb03/before/functions__test__financial.spec.js.before": "d3581ead26c9467400349cb23eefb37ffa4bccf50a05d0632152e27caaf61d1d",
+    "tool/kb03/before/functions__test__firestore.rules.spec.js.before": "fe4d21afabfc2b7d256f50c7b4e9fb6846017f51ac40a2e5e4e8742b61692b18",
+    "tool/kb03/before/functions__test__pilot.emulator.spec.js.before": "c0d8cc0978540c6cd9752c0d4f6c9613c2045af3843630d7d64f413619763cea",
+    "tool/kb03/protected-before.json": "aa596f220493e66a2cf9792708b8aef35347234d72301291d9371bf76c3ff943",
+    "tool/kb04/before/docs__HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md.before": "b94ec647599899da844d6e06640cefe292b81bd57d004d62c9978d5b5901f2f2",
+    "tool/kb04/before/docs__HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md.before": "28ce8570702def36fbf3c356b1b20cb4d71e1bf3a573f88b9e2287a6f9c84047",
+    "tool/kb04/before/functions__.eslintrc.js.before": "a3d24a70f0903ba71f2e2f23a51ac80943fc7e8bea2b82d71036d3e624fd00a5",
+    "tool/kb04/before/functions__index.js.before": "237d03e733ee1c4f29d5677fd44e16bed809bf1f25af3ab76969ed62c70a6a71",
+    "tool/kb04/before/functions__package.json.before": "8b34afb3f2f775d996771cae2ed072e9153ef0e3ef0b831255f76dcc7d30147b",
+    "tool/kb04/before/functions__test__financial.spec.js.before": "ceb7a48c809ca61327eb85a148b786b301f464daad947d05c07c0b779cfffa1c",
+    "tool/kb04/protected-before.json": "d560666385a27bbedf3c2d72261e2f241da441ba74c885f3317f11c9a8ede631",
+    "tool/kb05/before/docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md": "7f61b071aeac6e5eccc2ed0c75d8cbf7dc3bbb55e923ed943cdad9bb79c60342",
+    "tool/kb05/before/docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md": "c4c7eaf8a5656092cc159cfcaf1c6a93500a5c90e28a9ddbb597fab6f41ef220",
+    "tool/kb05/before/firestore.rules": "d2b040c472b466d467023fabc720ef13a76aef53c6e9ddfeb063817f50c5ac95",
+    "tool/kb05/before/functions/.eslintrc.js": "d050d13a85d2a5a37752fecfa329685c9ea1d2bed9fa1aa375a3835289d9baf2",
+    "tool/kb05/before/functions/courier-assignment.js": "6927f5a4abab1b0d4f39366f6cf0a01de003851520f50f62ab7e57fa11aa42fb",
+    "tool/kb05/before/functions/index.js": "fb01c5aacf2336c0cf8a3250285bcf92078ee2a6547efdf4217d55096213ebb5",
+    "tool/kb05/before/functions/operational-contingency.js": "d6414f586cba1dcc16fa4710ce3e0c8ff7c28c7942fd83ae6948efd7d7c8e220",
+    "tool/kb05/before/functions/order-cancellation.js": "f46dc8efb80c0a04a775c34b69cd8b3105cb87b4e13e7077bddbbf965a54869a",
+    "tool/kb05/before/functions/order-operations.js": "80f811d7e735e8f75714900d8282164d251f8c8df24c90f5af99cfb422f5f249",
+    "tool/kb05/before/functions/package.json": "784e53677583bd6faf30d98f0e1126aceefc84488c9ce2f710b209e35a9f3cc0",
+    "tool/kb05/before/functions/test/final-operations.emulator.spec.js": "3e97c2cb691e0ed8ab31b5e54b797f167e2079ab2419cc1f9776928784573546",
+    "tool/kb05/before/functions/test/financial.spec.js": "e2e8238790e7eea7053787d0746b38e0f4e985ee03052721568b3a8aede0dba1",
+    "tool/kb05/before/functions/test/order-cancellation.emulator.spec.js": "aedec126bc1f983025baa5127c6e27e4f67ba017bd68f3d128a7225d36a2ce45",
+    "tool/kb05/before/panel-operational_contingency.dart.txt": "13c07e02bac2efd37258cdc06e3c8c096321e340c058d6ca61e231ac41ad228d",
+    "tool/kb05/before/pilot.emulator.spec.js": "b3124176c305ec409ac1a26c3ef076766d55105c7be9237e6597c4bc191d6b16",
+    "tool/kb05/checklist-consistency.json": "7e28303c103c2efd6106db59008eedcb6e503e294d86cbe286edea82c54e1a80",
+    "tool/kb05/delivery_contingency_test.dart.txt": "7a60a22c59eef4c0e93d375c322a9816c0738d1f3b90fc65235f10bcdf6d2a91",
+    "tool/kb05/operational_contingency.dart.txt": "593d32141c498882040bd3608595196df55f6ac38d1b48fce721ede9bfc84377",
+    "tool/kb05/protected-after.json": "53a12600ea5ceada67213062bf1669767e5e61f80112a20dabd87d138c80d0dd",
+    "tool/kb05/protected-before.json": "31a261a84bd7931f25cc4d83dd5b5032d4721d50ba0c3cd19ba8277cc62838d7",
+    "tool/kb06/before/docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md": "4de6b02c3b6e8d66224515ffe0195605abc15b6df2e85caef35bda5b36663847",
+    "tool/kb06/before/docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md": "0c3c1dc815b6f9d10afc4bc8f5ba3a72f2b24ca2e04ec8b8a01a3653c3cdce8f",
+    "tool/kb06/before/functions/.eslintrc.js": "f680b37fd0f975d0ae51a035addefc2cf449081936ebfb32d736976853a65ed1",
+    "tool/kb06/before/functions/customer-account-state.js": "6ad69f07bc75f00957e1b423b04992e0f46a2f8b0aec772eefe857c93f89dc2d",
+    "tool/kb06/before/functions/customer-account.js": "c372b9748029e51164f5201d32b01322f604a72670c75a40d239c570987bec4a",
+    "tool/kb06/before/functions/package.json": "240fcabb1db846200922ffb964a4dffd06f1e2de3e81734eee24537dd62f3785",
+    "tool/kb06/before/functions/test/customer-account.emulator.spec.js": "3c3ff75883a1f7fed83bd28a304407a6ce2b80d9b0ab3042026f3189443608ca",
+    "tool/kb06/before/lib/core/models.dart.txt": "d45e515ba83b26c14e283be0b73763887c9117c0cf1d2927dd0dcb66952dbce8",
+    "tool/kb06/before/lib/data/customer_account.dart.txt": "92dc4cbffde6edf0876810d630b6240502affe9386fd6e312ec58e58b22d344a",
+    "tool/kb06/before/lib/data/customer_auth.dart.txt": "221e6e18a4282cd7a70946f33a8f09f370a455dc9d510de2411327a4338518d7",
+    "tool/kb06/before/lib/data/customer_bootstrap.dart.txt": "745298b80ede7a70dbc57572db52f2f09b6a3cfb85061a7ff2cf1850027858ac",
+    "tool/kb06/before/lib/main.dart.txt": "f5e8787b02df700949a221a49307405f8f36c2b1b3332c93505d4cda445c8681",
+    "tool/kb06/before/lib/screens/customer_account_closure_screen.dart.txt": "f676660810504c759c6ee6ce524777ab9be35ec7f45d96e8a20593d06c324641",
+    "tool/kb06/before/lib/screens/customer_session_gate.dart.txt": "591238b30ea6eab3320d168ada7c088905b9cf41bd460cfdf8114966df53cffb",
+    "tool/kb06/checklist-consistency.json": "27b66d10080bd4b41d616debe149d0599a76a915b24f939da994b9a900eb613d",
+    "tool/kb06/final-evidence.json": "a259a3d1f5db4fca53373816e1f345271dd62b5dd1adf2bcd2a449f24db12051",
+    "tool/kb06/protected-after.json": "71cd35f3c8a88ed231eb3c2f6da755a45c8c93fed20b64907e0b7ffe39aef2dd",
+    "tool/kb06/protected-before.json": "2513fa0dd8b05b0e949c83aa37df33542c35aba6cb1e3923e921cda9a614b184",
+    "tool/kb06/retomada-2026-10-25/checklist-consistency.json": "27b66d10080bd4b41d616debe149d0599a76a915b24f939da994b9a900eb613d",
+    "tool/kb06/retomada-2026-10-25/code-after.json": "0d5b853179c1fb0b1c76b3176493168b4af4b574830aa2dbc54355cf786504f4",
+    "tool/kb06/retomada-2026-10-25/code-before.json": "49a391f6ba22ebfcaf3c23f59bd8aebeeb22de98c637c9e9c10d3c306c1c0f0b",
+    "tool/kb06/retomada-2026-10-25/final-evidence.json": "6df6b4949b357c1f2d5a4846702f3b17bc7d13366183425e92fb174a1420c745",
+    "tool/kb06/retomada-2026-10-25/protected.json": "977a94abb68bb4da31d2b6f61158e5af6f167db48ee1bd2d3aa379287d850894",
+    "tool/kb07/before/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md": "bd175288378832d4a68ebc3306389b0ebf14633b3d67ffea3ccdef32f59721b6",
+    "tool/kb07/before/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md": "ba66dd83e108ca6c7e5f2c76bf564ff6103c167df53ebaf8f4c3925a06d5ff1b",
+    "tool/kb07/before/app.build.gradle.kts.txt": "4b90d584dd67eacdbefa089540f1bff570d77b717ac44418798e990f5511a7a4",
+    "tool/kb07/checklist-consistency.json": "a955c82b95593ad87543c4f8a32108c4cfa74109fd11b8729d12e913729f7f8a",
+    "tool/kb07/final-evidence.json": "4e5d91ae0e162cc3ad88fabf2c781c4589622c86bdedf342af8059cf38236d6c",
+    "tool/kb07/gradle-validation.json": "f5ca4bbe5512db6c6057373febec74362a496a48bf1ff890ccc3e0b4c938ffb8",
+    "tool/kb07/guard-evidence.json": "7c829c0e21eba0878c7de500aae0b4175c687a156c3832188adceb50115587c3",
+    "tool/kb07/protected-after.json": "331354f536129cc63715098ce3640b89f79c4de9893f73abf1c73327b9e3dec3",
+    "tool/kb07/protected-before.json": "78b90731633a0b8c69aa25e852451a26cb720f68dbe5da6f21b19a3d62cf9bd3",
+    "tool/kb07/secrets-audit.json": "24149ed7ed46f7b9cac81d1fcad8c3b36971b8417407710b6c2e07ae01dd574e",
+    "tool/kb07/signing-preflight-result.json": "b0ba1fbf68d3d14ff15cedd71e3563c6052cacbde0fcddc55b23fe84505cd35e",
+    "tool/visual_device/capture.ps1": "c161b988265d33f659545db8ee3428e47100d10f580ea6b4f5de84078bc1d811",
+    "tool/visual_home/capture.ps1": "f5fc8028c115c9156e541111c4cd79542b723ac96301b423e1a78b99cc2993ed",
+    "tool/visual_home/main.dart": "520e47f6f7aeb03006957f3c50c7c20d62ac978d53aad71406a526af89059987",
+    "tool/visual_splash/capture.ps1": "ee932c2eb29c670a04f208ef9bafc97e92481236499a648b1910a713f2934f7a",
+    "tool/visual_splash/main.dart": "2b67e23af18fb0335342b858d284b65b8581e168a5ef8fbebf9435f315c53092"
+  },
+  "summary": {
+    "initialModified": 61,
+    "initialNew": 282,
+    "staged": "",
+    "head": "f03689d",
+    "branch": "main",
+    "knownSensitiveNames": [
+      {
+        "path": "android/key.properties",
+        "bytes": 436,
+        "tracked": false,
+        "sensitive": true
+      }
+    ],
+    "trackedSensitiveNames": [],
+    "findings": [
+      {
+        "path": "android/app/google-services.json",
+        "rule": "google-api-key",
+        "lines": [
+          31,
+          67,
+          103,
+          139
+        ]
+      },
+      {
+        "path": "functions/index.js",
+        "rule": "personal-email-review",
+        "lines": [
+          610,
+          2732,
+          3188
+        ]
+      },
+      {
+        "path": "functions/package-lock.json",
+        "rule": "personal-email-review",
+        "lines": [
+          8033,
+          8614
+        ]
+      },
+      {
+        "path": "functions/test/courier-deliveries.emulator.spec.js",
+        "rule": "personal-email-review",
+        "lines": [
+          53
+        ]
+      },
+      {
+        "path": "functions/test/courier-deliveries.spec.js",
+        "rule": "personal-email-review",
+        "lines": [
+          73,
+          112
+        ]
+      },
+      {
+        "path": "functions/test/customer-onboarding.spec.js",
+        "rule": "secret-literal-review",
+        "lines": [
+          120
+        ]
+      },
+      {
+        "path": "functions/test/delivery-official.spec.js",
+        "rule": "secret-literal-review",
+        "lines": [
+          48,
+          182
+        ]
+      },
+      {
+        "path": "ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json",
+        "rule": "personal-email-review",
+        "lines": [
+          6,
+          12,
+          18,
+          24,
+          30,
+          36,
+          42,
+          48,
+          54,
+          60,
+          66,
+          72,
+          78,
+          84,
+          90,
+          96,
+          102,
+          108,
+          114
+        ]
+      },
+      {
+        "path": "ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json",
+        "rule": "personal-email-review",
+        "lines": [
+          10,
+          15
+        ]
+      },
+      {
+        "path": "lib/firebase_options.dart",
+        "rule": "google-api-key",
+        "lines": [
+          44,
+          52,
+          61,
+          70,
+          79
+        ]
+      },
+      {
+        "path": "lib/firebase_options.dart",
+        "rule": "secret-literal-review",
+        "lines": [
+          44,
+          52,
+          61,
+          70,
+          79
+        ]
+      },
+      {
+        "path": "lib/screens/registration_screen.dart",
+        "rule": "personal-id-review",
+        "lines": [
+          212
+        ]
+      },
+      {
+        "path": "test/customer_auth_test.dart",
+        "rule": "personal-email-review",
+        "lines": [
+          32
+        ]
+      },
+      {
+        "path": "test/customer_premium_components_test.dart",
+        "rule": "personal-email-review",
+        "lines": [
+          63,
+          68
+        ]
+      },
+      {
+        "path": "test/support/customer_flow_fakes.dart",
+        "rule": "personal-email-review",
+        "lines": [
+          70
+        ]
+      },
+      {
+        "path": "tool/visual_device/main.dart",
+        "rule": "personal-email-review",
+        "lines": [
+          211
+        ]
+      },
+      {
+        "path": "web/index.html",
+        "rule": "google-api-key",
+        "lines": [
+          46
+        ]
+      },
+      {
+        "path": "functions/test/order-acceptance.spec.js",
+        "rule": "secret-literal-review",
+        "lines": [
+          55,
+          79
+        ]
+      },
+      {
+        "path": "test/customer_privacy_test.dart",
+        "rule": "personal-email-review",
+        "lines": [
+          295
+        ]
+      },
+      {
+        "path": "tool/account_cycle/before/functions__index.js.before",
+        "rule": "personal-email-review",
+        "lines": [
+          592,
+          2681,
+          3127
+        ]
+      },
+      {
+        "path": "tool/kb03/before/functions__index.js.before",
+        "rule": "personal-email-review",
+        "lines": [
+          592,
+          2681,
+          3127
+        ]
+      },
+      {
+        "path": "tool/kb03/before/functions__test__delivery-official.spec.js.before",
+        "rule": "secret-literal-review",
+        "lines": [
+          158
+        ]
+      },
+      {
+        "path": "tool/kb04/before/functions__index.js.before",
+        "rule": "personal-email-review",
+        "lines": [
+          600,
+          2689,
+          3141
+        ]
+      },
+      {
+        "path": "tool/kb05/before/functions/index.js",
+        "rule": "personal-email-review",
+        "lines": [
+          610,
+          2732,
+          3188
+        ]
+      },
+      {
+        "path": "tool/kb07/protected-after.json",
+        "rule": "personal-email-review",
+        "lines": [
+          1195,
+          1199,
+          1235,
+          1239,
+          1247,
+          1251,
+          1255,
+          1259,
+          1267,
+          1271,
+          1275,
+          1279,
+          1283,
+          1287,
+          1291,
+          1295,
+          1299
+        ]
+      },
+      {
+        "path": "tool/kb07/protected-before.json",
+        "rule": "personal-email-review",
+        "lines": [
+          1195,
+          1199,
+          1235,
+          1239,
+          1247,
+          1251,
+          1255,
+          1259,
+          1267,
+          1271,
+          1275,
+          1279,
+          1283,
+          1287,
+          1291,
+          1295,
+          1299
+        ]
+      }
+    ],
+    "scanned": 375,
+    "binary": 0,
+    "noSubstantive": [
+      "lib/screens/admin_screen.dart",
+      "lib/screens/registration_screen.dart",
+      "lib/widgets/chamae_logo.dart",
+      "lib/widgets/real_web_map.dart"
+    ]
+  },
+  "metadata": [
+    {
+      "path": "android/hs_err_pid13296.log",
+      "bytes": 742430,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "android/hs_err_pid18532.log",
+      "bytes": 452103,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "android/key.properties",
+      "bytes": 436,
+      "tracked": false,
+      "sensitive": true
+    },
+    {
+      "path": "docs/visual_homologation_real_device_2026-10-20/analyze.log",
+      "bytes": 3556,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "docs/visual_homologation_real_device_2026-10-20/build_apk.log",
+      "bytes": 14224,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "docs/visual_homologation_real_device_2026-10-20/build_harness.log",
+      "bytes": 14286,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "docs/visual_homologation_real_device_2026-10-20/pix_tests.log",
+      "bytes": 3802,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "docs/visual_homologation_real_device_2026-10-20/restore_normal_apk.log",
+      "bytes": 78,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "docs/visual_homologation_real_device_2026-10-20/tests.log",
+      "bytes": 47068,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "firestore-debug.log",
+      "bytes": 650283,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "functions/firebase-debug.log",
+      "bytes": 33697801,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "functions/firestore-debug.log",
+      "bytes": 30413,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "hs_err_pid25640.log",
+      "bytes": 66306,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "replay_pid25640.log",
+      "bytes": 965210,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/account-unit.log",
+      "bytes": 820,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/analyze-initial.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/emulator-initial.log",
+      "bytes": 5382990,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/flutter-focused-2.log",
+      "bytes": 9244,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/flutter-focused-3.log",
+      "bytes": 3210,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/flutter-focused.log",
+      "bytes": 14950,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/lint-initial.log",
+      "bytes": 3988,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/lint-only-acceptance-test.log",
+      "bytes": 1072,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/lint-only-account-test.log",
+      "bytes": 1062,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/lint-only-analyze-final.log",
+      "bytes": 0,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/lint-only-analyze-sdk.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/lint-only-analyze.log",
+      "bytes": 0,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/lint-only-full-test.log",
+      "bytes": 63606,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/lint.log",
+      "bytes": 1038,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/account_cycle/node-initial.log",
+      "bytes": 42858,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/analyze_premium_final.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/android_stage04_analyze.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/android_stage04_auth.log",
+      "bytes": 8990,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/android_stage04_doctor.log",
+      "bytes": 4246,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/analyze-approved.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/analyze-final-review.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/analyze-final.log",
+      "bytes": 1284,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/analyze-initial.log",
+      "bytes": 1252,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/analyze-verified.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/build-web-approved.log",
+      "bytes": 2322,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/build-web-final-review.log",
+      "bytes": 2320,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/build-web-release.log",
+      "bytes": 830,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/chrome-approved.log",
+      "bytes": 12618,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/chrome-assets.log",
+      "bytes": 840,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/chrome-final.log",
+      "bytes": 0,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/flutter-final-review.log",
+      "bytes": 60916,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/flutter-suite-approved.log",
+      "bytes": 60778,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/flutter-suite-final.log",
+      "bytes": 67814,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/flutter-suite-verified.log",
+      "bytes": 64850,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/format-cart.log",
+      "bytes": 176,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/format-final-review.log",
+      "bytes": 182,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/format-final.log",
+      "bytes": 652,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/format-last.log",
+      "bytes": 98,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/format-tests.log",
+      "bytes": 362,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/format-verified.log",
+      "bytes": 272,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/format.log",
+      "bytes": 2032,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/layout-regressions.log",
+      "bytes": 12042,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/refinement-tests-final.log",
+      "bytes": 17034,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/refinement-tests-verified.log",
+      "bytes": 2122,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/targeted-tests-verified.log",
+      "bytes": 33550,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/app_cliente_final/targeted-tests.log",
+      "bytes": 17312,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/backend_final.log",
+      "bytes": 33086,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/backend_premium_final.log",
+      "bytes": 34814,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/build_admin_final.log",
+      "bytes": 2472,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/build_android_premium_final.log",
+      "bytes": 832,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/build_client_final.log",
+      "bytes": 1154,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/build_web_premium_final.log",
+      "bytes": 2266,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/build_web_premium_latest.log",
+      "bytes": 1154,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/checkout_test_fixes_2026-10-25/before.log",
+      "bytes": 16968,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/checkout_test_fixes_2026-10-25/flutter-all.log",
+      "bytes": 77216,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/checkout_test_fixes_2026-10-25/flutter-analyze.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/checkout_test_fixes_2026-10-25/targeted-after.log",
+      "bytes": 6416,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/chrome_admin_final.log",
+      "bytes": 47332,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/chrome_contracts_final.log",
+      "bytes": 55608,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/chrome_premium_final.log",
+      "bytes": 83158,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/chrome_premium_session_final.log",
+      "bytes": 57528,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/chrome_ux_final.log",
+      "bytes": 70258,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/flutterfire_apps_audit.log",
+      "bytes": 10504,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/flutterfire_stage03_analyze.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/flutterfire_stage03_build_android.log",
+      "bytes": 886,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/flutterfire_stage03_build_web.log",
+      "bytes": 2336,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/flutterfire_stage03_configure.log",
+      "bytes": 32134,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/flutterfire_stage03_suite.log",
+      "bytes": 26698,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/flutterfire_stage03_targeted.log",
+      "bytes": 8960,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_backend_final_regression.log",
+      "bytes": 16184,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_backend_lint.log",
+      "bytes": 50,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_backend_lint_final.log",
+      "bytes": 50,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_backend_suite.log",
+      "bytes": 38748,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_backend_suite_final.log",
+      "bytes": 38722,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_backend_targeted.log",
+      "bytes": 16310,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_backend_tests.log",
+      "bytes": 42114,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_backend_tests_final.log",
+      "bytes": 41906,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_checkout_chrome.log",
+      "bytes": 3774,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_checkout_chrome_verified.log",
+      "bytes": 358,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_client_analyze.log",
+      "bytes": 1286,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_client_analyze_final.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_client_build_android.log",
+      "bytes": 10898,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_client_build_web.log",
+      "bytes": 2356,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_client_build_web_final.log",
+      "bytes": 2336,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_client_suite.log",
+      "bytes": 38810,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_client_suite_final.log",
+      "bytes": 35842,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_client_targeted.log",
+      "bytes": 6426,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_emulator_final.log",
+      "bytes": 2610830,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_emulator_rules.log",
+      "bytes": 4738104,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_emulator_tests.log",
+      "bytes": 3352,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_emulator_verified.log",
+      "bytes": 7096,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_flutter_analyze.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_flutter_direct.log",
+      "bytes": 1192,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_flutter_tests.log",
+      "bytes": 0,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_flutter_verified.log",
+      "bytes": 7998,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/frete_lint_fix.log",
+      "bytes": 540,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/google_auth_analyze.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/google_auth_chrome.log",
+      "bytes": 61886,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/google_auth_doctor.log",
+      "bytes": 4242,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/google_auth_suite.log",
+      "bytes": 24976,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/google_auth_targeted.log",
+      "bytes": 7354,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb03/acceptance-unit-initial.log",
+      "bytes": 23076,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb03/emulator-final.log",
+      "bytes": 5637220,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb03/emulator-initial.log",
+      "bytes": 5679136,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb03/flutter-affected.log",
+      "bytes": 13314,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb03/flutter-analyze.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb03/guard-unit-final.log",
+      "bytes": 3310,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb03/lint-all-final.log",
+      "bytes": 758,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb03/lint-initial.log",
+      "bytes": 13202,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb03/lint-scoped-final.log",
+      "bytes": 0,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb03/lint-scoped.log",
+      "bytes": 900,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb03/node-final.log",
+      "bytes": 54792,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb03/node-initial.log",
+      "bytes": 41852,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb04/cancellation-unit.log",
+      "bytes": 1276,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb04/emulator-final.log",
+      "bytes": 5937782,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb04/emulator-focused.log",
+      "bytes": 329846,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb04/flutter-affected.log",
+      "bytes": 12152,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb04/flutter-analyze.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb04/lint-all.log",
+      "bytes": 758,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb04/lint-initial.log",
+      "bytes": 3658,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb04/lint-new.log",
+      "bytes": 3708,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb04/lint-scoped.log",
+      "bytes": 0,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb04/node-current.log",
+      "bytes": 55930,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb04/node-final.log",
+      "bytes": 57174,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb04/node-initial.log",
+      "bytes": 54798,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/emulator-final-after-review.log",
+      "bytes": 6118014,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/emulator-final.log",
+      "bytes": 6091834,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/emulator-first.log",
+      "bytes": 865276,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/flutter-affected.log",
+      "bytes": 12180,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/flutter-analyze.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/functions-final.log",
+      "bytes": 59436,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/functions-first.log",
+      "bytes": 57216,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/lint-final-extra.log",
+      "bytes": 0,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/lint-scoped.log",
+      "bytes": 0,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/panel-analyze-final.log",
+      "bytes": 1664,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/panel-analyze.log",
+      "bytes": 2036,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/panel-tests-first.log",
+      "bytes": 1650,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/panel-tests.log",
+      "bytes": 4216,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb05/unit.log",
+      "bytes": 2106,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/emulator-all.log",
+      "bytes": 6129478,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/emulator-final.log",
+      "bytes": 6198600,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/emulator-privacy.log",
+      "bytes": 147242,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/flutter-affected-final.log",
+      "bytes": 26388,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/flutter-all.log",
+      "bytes": 88824,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/flutter-analyze.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/flutter-first.log",
+      "bytes": 10598,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/flutter-privacy.log",
+      "bytes": 15912,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/flutter-targeted.log",
+      "bytes": 18156,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/functions-final.log",
+      "bytes": 61636,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/functions-privacy.log",
+      "bytes": 2546,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/lint-fix.log",
+      "bytes": 404,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/lint-scoped.log",
+      "bytes": 0,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/retomada-2026-10-25/emulator.log",
+      "bytes": 159424,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/retomada-2026-10-25/flutter-affected.log",
+      "bytes": 28478,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/retomada-2026-10-25/flutter-all.log",
+      "bytes": 85848,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/retomada-2026-10-25/flutter-analyze.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/retomada-2026-10-25/functions.log",
+      "bytes": 61680,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb06/retomada-2026-10-25/lint.log",
+      "bytes": 0,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb07/bundle-dry-run.log",
+      "bytes": 86082,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb07/debug-dry-run.log",
+      "bytes": 58542,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb07/flutter-all.log",
+      "bytes": 73008,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb07/flutter-analyze.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb07/gradle-help.log",
+      "bytes": 20606,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb07/pub-get.log",
+      "bytes": 3814,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/kb07/signing-preflight.log",
+      "bytes": 19782,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/post_login_analyze.log",
+      "bytes": 0,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/post_login_analyze_final.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/post_login_analyze_retry.log",
+      "bytes": 1642,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/post_login_backend.log",
+      "bytes": 1822,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/post_login_flutter.log",
+      "bytes": 0,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/post_login_flutter_retry.log",
+      "bytes": 11420,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/post_login_rules.log",
+      "bytes": 2524280,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/post_login_rules_retry.log",
+      "bytes": 203936,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/production_identifiers_analyze.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/production_identifiers_auth.log",
+      "bytes": 8172,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/production_identifiers_build_android.log",
+      "bytes": 886,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/production_identifiers_build_web.log",
+      "bytes": 1154,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/production_identifiers_suite.log",
+      "bytes": 26348,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/raio_backend_lint.log",
+      "bytes": 21918,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/raio_backend_lint_final.log",
+      "bytes": 50,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/raio_backend_tests.log",
+      "bytes": 39706,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/raio_backend_tests_final.log",
+      "bytes": 39758,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/raio_client_analyze.log",
+      "bytes": 202,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/raio_client_analyze_final.log",
+      "bytes": 200,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/raio_client_apk.log",
+      "bytes": 10878,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/raio_client_suite.log",
+      "bytes": 34792,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/raio_client_targeted.log",
+      "bytes": 5914,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/raio_client_web.log",
+      "bytes": 2336,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/raio_emulator.log",
+      "bytes": 4747370,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/rules_premium_final.log",
+      "bytes": 4897722,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/analyze.log",
+      "bytes": 96166,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/analyze_final.log",
+      "bytes": 3556,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/build_apk_debug.log",
+      "bytes": 10848,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/build_apk_debug_final.log",
+      "bytes": 14224,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/build_web_release.log",
+      "bytes": 2306,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/build_web_release_final.log",
+      "bytes": 5798,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/capture_final.log",
+      "bytes": 6472,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/chrome_test_final.log",
+      "bytes": 156,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/flutter_test.log",
+      "bytes": 59892,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/flutter_test_final.log",
+      "bytes": 42168,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/homologation_devices.log",
+      "bytes": 1438,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/responsive_final.log",
+      "bytes": 11114,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/responsive_retry.log",
+      "bytes": 87470,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/responsive_single.log",
+      "bytes": 15016,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/responsive_test.log",
+      "bytes": 454,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_freeze/targeted_test.log",
+      "bytes": 296576,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_homologation/analyze.log",
+      "bytes": 3556,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_homologation/build_apk.log",
+      "bytes": 14224,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_homologation/build_web.log",
+      "bytes": 5798,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_homologation/captures.log",
+      "bytes": 7032,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_homologation/keyboard_final.log",
+      "bytes": 3972,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_homologation/small_android.log",
+      "bytes": 90242,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_homologation/small_android_retry.log",
+      "bytes": 23344,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_homologation/states.log",
+      "bytes": 4580,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_homologation/targeted.log",
+      "bytes": 107040,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/visual_homologation/tests.log",
+      "bytes": 46158,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/vm_client_final.log",
+      "bytes": 15496,
+      "tracked": false,
+      "sensitive": false
+    },
+    {
+      "path": "tool/vm_premium_final.log",
+      "bytes": 23050,
+      "tracked": false,
+      "sensitive": false
+    }
+  ]
+}

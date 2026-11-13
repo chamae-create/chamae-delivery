@@ -5,13 +5,14 @@ const vm = require("node:vm");
 const {test} = require("node:test");
 const {customerPolicyFixture, customerProfileFixture} =
     require("./customer-policy-fixture");
+const {policyFingerprint} = require("../customer-onboarding");
 const {deliveryFixture} = require("./delivery-fixture");
 const {useOpenClock, countryEvidence} = require("./operational-fixture");
 const {serverClock} = require("../order-acceptance");
 useOpenClock();
 
 const source = fs.readFileSync(path.join(__dirname, "../index.js"), "utf8");
-const clone = (value) => JSON.parse(JSON.stringify(value));
+const clone = (value) => value === undefined ? undefined : JSON.parse(JSON.stringify(value));
 const reference = (documentPath) => ({
   path: documentPath, id: documentPath.split("/").pop(),
 });
@@ -23,8 +24,8 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
     customerUid: "buyer", deliveryAddress: delivery.destination,
     deliveryQuoteId: delivery.quoteId,
     itemsList: [{id: "p1", quantity: 3, price: 0.01, unitPrice: 0.01}],
-    itemsTotal: 1, subtotal: 1, customerFee: 1, merchantFee: 1,
-    merchantNet: 1, platformFee: 1, totalBRL: 1, deliveryFee: 1,
+    itemsTotal: 1, subtotal: 1, customerFee: 0, merchantFee: 0,
+    merchantNet: 1, platformFee: 0, totalBRL: 70, deliveryFee: 1,
     financialValidationStatus: "validated", financialValidationVersion: 1,
     paymentMethod: "PIX", pixRequested: true, splitPayment: false,
     paymentStatus: "Aguardando confirmação", status: "Aguardando pagamento",
@@ -34,6 +35,7 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
     ...delivery.documents,
     ["orders/o1", clone(initial)],
     ["products/p1", {
+      category: "Snacks & Doces",
       priceBRL: 20, stock: 20, reservedStock: 0, salesCount: 0, ...product,
     }],
   ]);
@@ -99,7 +101,7 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
         id: "ORD1", status: options.providerStatus || "processed",
         status_detail: options.providerDetail || "accredited",
         external_reference: "o1", processing_mode: "automatic",
-        total_amount: options.mpAmount || body.total_amount || "70.60",
+        total_amount: options.mpAmount || body.total_amount || "70.00",
         transactions: {payments: [{
           id: "PAY1", status: "processed",
           payment_method: {
@@ -111,6 +113,7 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
     require: (name) => {
       switch (name) {
         case "node:crypto": return require(name);
+        case "./launch-financial-policy": return require("../launch-financial-policy");
         case "./delivery-service": return require("../delivery-service");
         case "./order-acceptance": return require("../order-acceptance");
         case "./order-cancellation-state": return require("../order-cancellation-state");
@@ -129,7 +132,9 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
         case "firebase-functions/v2/scheduler": return {onSchedule: (_, handler) => handler};
         case "./courier-approval": return require("../courier-approval");
         case "./courier-account": return require("../courier-account");
+        case "./courier-remuneration": return require("../courier-remuneration");
         case "./courier-events": return require("../courier-events");
+        case "./courier-policy": return require("../courier-policy");
         case "./courier-photo": return require("../courier-photo");
         case "./courier-assignment": return require("../courier-assignment");
         case "./order-operations": return require("../order-operations");
@@ -157,7 +162,10 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
             increment: (value) => ({increment: value}),
           },
         };
-        default: throw new Error(`Unexpected import: ${name}`);
+        default:
+          if (["./courier-pickup-runtime", "./customer-identification", "./age-verification-service",
+            "./recipient-age-check", "./delivery-journey", "./delivery-pin-verification"].includes(name)) return require("../" + name.slice(2));
+          throw new Error(`Unexpected import: ${name}`);
       }
     },
   };
@@ -201,13 +209,15 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
 
 const assertFinancial = (data) => {
   for (const [key, expected] of Object.entries({
-    itemsTotal: 60, deliveryFee: 10, customerFee: 0.60, merchantFee: 1.80,
-    merchantNet: 58.20, platformFee: 2.40, totalBRL: 70.60,
+    itemsTotal: 60, deliveryFee: 10, customerFee: 0, merchantFee: 0,
+    merchantNet: 60, platformFee: 0, totalBRL: 70.00,
   })) assert.equal(data[key], expected, key);
 };
 
 test("new flow checks consent before finance/PIX", async () => {
   const policy = customerPolicyFixture();
+  policy.minimumAgeByCountry = {BR: 18, PY: 20};
+  policy.contentHash = policyFingerprint(policy);
   const f = fixture({customerFlowVersion: 2, customerUid: "buyer",
     deliveryAddress: deliveryFixture().destination});
   f.docs.set("customerPolicies/current", policy);
@@ -223,6 +233,8 @@ test("new flow checks consent before finance/PIX", async () => {
 test("new flow rejects stale consent or missing alcohol policy", async () => {
   for (const invalid of ["consent", "alcohol"]) {
     const policy = customerPolicyFixture();
+  policy.minimumAgeByCountry = {BR: 18, PY: 20};
+  policy.contentHash = policyFingerprint(policy);
     const f = fixture({customerFlowVersion: 2, customerUid: "buyer",
       deliveryAddress: {countryCode: "BR"}}, {category: "Cervejas"});
     f.docs.set("customerPolicies/current", policy);
@@ -236,13 +248,36 @@ test("new flow rejects stale consent or missing alcohol policy", async () => {
 });
 
 for (const flow of ["auto", "manual", "reserve"]) {
+  test(`${flow}: a frozen price does not authorize a newly blocked product`, async () => {
+    const policy = customerPolicyFixture();
+  policy.minimumAgeByCountry = {BR: 18, PY: 20};
+  policy.contentHash = policyFingerprint(policy);
+    const overrides = {customerFlowVersion: 2, customerUid: "buyer",
+      ...(flow === "reserve" ? {paymentMethod: "Dinheiro", pixRequested: false} : {})};
+    const first = fixture(overrides);
+    first.docs.set("customerPolicies/current", policy);
+    first.docs.set("customerProfiles/buyer", customerProfileFixture(policy, "TEST-TIMESTAMP"));
+    await first.invoke(flow);
+    const frozen = first.docs.get("orderFinancials/o1");
+    assert.ok(frozen);
+    const retry = fixture(overrides, {commercialBlocked: true}, {financial: frozen});
+    retry.docs.set("customerPolicies/current", policy);
+    retry.docs.set("customerProfiles/buyer", customerProfileFixture(policy, "TEST-TIMESTAMP"));
+    await retry.invoke(flow);
+    assert.equal(retry.requests.length, 0);
+    assert.equal(retry.docs.get("products/p1").reservedStock, 0);
+    assert.deepEqual(retry.docs.get("orderFinancials/o1"), frozen);
+  });
+}
+
+for (const flow of ["auto", "manual", "reserve"]) {
   test(`${flow}: route quote freezes fee/version and ignores forged freight`,
       async () => {
         const destination = {latitude: -20.01, longitude: -50.01,
           countryCode: "BR", confirmed: true};
         const quoteId = "a".repeat(64);
         const f = fixture({customerUid: "buyer", deliveryAddress: destination,
-          deliveryQuoteId: quoteId, deliveryFee: 99999,
+          deliveryQuoteId: quoteId, deliveryFee: 99999, totalBRL: 67.25,
           ...(flow === "reserve" ? {paymentMethod: "Maquininha",
             pixRequested: false, status: "Novo"} : {})});
         f.docs.set("deliveryConfiguration/current", {mode: "routeBands",
@@ -263,7 +298,7 @@ for (const flow of ["auto", "manual", "reserve"]) {
         await f.invoke(flow);
         const frozen = f.docs.get("orderFinancials/o1");
         assert.equal(frozen.deliveryFee, 7.25);
-        assert.equal(frozen.totalBRL, 67.85);
+        assert.equal(frozen.totalBRL, 67.25);
         assert.equal(frozen.deliverySnapshot.configurationVersion, "v1");
         assert.equal(frozen.deliverySnapshot.distanceMeters, 2300);
         assert.equal(frozen.deliveryDistanceMeters, 2300);
@@ -393,11 +428,11 @@ for (const country of ["BR", "PY"]) {
       order.deliveryAddress.countryCode = country; quote.destination.countryCode = country;
       quote.destinationVerification.countryCode = country;
       await f.invoke(pix ? "auto" : "reserve");
-      const allowed = country === "BR" || pix || method === "Dinheiro" || split;
+      const allowed = country === "BR" && !split;
       assert.equal(f.docs.has("orderFinancials/o1"), allowed);
       if (!allowed) {
         assert.equal(f.docs.get("products/p1").reservedStock, 0);
-        assert.equal(order.financialValidationError, "PAYMENT_METHOD_NOT_ALLOWED_FOR_COUNTRY");
+        assert.equal(order.financialValidationError, country === "PY" ? "CROSS_BORDER_OPERATION_NOT_AUTHORIZED" : "SINGLE_PAYMENT_REQUIRED");
       }
     });
   }
@@ -453,7 +488,7 @@ for (const flow of ["auto", "manual"]) {
     assertFinancial(f.docs.get("orderFinancials/o1"));
     assert.equal(f.docs.get("orders/o1").itemsList[0].price, 20);
     assert.equal(f.docs.get("orders/o1").itemsList[0].unitPrice, 20);
-    assert.equal(JSON.parse(f.requests[0].body).total_amount, "70.60");
+    assert.equal(JSON.parse(f.requests[0].body).total_amount, "70.00");
     assert.equal(f.docs.get("products/p1").stock, 20);
   });
 
@@ -470,7 +505,7 @@ for (const flow of ["auto", "manual"]) {
         f.docs.get("products/p1").priceBRL = 100;
         await f.invoke(flow);
         assertFinancial(order);
-        assert.equal(JSON.parse(f.requests[1].body).total_amount, "70.60");
+        assert.equal(JSON.parse(f.requests[1].body).total_amount, "70.00");
         assert.equal(f.requests[1].headers["X-Idempotency-Key"], key);
       });
 
@@ -486,7 +521,7 @@ for (const flow of ["auto", "manual"]) {
 
   test(`${flow}: legacy matching amount reuses idempotency key`, async () => {
     const f = fixture({
-      mercadoPagoIdempotencyKey: "legacy-key", mercadoPagoAmountBRL: 70.60,
+      mercadoPagoIdempotencyKey: "legacy-key", mercadoPagoAmountBRL: 70.00,
     });
     await f.invoke(flow);
     assert.equal(f.requests[0].headers["X-Idempotency-Key"], "legacy-key");
@@ -541,16 +576,16 @@ test("cash: rejects insufficient tender against official total", async () => {
   assert.equal(f.docs.get("products/p1").reservedStock, 0);
 });
 
-for (const [currency, amount] of [["BRL", 70.60], ["USD", 14.12],
+for (const [currency, amount] of [["BRL", 70.00], ["USD", 14.12],
   ["PYG", 105900]]) {
-  test(`cash: accepts existing ${currency} conversion`, async () => {
+  test(`cash: ${currency} requires a genuine configured rate`, async () => {
     const f = fixture({
       paymentMethod: "Dinheiro", pixRequested: false,
       cashCurrency: currency, cashTendered: amount,
     });
     await f.invoke("reserve");
-    assertFinancial(f.docs.get("orders/o1"));
-    assert.equal(f.docs.get("products/p1").reservedStock, 3);
+    if (currency === "BRL") { assertFinancial(f.docs.get("orders/o1")); assert.equal(f.docs.get("products/p1").reservedStock, 3); }
+    else { assert.equal(f.docs.get("orders/o1").financialValidationError, "EXCHANGE_RATE_UNAVAILABLE"); assert.equal(f.docs.get("products/p1").reservedStock, 0); }
   });
 }
 
@@ -563,30 +598,30 @@ const split = (amount) => ({
   ],
 });
 
-test("split: validates original currencies, ignores client conversions",
+test("split: rejects new purchase even when declared payments cover the total",
     async () => {
       const f = fixture(split(4.12));
       await f.invoke("reserve");
-      assertFinancial(f.docs.get("orders/o1"));
-      assert.equal(f.docs.get("products/p1").reservedStock, 3);
+      assert.equal(f.docs.get("orders/o1").financialValidationError,"SINGLE_PAYMENT_REQUIRED");
+      assert.equal(f.docs.get("products/p1").reservedStock,0);
     });
 
 test("split: rejects insufficient sum despite forged paid totals", async () => {
   const f = fixture(split(1));
   await f.invoke("reserve");
   assert.equal(f.docs.get("orders/o1").financialValidationError,
-      "PAGAMENTO_INSUFICIENTE");
+      "SINGLE_PAYMENT_REQUIRED");
   assert.equal(f.docs.get("products/p1").reservedStock, 0);
 });
 
-test("rounding: rounds each percentage to cents", async () => {
-  const f = fixture({itemsList: [{id: "p1", quantity: 1}]}, {priceBRL: 0.50});
+test("launch: no fee on fractional item price", async () => {
+  const f = fixture({itemsList: [{id: "p1", quantity: 1}], totalBRL: 10.50}, {priceBRL: 0.50});
   await f.invoke("auto");
   const data = f.docs.get("orders/o1");
-  assert.equal(data.customerFee, 0.01);
-  assert.equal(data.merchantFee, 0.02);
-  assert.equal(data.merchantNet, 0.48);
-  assert.equal(data.totalBRL, 10.51);
+  assert.equal(data.customerFee, 0);
+  assert.equal(data.merchantFee, 0);
+  assert.equal(data.merchantNet, 0.50);
+  assert.equal(data.totalBRL, 10.50);
 });
 
 test("compatibility: official price fallback and duplicate items", async () => {
@@ -616,12 +651,13 @@ test("missing product cannot produce a charge", async () => {
   assert.equal(f.requests.length, 0);
 });
 
-test("transaction retry reads the updated official price", async () => {
+test("transaction retry requires reconfirmation after official price changes", async () => {
   const f = fixture({}, {}, {retry: (docs) => {
     docs.get("products/p1").priceBRL = 30;
   }});
   await f.invoke("auto");
-  assert.equal(JSON.parse(f.requests[0].body).total_amount, "100.90");
+  assert.equal(f.requests.length, 0);
+  assert.equal(f.docs.get("orders/o1").financialValidationError, "FINANCIAL_POLICY_RECONFIRMATION_REQUIRED");
 });
 
 test("webhook uses official amount even after client mirror is modified",
@@ -693,19 +729,20 @@ test("legacy reserved completion without delivery/collection evidence fails clos
     });
 
 test("multiple official products contribute to the same subtotal", async () => {
-  const f = fixture({itemsList: [
+  const f = fixture({totalBRL: 69.99, itemsList: [
     {id: "p1", quantity: 2, price: 0},
     {id: "p2", quantity: 1, price: 999},
   ]});
   f.docs.set("products/p2", {
-    priceBRL: 19.99, stock: 10, reservedStock: 0, salesCount: 0,
+    category: "Cervejas", priceBRL: 19.99, stock: 10, reservedStock: 0,
+    salesCount: 0,
   });
   await f.invoke("auto");
   const data = f.docs.get("orders/o1");
   assert.equal(data.itemsTotal, 59.99);
-  assert.equal(data.customerFee, 0.60);
-  assert.equal(data.merchantFee, 1.80);
-  assert.equal(data.totalBRL, 70.59);
+  assert.equal(data.customerFee, 0);
+  assert.equal(data.merchantFee, 0);
+  assert.equal(data.totalBRL, 69.99);
 });
 
 for (const itemsList of [[], [{id: "p1", quantity: -1}],
@@ -719,7 +756,7 @@ for (const itemsList of [[], [{id: "p1", quantity: -1}],
 }
 
 test("legacy PIX without frozen amount does not trust totalBRL", async () => {
-  const f = fixture({mercadoPagoOrderId: "ORD1", totalBRL: 70.60});
+  const f = fixture({mercadoPagoOrderId: "ORD1", totalBRL: 70.00});
   await f.invoke("webhook");
   assert.notEqual(f.docs.get("orders/o1").paymentStatus, "Pago");
   assert.equal(f.docs.get("products/p1").stock, 20);
@@ -729,7 +766,7 @@ test("split rejects overflow in declared converted amounts", async () => {
   const f = fixture(split(1e308));
   await f.invoke("reserve");
   assert.equal(f.docs.get("orders/o1").financialValidationError,
-      "VALOR_PAGAMENTO_INVALIDO");
+      "SINGLE_PAYMENT_REQUIRED");
   assert.equal(f.docs.get("products/p1").reservedStock, 0);
 });
 

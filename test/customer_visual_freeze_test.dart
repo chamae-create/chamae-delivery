@@ -104,7 +104,7 @@ void main() {
           addTearDown(tester.view.resetViewPadding);
         }
         final products = [
-          product('a', 'Bebida de teste', 'Cervejas'),
+          product('a', 'Bebida de teste', 'Refrigerantes & Sucos'),
           product('b', 'Snack de teste', 'Snacks & Doces'),
           product('blocked', 'POD', 'Tabacaria')
         ];
@@ -116,7 +116,7 @@ void main() {
         await tester.tap(find.text('Categorias').last);
         await tester.pumpAndSettle();
         await tester.scrollUntilVisible(
-            find.byKey(const ValueKey('category-Cervejas')), 250,
+            find.byKey(const ValueKey('category-Refrigerantes & Sucos')), 250,
             scrollable: find
                 .descendant(
                     of: find.byType(CustomScrollView),
@@ -127,10 +127,10 @@ void main() {
         expect(tester.takeException(), isNull);
         if (scale == 1) await capture(tester, 'categories_$width');
         await Scrollable.ensureVisible(
-            tester.element(find.byKey(const ValueKey('category-Cervejas'))),
+            tester.element(find.byKey(const ValueKey('category-Refrigerantes & Sucos'))),
             alignment: .5);
         await tester.pumpAndSettle();
-        await tester.tap(find.byKey(const ValueKey('category-Cervejas')));
+        await tester.tap(find.byKey(const ValueKey('category-Refrigerantes & Sucos')));
         await tester.pumpAndSettle();
         await tester.scrollUntilVisible(find.text('Bebida de teste'), 250,
             scrollable: find
@@ -143,6 +143,9 @@ void main() {
             alignment: .3);
         await tester.pumpAndSettle();
         await tester.tap(find.text('Bebida de teste'));
+        await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(find.text('Descrição do catálogo de teste.'), 100,
+            scrollable: find.byType(Scrollable).first);
         await tester.pumpAndSettle();
         expect(find.text('Descrição do catálogo de teste.'), findsOneWidget);
         expect(tester.takeException(), isNull);

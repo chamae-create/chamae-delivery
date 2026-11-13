@@ -30,7 +30,7 @@ Future<RestoredCustomerCart> restoreCustomerCart(List rawItems,
     if (lookup != null && !offline) {
       try {
         product = await lookup(id);
-        if (product != null && isCommerciallyBlocked(product)) {
+        if (product != null && isCommerciallyBlocked({...product, 'id': id})) {
           notices.add('${raw['name']} está fora de venda e foi removido.');
           continue;
         }
@@ -66,8 +66,11 @@ Future<RestoredCustomerCart> restoreCustomerCart(List rawItems,
         category: product?['category']?.toString() ??
             raw['category']?.toString() ??
             '',
-        commercialBlocked: product?['commercialBlocked'] == true ||
-            raw['commercialBlocked'] == true);
+        commercialBlocked: product != null && categoryReviewRequired(product) ||
+            product?['commercialBlocked'] == true ||
+            raw['commercialBlocked'] == true,
+        isAlcoholic: product?['isAlcoholic'] == true || raw['isAlcoholic'] == true,
+        requiresAgeCheck: product?['requiresAgeCheck'] == true || raw['requiresAgeCheck'] == true);
   }
   return RestoredCustomerCart(items, notices);
 }

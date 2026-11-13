@@ -1,0 +1,54 @@
+﻿[
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\pubspec.yaml",
+        "Hash":  "FBCD1ED55F46783A515C73A7056C3DF094561233A46AF7118CD30FF0056171B6"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\pubspec.lock",
+        "Hash":  "78A59519E1BB1C9761FADB58F4EF16E1E4215DD21B06CE83020A95F1EB477C63"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\package.json",
+        "Hash":  "4372EA476D282CF0C07C3A7C180EC9E29A4B51DFF6442E4B44DCA75CFEAF623F"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\package-lock.json",
+        "Hash":  "C7741EF3CAF08CEF7AFBC38575460C84AB26AAF7B05D5BB3C90781A6CFE140FF"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\delivery-pricing.js",
+        "Hash":  "7FD520E0A81AB2D486BCEE5E4DFBF86C56C6BDF64EAD4DA73E57C0F1718B0AB9"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\google-routes-provider.js",
+        "Hash":  "054D4EECDB0D2959A93D94F0B690467B69F972B9376618B54D3DD30004A23BD1"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\config\\delivery-pricing-initial.json",
+        "Hash":  "53B748AAAB63C1198126A3EDA6ECCAFF56DCF392D303A5A9BBEF645B9C635B4B"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\order-operations.js",
+        "Hash":  "80F811D7E735E8F75714900D8282164D251F8C8DF24C90F5AF99CFB422F5F249"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\courier-assignment.js",
+        "Hash":  "6927F5A4ABAB1B0D4F39366F6CF0A01DE003851520F50F62AB7E57FA11AA42FB"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\courier-deliveries.js",
+        "Hash":  "21283BD853DF1C371C07220D9F5701218776D08C7A104DBC010E9D11754D470C"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\lib\\core\\store_hours.dart",
+        "Hash":  "1A5EAB395805D06E1D328AF82BF5F52A6B28CE9E889A897890B257961140AB59"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\lib\\core\\cart_validation.dart",
+        "Hash":  "67B54764F155E088BEC48339F8064F489F5E9AB35A175AE063FD47909D7C8556"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\lib\\data\\delivery_quote.dart",
+        "Hash":  "F9D3FD8B1AAA61A3C8FA7FA234244515CA580EFC66A9A94969F1260CF9DB6FB0"
+    }
+]

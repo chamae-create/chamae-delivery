@@ -1,0 +1,560 @@
+{
+  "counts": {
+    "total": 116,
+    "modified": 54,
+    "added": 62,
+    "deleted": 0,
+    "renamed": 0,
+    "other": 0
+  },
+  "exactApprovedSet": true,
+  "excludedStaged": [],
+  "unsafeNames": [],
+  "textFiles": 112,
+  "binaryFiles": 4,
+  "patternHits": [
+    {
+      "path": "android/app/build.gradle.kts",
+      "rule": "password",
+      "count": 11
+    },
+    {
+      "path": "android/app/build.gradle.kts",
+      "rule": "private_key",
+      "count": 1
+    },
+    {
+      "path": "android/app/build.gradle.kts",
+      "rule": "storePassword",
+      "count": 4
+    },
+    {
+      "path": "android/app/build.gradle.kts",
+      "rule": "keyPassword",
+      "count": 4
+    },
+    {
+      "path": "android/key.properties.example",
+      "rule": "password",
+      "count": 2
+    },
+    {
+      "path": "android/key.properties.example",
+      "rule": "storePassword",
+      "count": 1
+    },
+    {
+      "path": "android/key.properties.example",
+      "rule": "keyPassword",
+      "count": 1
+    },
+    {
+      "path": "docs/APP-CLIENTE-CONSOLIDACAO-FINAL-2026-10-24.md",
+      "rule": "token",
+      "count": 2
+    },
+    {
+      "path": "docs/CHECKPOINT-GIT-PRE-HOMOLOGACAO-2026-10-25.md",
+      "rule": "password",
+      "count": 3
+    },
+    {
+      "path": "docs/CHECKPOINT-GIT-PRE-HOMOLOGACAO-2026-10-25.md",
+      "rule": "secret",
+      "count": 4
+    },
+    {
+      "path": "docs/CHECKPOINT-GIT-PRE-HOMOLOGACAO-2026-10-25.md",
+      "rule": "token",
+      "count": 3
+    },
+    {
+      "path": "docs/CHECKPOINT-GIT-PRE-HOMOLOGACAO-2026-10-25.md",
+      "rule": "private_key",
+      "count": 2
+    },
+    {
+      "path": "docs/CHECKPOINT-GIT-PRE-HOMOLOGACAO-2026-10-25.md",
+      "rule": "client_secret",
+      "count": 1
+    },
+    {
+      "path": "docs/CHECKPOINT-GIT-PRE-HOMOLOGACAO-2026-10-25.md",
+      "rule": "BEGIN PRIVATE KEY",
+      "count": 1
+    },
+    {
+      "path": "docs/CHECKPOINT-GIT-PRE-HOMOLOGACAO-2026-10-25.md",
+      "rule": "storePassword",
+      "count": 1
+    },
+    {
+      "path": "docs/CHECKPOINT-GIT-PRE-HOMOLOGACAO-2026-10-25.md",
+      "rule": "keyPassword",
+      "count": 1
+    },
+    {
+      "path": "docs/EXCLUSAO-CONTA-E-CONFIRMACAO-PEDIDO-2026-10-24.md",
+      "rule": "token",
+      "count": 1
+    },
+    {
+      "path": "docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md",
+      "rule": "secret",
+      "count": 2
+    },
+    {
+      "path": "docs/HOMOLOGACAO-MVP-CHAMAE-2026-10-24.md",
+      "rule": "token",
+      "count": 7
+    },
+    {
+      "path": "docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md",
+      "rule": "secret",
+      "count": 1
+    },
+    {
+      "path": "docs/HOMOLOGACAO-MVP-CHAMAE-CHECKLIST-2026-10-24.md",
+      "rule": "token",
+      "count": 1
+    },
+    {
+      "path": "docs/KB-05-CONTINGENCIA-ENTREGA-2026-10-24.md",
+      "rule": "token",
+      "count": 1
+    },
+    {
+      "path": "docs/KB-06-PRIVACIDADE-APPLE-CONTA-2026-10-24.md",
+      "rule": "secret",
+      "count": 2
+    },
+    {
+      "path": "docs/KB-06-PRIVACIDADE-APPLE-CONTA-2026-10-24.md",
+      "rule": "token",
+      "count": 23
+    },
+    {
+      "path": "docs/KB-07-ANDROID-SIGNING-BUILD-2026-10-25.md",
+      "rule": "password",
+      "count": 2
+    },
+    {
+      "path": "docs/KB-07-ANDROID-SIGNING-BUILD-2026-10-25.md",
+      "rule": "storePassword",
+      "count": 1
+    },
+    {
+      "path": "docs/KB-07-ANDROID-SIGNING-BUILD-2026-10-25.md",
+      "rule": "keyPassword",
+      "count": 1
+    },
+    {
+      "path": "docs/home_official_visual_audit_2026-10-21.md",
+      "rule": "token",
+      "count": 2
+    },
+    {
+      "path": "firestore.rules",
+      "rule": "secret",
+      "count": 1
+    },
+    {
+      "path": "firestore.rules",
+      "rule": "token",
+      "count": 7
+    },
+    {
+      "path": "functions/courier-assignment.js",
+      "rule": "secret",
+      "count": 1
+    },
+    {
+      "path": "functions/courier-assignment.js",
+      "rule": "token",
+      "count": 5
+    },
+    {
+      "path": "functions/customer-account.js",
+      "rule": "secret",
+      "count": 1
+    },
+    {
+      "path": "functions/customer-account.js",
+      "rule": "token",
+      "count": 11
+    },
+    {
+      "path": "functions/customer-onboarding.js",
+      "rule": "token",
+      "count": 4
+    },
+    {
+      "path": "functions/customer-provider-revocation.js",
+      "rule": "secret",
+      "count": 1
+    },
+    {
+      "path": "functions/customer-provider-revocation.js",
+      "rule": "token",
+      "count": 7
+    },
+    {
+      "path": "functions/customer-security.js",
+      "rule": "secret",
+      "count": 7
+    },
+    {
+      "path": "functions/customer-security.js",
+      "rule": "token",
+      "count": 5
+    },
+    {
+      "path": "functions/delivery-service.js",
+      "rule": "secret",
+      "count": 4
+    },
+    {
+      "path": "functions/delivery-service.js",
+      "rule": "token",
+      "count": 7
+    },
+    {
+      "path": "functions/index.js",
+      "rule": "secret",
+      "count": 15
+    },
+    {
+      "path": "functions/index.js",
+      "rule": "token",
+      "count": 12
+    },
+    {
+      "path": "functions/operational-contingency.js",
+      "rule": "token",
+      "count": 2
+    },
+    {
+      "path": "functions/order-cancellation.js",
+      "rule": "token",
+      "count": 1
+    },
+    {
+      "path": "functions/order-chat.js",
+      "rule": "token",
+      "count": 3
+    },
+    {
+      "path": "functions/test/customer-account.emulator.spec.js",
+      "rule": "secret",
+      "count": 2
+    },
+    {
+      "path": "functions/test/customer-account.emulator.spec.js",
+      "rule": "token",
+      "count": 5
+    },
+    {
+      "path": "functions/test/customer-account.spec.js",
+      "rule": "token",
+      "count": 8
+    },
+    {
+      "path": "functions/test/customer-privacy.emulator.spec.js",
+      "rule": "secret",
+      "count": 2
+    },
+    {
+      "path": "functions/test/customer-privacy.emulator.spec.js",
+      "rule": "token",
+      "count": 8
+    },
+    {
+      "path": "functions/test/customer-provider-revocation.spec.js",
+      "rule": "secret",
+      "count": 2
+    },
+    {
+      "path": "functions/test/customer-provider-revocation.spec.js",
+      "rule": "token",
+      "count": 10
+    },
+    {
+      "path": "functions/test/delivery-contingency.emulator.spec.js",
+      "rule": "token",
+      "count": 2
+    },
+    {
+      "path": "functions/test/delivery-contingency.spec.js",
+      "rule": "secret",
+      "count": 2
+    },
+    {
+      "path": "functions/test/delivery-contingency.spec.js",
+      "rule": "token",
+      "count": 3
+    },
+    {
+      "path": "functions/test/delivery-contracts.spec.js",
+      "rule": "password",
+      "count": 2
+    },
+    {
+      "path": "functions/test/delivery-contracts.spec.js",
+      "rule": "secret",
+      "count": 5
+    },
+    {
+      "path": "functions/test/delivery-contracts.spec.js",
+      "rule": "token",
+      "count": 3
+    },
+    {
+      "path": "functions/test/delivery-official.spec.js",
+      "rule": "secret",
+      "count": 2
+    },
+    {
+      "path": "functions/test/delivery-official.spec.js",
+      "rule": "token",
+      "count": 1
+    },
+    {
+      "path": "functions/test/delivery-radius.emulator.spec.js",
+      "rule": "token",
+      "count": 2
+    },
+    {
+      "path": "functions/test/final-operations.emulator.spec.js",
+      "rule": "token",
+      "count": 1
+    },
+    {
+      "path": "functions/test/financial.spec.js",
+      "rule": "secret",
+      "count": 3
+    },
+    {
+      "path": "functions/test/firestore.rules.spec.js",
+      "rule": "password",
+      "count": 2
+    },
+    {
+      "path": "functions/test/firestore.rules.spec.js",
+      "rule": "secret",
+      "count": 3
+    },
+    {
+      "path": "functions/test/firestore.rules.spec.js",
+      "rule": "token",
+      "count": 1
+    },
+    {
+      "path": "functions/test/order-acceptance.emulator.spec.js",
+      "rule": "token",
+      "count": 7
+    },
+    {
+      "path": "functions/test/order-cancellation.emulator.spec.js",
+      "rule": "password",
+      "count": 1
+    },
+    {
+      "path": "functions/test/order-cancellation.emulator.spec.js",
+      "rule": "secret",
+      "count": 6
+    },
+    {
+      "path": "functions/test/order-cancellation.emulator.spec.js",
+      "rule": "token",
+      "count": 2
+    },
+    {
+      "path": "functions/test/order-cancellation.spec.js",
+      "rule": "password",
+      "count": 1
+    },
+    {
+      "path": "functions/test/order-cancellation.spec.js",
+      "rule": "token",
+      "count": 4
+    },
+    {
+      "path": "functions/test/pilot.emulator.spec.js",
+      "rule": "password",
+      "count": 2
+    },
+    {
+      "path": "functions/test/pilot.emulator.spec.js",
+      "rule": "token",
+      "count": 1
+    },
+    {
+      "path": "lib/data/customer_auth.dart",
+      "rule": "token",
+      "count": 16
+    },
+    {
+      "path": "lib/data/customer_orders.dart",
+      "rule": "token",
+      "count": 1
+    },
+    {
+      "path": "lib/screens/customer_profile_screen.dart",
+      "rule": "token",
+      "count": 1
+    },
+    {
+      "path": "test/customer_account_cycle_test.dart",
+      "rule": "secret",
+      "count": 2
+    },
+    {
+      "path": "test/customer_auth_test.dart",
+      "rule": "token",
+      "count": 9
+    },
+    {
+      "path": "test/customer_orders_test.dart",
+      "rule": "token",
+      "count": 2
+    },
+    {
+      "path": "test/customer_privacy_test.dart",
+      "rule": "secret",
+      "count": 4
+    },
+    {
+      "path": "test/customer_privacy_test.dart",
+      "rule": "token",
+      "count": 20
+    }
+  ],
+  "literalAssignments": [
+    {
+      "path": "functions/test/customer-provider-revocation.spec.js",
+      "line": 72,
+      "field": "accessToken",
+      "characters": 9,
+      "testFile": true,
+      "placeholder": true
+    },
+    {
+      "path": "functions/test/delivery-official.spec.js",
+      "line": 48,
+      "field": "apiKey",
+      "characters": 9,
+      "testFile": true,
+      "placeholder": true
+    },
+    {
+      "path": "functions/test/delivery-official.spec.js",
+      "line": 182,
+      "field": "apiKey",
+      "characters": 9,
+      "testFile": true,
+      "placeholder": true
+    },
+    {
+      "path": "functions/test/firestore.rules.spec.js",
+      "line": 443,
+      "field": "secret",
+      "characters": 15,
+      "testFile": true,
+      "placeholder": false
+    },
+    {
+      "path": "functions/test/order-acceptance.emulator.spec.js",
+      "line": 26,
+      "field": "MERCADOPAGO_ACCESS_TOKEN",
+      "characters": 9,
+      "testFile": true,
+      "placeholder": true
+    },
+    {
+      "path": "functions/test/order-acceptance.spec.js",
+      "line": 55,
+      "field": "apiKey",
+      "characters": 9,
+      "testFile": true,
+      "placeholder": true
+    },
+    {
+      "path": "functions/test/order-acceptance.spec.js",
+      "line": 79,
+      "field": "apiKey",
+      "characters": 16,
+      "testFile": true,
+      "placeholder": true
+    },
+    {
+      "path": "functions/test/order-acceptance.spec.js",
+      "line": 88,
+      "field": "apiKey",
+      "characters": 4,
+      "testFile": true,
+      "placeholder": true
+    },
+    {
+      "path": "functions/test/order-acceptance.spec.js",
+      "line": 91,
+      "field": "apiKey",
+      "characters": 4,
+      "testFile": true,
+      "placeholder": true
+    },
+    {
+      "path": "test/customer_auth_test.dart",
+      "line": 108,
+      "field": "idToken",
+      "characters": 18,
+      "testFile": true,
+      "placeholder": true
+    },
+    {
+      "path": "test/customer_privacy_test.dart",
+      "line": 124,
+      "field": "idToken",
+      "characters": 15,
+      "testFile": true,
+      "placeholder": true
+    }
+  ],
+  "danger": [],
+  "absolutePaths": [
+    {
+      "path": "docs/CHECKPOINT-GIT-PRE-HOMOLOGACAO-2026-10-25.md",
+      "line": 5,
+      "documentation": true
+    },
+    {
+      "path": "docs/CHECKPOINT-GIT-PRE-HOMOLOGACAO-2026-10-25.md",
+      "line": 121,
+      "documentation": true
+    },
+    {
+      "path": "docs/CHECKPOINT-GIT-PRE-HOMOLOGACAO-2026-10-25.md",
+      "line": 692,
+      "documentation": true
+    },
+    {
+      "path": "docs/KB-07-ANDROID-SIGNING-BUILD-2026-10-25.md",
+      "line": 58,
+      "documentation": true
+    },
+    {
+      "path": "docs/KB-07-ANDROID-SIGNING-BUILD-2026-10-25.md",
+      "line": 226,
+      "documentation": true
+    },
+    {
+      "path": "docs/splash_official_validation_2026-10-21/README.md",
+      "line": 5,
+      "documentation": true
+    }
+  ],
+  "conflictMarkers": [],
+  "excludedCount": 228,
+  "excludedPreserved": true,
+  "headUnchanged": true,
+  "officialKeyOutsideRepo": true
+}

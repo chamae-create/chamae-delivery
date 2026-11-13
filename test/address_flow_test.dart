@@ -106,10 +106,12 @@ void main() {
     final store = MemoryWorkspace();
     String? searched;
     bool? gpsRequested;
+    DeliveryAddress? sessionAddress;
     await tester.pumpWidget(MaterialApp(
         home: AddressDestinationScreen(
             onboarding: false,
             workspace: store,
+            onComplete: (address) => sessionAddress = address,
             mapPicker: (gps, query) async {
               gpsRequested = gps;
               searched = query;
@@ -137,8 +139,9 @@ void main() {
         scrollable: find.byType(Scrollable).first);
     await tester.tap(find.text('Confirmar destino'));
     await tester.pumpAndSettle();
-    expect(store.data['lastAddress']['noNumber'], true);
-    expect(store.data['lastAddress']['countryCode'], 'PY');
+    expect(sessionAddress?.noNumber, true);
+    expect(sessionAddress?.countryCode, 'PY');
+    expect(store.data.containsKey('lastAddress'), isFalse);
   });
   testWidgets(
       'unknown country asks fallback; unsupported structured country cannot be confirmed',

@@ -36,33 +36,24 @@ void main() {
     const Size(440, 850),
     const Size(640, 360)
   ]) {
-    testWidgets('official artwork covers viewport proportionally at $size',
+    testWidgets('premium artwork fits whole viewport proportionally at $size',
         (tester) async {
       final ready = Completer<void>();
       await showSplash(tester, ready, width: size.width, height: size.height);
       await tester.pump(const Duration(milliseconds: 2600));
       final image = tester.widget<Image>(find.byType(Image));
-      expect(
-          ((image.image as ResizeImage).imageProvider as AssetImage).assetName,
-          'assets/images/splash/chamae_official_gold_2026_10_21.jpeg');
-      expect(image.fit, BoxFit.cover);
-      expect(image.alignment, Alignment.bottomCenter);
-      final bounds = tester.getRect(find.byType(Image));
-      expect(bounds.left, lessThanOrEqualTo(.01));
-      expect(bounds.top, lessThanOrEqualTo(.01));
-      expect(bounds.right, greaterThanOrEqualTo(size.width - .01));
-      expect(bounds.bottom, greaterThanOrEqualTo(size.height - .01));
-      // Uniform cover scaling keeps the protected artwork region whole on
-      // supported portrait baselines, including the final cinematic zoom.
-      if (size.height > size.width) {
-        final fit = applyBoxFit(BoxFit.cover, const Size(740, 1600), size);
-        final crop = Alignment.bottomCenter
-            .inscribe(fit.source, Offset.zero & const Size(740, 1600));
-        expect(crop.top, lessThan(478)); // top of the official mark
-        expect(crop.bottom, greaterThan(1545)); // bottom of Loumak
-        expect(crop.left, lessThan(70));
-        expect(crop.right, greaterThan(650));
-      }
+      expect((image.image as AssetImage).assetName, SplashScreen.artwork);
+      expect(image.fit, BoxFit.contain);
+      expect(image.alignment, Alignment.center);
+      final fitted =
+          applyBoxFit(BoxFit.contain, SplashScreen.artworkSize, size);
+      expect(fitted.source, SplashScreen.artworkSize);
+      final destination =
+          Alignment.center.inscribe(fitted.destination, Offset.zero & size);
+      expect(destination.left, greaterThanOrEqualTo(0));
+      expect(destination.top, greaterThanOrEqualTo(0));
+      expect(destination.right, lessThanOrEqualTo(size.width));
+      expect(destination.bottom, lessThanOrEqualTo(size.height));
       expect(find.text('Loumak'), findsNothing);
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
@@ -99,27 +90,29 @@ void main() {
   });
 
   testWidgets(
-      'ready initialization completes the 2.5 second sequence before fading',
+      'ready initialization respects three seconds total',
       (tester) async {
     final ready = Completer<void>();
     await showSplash(tester, ready);
     ready.complete();
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 2400));
+    await tester.pump(const Duration(milliseconds: 2999));
     expect(find.text('Destino real pronto'), findsNothing);
-    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 1));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Destino real pronto'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 180));
     await tester.pumpAndSettle();
     expect(find.text('Destino real pronto'), findsOneWidget);
     expect(find.byType(SplashScreen), findsNothing);
   });
 
-  testWidgets('reduced motion skips the visual wait once ready',
+  testWidgets('reduced motion preserves three second minimum',
       (tester) async {
     final ready = Completer<void>();
     await showSplash(tester, ready, reduced: true);
     ready.complete();
+    await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
     expect(find.text('Destino real pronto'), findsOneWidget);
   });

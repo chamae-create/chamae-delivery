@@ -8,7 +8,7 @@ Product sample(String id,
         {bool offer = false,
         int sales = 1,
         int stock = 2,
-        String category = 'Cervejas',
+        String category = 'Refrigerantes & Sucos',
         String? name,
         double price = 20}) =>
     Product(

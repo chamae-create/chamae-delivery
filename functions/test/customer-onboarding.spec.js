@@ -94,8 +94,7 @@ test("consent cannot be used to alter DOB or let courier/anonymous/admin self-en
 test("country policy gates restricted products; unknown policy fails closed", () => {
   const now = new Date("2026-10-18T12:00:00Z");
   const context = {policy: policy(), profile: {birthDate: "2006-10-18"}, country: "BR"};
-  checkProductEligibility(context, {category: "Cervejas"}, now);
-  assert.equal(context.documentRequiredAtDelivery, true);
+  assert.throws(() => checkProductEligibility(context, {category: "Cervejas"}, now), e => e.details.reason === "AGE_PROVIDER_UNAVAILABLE");
   context.country = "PY";
   assert.throws(() => checkProductEligibility(context, {isAlcoholic: true}, now));
   context.policy.minimumAgeByCountry = {};
@@ -111,7 +110,8 @@ test("new purchase requires current consent; legacy orders remain compatible", a
   });
   await acceptDocuments(db, request());
   docs.set("products/p1", {category: "Gelo"});
-  assert.equal((await checkPurchase(db, {auth: auth(), data: {countryCode: "PY", productIds: ["p1"]}})).eligible, true);
+  assert.equal((await checkPurchase(db, {auth: auth(), data: {countryCode: "BR", productIds: ["p1"]}})).eligible, true);
+  await assert.rejects(checkPurchase(db, {auth: auth(), data: {countryCode: "PY", productIds: ["p1"]}}), e => e.details.reason === "CROSS_BORDER_OPERATION_NOT_AUTHORIZED");
   await assert.rejects(checkPurchase(db, {auth: auth(), data: {countryCode: "US", productIds: ["p1"]}}));
 });
 test("Google Routes server adapter uses field mask and real distance; no fallback", async () => {

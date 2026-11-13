@@ -1,0 +1,46 @@
+﻿[
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\pubspec.yaml",
+        "Hash":  "FBCD1ED55F46783A515C73A7056C3DF094561233A46AF7118CD30FF0056171B6"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\pubspec.lock",
+        "Hash":  "78A59519E1BB1C9761FADB58F4EF16E1E4215DD21B06CE83020A95F1EB477C63"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\package.json",
+        "Hash":  "4372EA476D282CF0C07C3A7C180EC9E29A4B51DFF6442E4B44DCA75CFEAF623F"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\package-lock.json",
+        "Hash":  "C7741EF3CAF08CEF7AFBC38575460C84AB26AAF7B05D5BB3C90781A6CFE140FF"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\order-operations.js",
+        "Hash":  "80F811D7E735E8F75714900D8282164D251F8C8DF24C90F5AF99CFB422F5F249"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\courier-assignment.js",
+        "Hash":  "6927F5A4ABAB1B0D4F39366F6CF0A01DE003851520F50F62AB7E57FA11AA42FB"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\customer-account.js",
+        "Hash":  "C372B9748029E51164F5201D32B01322F604A72670C75A40D239C570987BEC4A"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\customer-onboarding.js",
+        "Hash":  "EA2BF897295974141E2FD10B583131F2089585ECCBD4DBF6300E70FA81172300"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\google-routes-provider.js",
+        "Hash":  "054D4EECDB0D2959A93D94F0B690467B69F972B9376618B54D3DD30004A23BD1"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\delivery-pricing.js",
+        "Hash":  "7FD520E0A81AB2D486BCEE5E4DFBF86C56C6BDF64EAD4DA73E57C0F1718B0AB9"
+    },
+    {
+        "Path":  "C:\\Users\\DELL\\chamae_delivery\\functions\\config\\delivery-pricing-initial.json",
+        "Hash":  "53B748AAAB63C1198126A3EDA6ECCAFF56DCF392D303A5A9BBEF645B9C635B4B"
+    }
+]

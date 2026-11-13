@@ -3,6 +3,9 @@ const {Timestamp, FieldValue} = require("firebase-admin/firestore");
 const {HttpsError, onCall} = require("firebase-functions/v2/https");
 const {validNavigation} = require("./courier-navigation-package");
 const {requireApprovedCourier} = require("./courier-authorization");
+const {assertCurrentCourierAcceptance} = require("./courier-policy");
+const {planCourierDelivery, writeCourierDelivery} = require("./courier-deliveries");
+const {assertCustomerAccountActive} = require("./customer-account-state");
 const {authorize, readyForDispatch} = require("./courier-assignment");
 const fields = ["version", "algorithm", "keyId", "orderId", "assignmentId", "courierUid",
   "packageVersion", "expiresAtMs", "nonce", "signature"];
@@ -81,7 +84,9 @@ function validatePackage(bytes, ticket) {
     d.payment.amountMinor < 0 || d.payment.state === "paid" && d.payment.amountMinor !== 0 ||
     !["BRL", "PYG", "USD"].includes(d.payment.currency) ||
     pin.orderId !== ticket.orderId ||
-    !pin.verificationMaterial || pin.verificationVersion !== 1 ||
+    pin.verificationMaterial !== "server-only:v1" || pin.verificationVersion !== 1 ||
+    !Number.isSafeInteger(d.expiresAtMs) || d.expiresAtMs <= Date.now() || d.expiresAtMs > a.expiresAtMs ||
+    pin.expiresAtMs > d.expiresAtMs ||
     !Number.isSafeInteger(pin.expiresAtMs) || pin.expiresAtMs <= Date.now() ||
     !Number.isInteger(pin.maxAttempts) || pin.maxAttempts < 1 || pin.maxAttempts > 5 ||
     ["pin", "plainPin", "customerPhone", "merchantNet", "orderFinancials"].some((k) => Object.hasOwn(d, k)) ||
@@ -115,6 +120,7 @@ async function issueTicket(db, request, ports = unconfigured) {
     throw new HttpsError("invalid-argument",
         "Pedido inválido.");
   }
+  const prepared = typeof ports.preparePackage === "function" ? await ports.preparePackage(request) : null;
   return db.runTransaction(async (tx) => {
     const actor = await tx.get(db.doc(`couriers/${request.auth.uid}`));
     if (actor.exists) throw new HttpsError("permission-denied", "Use uma conta administrativa.");
@@ -129,14 +135,20 @@ async function issueTicket(db, request, ports = unconfigured) {
       throw new HttpsError("permission-denied",
           "Motoboy não liberado.");
     }
-    return {ticket: await ports.sign({version: 2, algorithm: "Ed25519", keyId: "pickup-v2",
+    if (prepared && (prepared.assignmentId !== order.courierAssignmentId ||
+        prepared.courierUid !== order.courierUid || prepared.expiresAtMs <= Date.now())) {
+      throw new HttpsError("failed-precondition", "PACKAGE_SOURCE_CHANGED");
+    }
+    return {ticket: await ports.sign({version: 2, algorithm: "Ed25519", keyId: ports.keyId || "pickup-v2",
       orderId: id, assignmentId: order.courierAssignmentId, courierUid: order.courierUid,
-      packageVersion: 1, expiresAtMs: order.courierAssignmentExpiresAt.toMillis(), nonce: randomUUID()})};
+      packageVersion: 1, expiresAtMs: Math.min(order.courierAssignmentExpiresAt.toMillis(),
+        prepared ? prepared.expiresAtMs : Number.MAX_SAFE_INTEGER), nonce: randomUUID()})};
   });
 }
 async function beginPickup(db, request, ports = unconfigured) {
   return db.runTransaction(async (tx) => {
     const courier = await requireApprovedCourier(db, request, tx);
+    await assertCurrentCourierAcceptance(db, courier.uid, tx);
     const parsed = parseTicket(request.data && request.data.ticket);
     const ticket = verifyTicket(request.data.ticket, await ports.publicKey(parsed.keyId));
     if (ticket.courierUid !== courier.uid) {
@@ -150,11 +162,18 @@ async function beginPickup(db, request, ports = unconfigured) {
     if (request.data.expectedOrderId && request.data.expectedOrderId !== ticket.orderId) {
       throw new HttpsError("failed-precondition", "Pedido incorreto.");
     }
+    const sessionId = createHash("sha256").update(`${courier.uid}:${ticket.nonce}`).digest("hex");
+    const confirmedGrant = await tx.get(db.doc(`courierPickupGrants/${ticket.orderId}`));
     const binding = await tx.get(db.doc(`courierPickupAssignments/${ticket.assignmentId}`));
-    if (! (order.acceptedAt instanceof Timestamp) || binding.exists && binding.data().status !== "active") {
+    if (!(order.acceptedAt instanceof Timestamp) || !binding.exists || !(binding.data().status === "active" ||
+        binding.data().status === "pickedUp" && confirmedGrant.exists &&
+        confirmedGrant.data().sessionId === sessionId && confirmedGrant.data().assignmentId === ticket.assignmentId &&
+        confirmedGrant.data().courierUid === courier.uid && order.status === "Saiu para Entrega" &&
+        ["headingToCustomer", "arrived"].includes(order.courierDeliveryPhase)) ||
+        binding.data().orderId !== ticket.orderId || binding.data().courierUid !== courier.uid) {
       throw new HttpsError("failed-precondition", "Aceite a entrega antes de retirar.");
     }
-    let bytes = await ports.package(ticket, order);
+    let bytes = await ports.package(ticket, order, tx);
     if (!Buffer.isBuffer(bytes) || !bytes.length || bytes.length > 2 * 1024 * 1024) {
       throw new HttpsError("failed-precondition", "Pacote offline incompleto.");
     }
@@ -162,7 +181,6 @@ async function beginPickup(db, request, ports = unconfigured) {
     if (order.displayOrderId && JSON.parse(bytes.toString("utf8")).delivery.number !== order.displayOrderId) {
       throw new HttpsError("failed-precondition", "Identificador operacional divergente no pacote.");
     }
-    const sessionId = createHash("sha256").update(`${courier.uid}:${ticket.nonce}`).digest("hex");
     const ref = db.doc(`courierPickupSessions/${sessionId}`);
     const previous = await tx.get(ref);
     const activationProof = previous.exists ? previous.data().activationProof : randomBytes(32).toString("base64url");
@@ -175,13 +193,19 @@ async function beginPickup(db, request, ports = unconfigured) {
       throw new HttpsError("aborted",
           "O pacote mudou. Leia um novo ticket.");
     }
+    const expiresAtMs = Math.min(ticket.expiresAtMs, order.courierAssignmentExpiresAt.toMillis(),
+        complete.assignment.expiresAtMs, complete.delivery.expiresAtMs, complete.delivery.pinVerifier.expiresAtMs);
+    if (typeof ports.attest !== "function") throw new HttpsError("failed-precondition", "PICKUP_ATTESTATION_NOT_CONFIGURED");
+    const attestation = await ports.attest({keyId: ticket.keyId, orderId: ticket.orderId,
+      assignmentId: ticket.assignmentId, courierUid: courier.uid, packageVersion: ticket.packageVersion,
+      expiresAtMs, sessionId, digest, length: bytes.length});
     if (!previous.exists) {
       tx.create(ref, {courierUid: courier.uid, orderId: ticket.orderId,
         assignmentId: ticket.assignmentId, packageVersion: ticket.packageVersion,
-        expiresAt: Timestamp.fromMillis(Math.min(ticket.expiresAtMs, order.courierAssignmentExpiresAt.toMillis())),
+        expiresAt: Timestamp.fromMillis(expiresAtMs),
         digest, activationProof, createdAt: FieldValue.serverTimestamp()});
     }
-    return {sessionId, digest, length: bytes.length, package: bytes.toString("base64")};
+    return {sessionId, digest, length: bytes.length, package: bytes.toString("base64"), attestation};
   }).catch(async (error) => {
     if (request.auth && error.code === "permission-denied") {
       try {
@@ -193,21 +217,22 @@ async function beginPickup(db, request, ports = unconfigured) {
     throw error;
   });
 }
-async function confirmPickup(db, request) {
+async function confirmPickup(db, request, helpers = {}) {
   const data = request.data || {};
   if (!/^[a-f0-9]{64}$/.test(data.sessionId || "") || !/^[a-f0-9]{64}$/.test(data.digest || "") ||
       Object.keys(data).some((k) => !["sessionId", "digest", "activationProof"].includes(k))) {
-    throw new HttpsError("invalid-argument",
-        "Preparação inválida.");
+    throw new HttpsError("invalid-argument", "Preparação inválida.");
+  }
+  if (typeof helpers.checkFinancial !== "function") {
+    throw new HttpsError("failed-precondition", "DISPATCH_FINANCIAL_GATE_NOT_CONFIGURED");
   }
   return db.runTransaction(async (tx) => {
     const courier = await requireApprovedCourier(db, request, tx);
-    const sessionRef = db.doc(`courierPickupSessions/${data.sessionId}`);
-    const session = await tx.get(sessionRef);
+    await assertCurrentCourierAcceptance(db, courier.uid, tx);
+    const session = await tx.get(db.doc("courierPickupSessions/" + data.sessionId));
     if (!session.exists || session.data().courierUid !== courier.uid || session.data().digest !== data.digest ||
-        session.data().expiresAt.toMillis() <= Date.now()) {
-      throw new HttpsError("permission-denied",
-          "Preparação inválida.");
+        !(session.data().expiresAt instanceof Timestamp) || session.data().expiresAt.toMillis() <= Date.now()) {
+      throw new HttpsError("permission-denied", "Preparação inválida.");
     }
     const prepared = session.data();
     if (typeof data.activationProof !== "string" || data.activationProof.length > 128 ||
@@ -215,30 +240,63 @@ async function confirmPickup(db, request) {
             createHash("sha256").update(prepared.activationProof).digest())) {
       throw new HttpsError("permission-denied", "Recebimento do pacote não confirmado.");
     }
-    const orderRef = db.doc(`orders/${prepared.orderId}`);
+    const orderRef = db.doc("orders/" + prepared.orderId);
     const order = (await tx.get(orderRef)).data();
     if (!matchAssignment(order, courier.uid, prepared.assignmentId, Date.now()) || courier.profile.online !== true ||
         !readyForDispatch(order)) throw new HttpsError("failed-precondition", "A entrega mudou. Atualize com a loja.");
-    const grantRef = db.doc(`courierPickupGrants/${prepared.orderId}`);
-    const previous = await tx.get(grantRef);
-    if (previous.exists && previous.data().sessionId === data.sessionId) return {acknowledged: true, replayed: true};
-    if (previous.exists && previous.data().assignmentId === prepared.assignmentId) {
-      throw new HttpsError("already-exists", "Retirada já confirmada por outro ticket.");
+    if (typeof order.customerUid !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(order.customerUid)) {
+      throw new HttpsError("failed-precondition", "CUSTOMER_UNAVAILABLE");
     }
-    const bindingRef = db.doc(`courierPickupAssignments/${prepared.assignmentId}`);
+    await assertCustomerAccountActive(db, order.customerUid, tx);
+    const financial = await tx.get(db.doc("orderFinancials/" + prepared.orderId));
+    if (!financial.exists) throw new HttpsError("failed-precondition", "FINANCIAL_RECORD_REQUIRED");
+    helpers.checkFinancial(order, financial.data());
+    const grantRef = db.doc("courierPickupGrants/" + prepared.orderId);
+    const previous = await tx.get(grantRef);
+    const bindingRef = db.doc("courierPickupAssignments/" + prepared.assignmentId);
     const binding = await tx.get(bindingRef);
-    if (! (order.acceptedAt instanceof Timestamp) || binding.exists && binding.data().status !== "active") {
+    if (!(order.acceptedAt instanceof Timestamp) || !binding.exists ||
+        binding.data().orderId !== prepared.orderId || binding.data().courierUid !== courier.uid) {
       throw new HttpsError("failed-precondition", "Esta entrega não está mais atribuída a você.");
     }
-    if (binding.exists) tx.update(bindingRef, {status: "pickedUp", pickedUpAt: FieldValue.serverTimestamp()});
-    if (order.expectedPickupBy instanceof Timestamp && Date.now() <= order.expectedPickupBy.toMillis()) {
-      tx.set(db.doc(`courierReliabilityEvents/${prepared.assignmentId}-ontime`), {type: "pickupOnTime",
-        orderId: prepared.orderId, assignmentId: prepared.assignmentId, courierUid: courier.uid,
-        at: FieldValue.serverTimestamp()});
+    const replay = previous.exists && previous.data().sessionId === data.sessionId;
+    if (replay) {
+      if (previous.data().digest !== data.digest || previous.data().courierUid !== courier.uid ||
+          previous.data().assignmentId !== prepared.assignmentId || binding.data().status !== "pickedUp" ||
+          order.status !== "Saiu para Entrega" || !["headingToCustomer", "arrived"].includes(order.courierDeliveryPhase)) {
+        throw new HttpsError("failed-precondition", "DISPATCH_REVALIDATION_REQUIRED");
+      }
+    } else {
+      if (previous.exists && previous.data().assignmentId === prepared.assignmentId) {
+        throw new HttpsError("already-exists", "Retirada já confirmada por outro ticket.");
+      }
+      if (binding.data().status !== "active" || order.status !== "Em Separação" ||
+          ![undefined, "pickedUp"].includes(order.courierDeliveryPhase)) {
+        throw new HttpsError("failed-precondition", "DISPATCH_TRANSITION_INVALID");
+      }
+      const previousProjection = await tx.get(db.doc("courierDeliveries/" + prepared.orderId));
+      const plan = planCourierDelivery({orderId: prepared.orderId, order,
+        previous: previousProjection.data() || {}, exists: previousProjection.exists, registered: true,
+        now: Timestamp.now(), binding: {courierUid: courier.uid, status: "Saiu para Entrega"}});
+      if (plan.revoked) throw new HttpsError("failed-precondition", "DELIVERY_PROJECTION_INVALID");
+      tx.update(bindingRef, {status: "pickedUp", pickedUpAt: FieldValue.serverTimestamp()});
+      if (order.expectedPickupBy instanceof Timestamp && Date.now() <= order.expectedPickupBy.toMillis()) {
+        tx.set(db.doc("courierReliabilityEvents/" + prepared.assignmentId + "-ontime"), {type: "pickupOnTime",
+          orderId: prepared.orderId, assignmentId: prepared.assignmentId, courierUid: courier.uid,
+          at: FieldValue.serverTimestamp()});
+      }
+      tx.set(grantRef, {...prepared, sessionId: data.sessionId, confirmedAt: FieldValue.serverTimestamp()});
+      tx.update(orderRef, {status: "Saiu para Entrega", dispatchedAt: FieldValue.serverTimestamp(),
+        courierDeliveryPhase: "headingToCustomer", courierPickupState: "headingToCustomer",
+        courierPickedUpAt: FieldValue.serverTimestamp()});
+      writeCourierDelivery(tx, {plan, deliveryRef: db.doc("courierDeliveries/" + prepared.orderId),
+        auditRef: db.collection("courierDeliveryAudit").doc(), orderId: prepared.orderId,
+        previous: previousProjection.data() || {}, actorUid: courier.uid});
     }
-    tx.set(grantRef, {...prepared, sessionId: data.sessionId, confirmedAt: FieldValue.serverTimestamp()});
-    tx.update(orderRef, {courierPickupState: "headingToCustomer", courierPickedUpAt: FieldValue.serverTimestamp()});
-    return {acknowledged: true, replayed: false};
+    return {acknowledged: true, replayed: replay, dispatchAcknowledgement: {
+      acknowledged: true, orderId: prepared.orderId, courierUid: courier.uid,
+      assignmentId: prepared.assignmentId, sessionId: data.sessionId, packageDigest: data.digest,
+      status: "Saiu para Entrega", phase: replay ? order.courierDeliveryPhase : "headingToCustomer"}};
   });
 }
 async function listAssignments(db, request) {
@@ -267,12 +325,13 @@ async function listAssignments(db, request) {
     return {assignments};
   });
 }
-function createCourierPickupFunctions(db) {
+function createCourierPickupFunctions(db, ports = unconfigured) {
   const options = {region: "southamerica-east1", maxInstances: 10};
+  const providerOptions = {...options, secrets: ports.secrets || []};
   return {chamaeMinhasAtribuicoes: onCall(options, (r) => listAssignments(db, r)),
-    chamaeEmitirTicketRetirada: onCall(options, (r) => issueTicket(db, r)),
-    chamaePrepararRetirada: onCall(options, (r) => beginPickup(db, r)),
-    chamaeConfirmarPacoteRetirada: onCall(options, (r) => confirmPickup(db, r))};
+    chamaeEmitirTicketRetirada: onCall(providerOptions, (r) => issueTicket(db, r, ports)),
+    chamaePrepararRetirada: onCall(providerOptions, (r) => beginPickup(db, r, ports)),
+    chamaeConfirmarPacoteRetirada: onCall(options, (r) => confirmPickup(db, r, ports))};
 }
 module.exports = {matchAssignment, validatePackage, listAssignments, parseTicket, verifyTicket, signTicket,
   issueTicket, beginPickup,

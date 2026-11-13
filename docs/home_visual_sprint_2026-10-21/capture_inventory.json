@@ -1,0 +1,104 @@
+{
+  "device": {
+    "model": "NUU M2",
+    "android": "7",
+    "api": 24,
+    "logicalSize": [
+      360,
+      640
+    ],
+    "physicalSize": [
+      720,
+      1280
+    ],
+    "densityDpi": 320,
+    "systemFontScale": 1
+  },
+  "mode": "debug isolated fixtures; not production data",
+  "captures": [
+    {
+      "name": "cart-state.png",
+      "bytes": 458561,
+      "width": 720,
+      "height": 1280,
+      "sha256": "b30ae5ae58234c85865d7c550b89d071f3ac7d80982e5b7b00af82f60c3fe757"
+    },
+    {
+      "name": "catalog.png",
+      "bytes": 398781,
+      "width": 720,
+      "height": 1280,
+      "sha256": "5f4e597afa507c8f28b312174eef9380ac9b34b9d8a64f24b9db8ef7e625315c"
+    },
+    {
+      "name": "categories-preview.png",
+      "bytes": 383228,
+      "width": 720,
+      "height": 1280,
+      "sha256": "fd58bbac5606072f015a6edba9950b94c4718f19b352c2f24621c0fa68f20eac"
+    },
+    {
+      "name": "empty.png",
+      "bytes": 541634,
+      "width": 720,
+      "height": 1280,
+      "sha256": "3b37e2fa76338b7c96a9834c8c519bdc6808a41798fe9b2993b8226d85b54117"
+    },
+    {
+      "name": "error.png",
+      "bytes": 550726,
+      "width": 720,
+      "height": 1280,
+      "sha256": "db4629590eef4f90f6a407ecb2e63035cea0eaada9e05d01ee50ef96cfd9eb18"
+    },
+    {
+      "name": "home.png",
+      "bytes": 591098,
+      "width": 720,
+      "height": 1280,
+      "sha256": "0b562d751fa0ea71575d0d4d0f8a80fcc9ca9f9d6837d800b0f9da04db0de99b"
+    },
+    {
+      "name": "large-text.png",
+      "bytes": 552662,
+      "width": 720,
+      "height": 1280,
+      "sha256": "8b271ef4e5a8c4eb383abcdd74e09505d70fa136629979c621abfee0aa148d5e"
+    },
+    {
+      "name": "no-address.png",
+      "bytes": 586149,
+      "width": 720,
+      "height": 1280,
+      "sha256": "a479f824c73188600afb748159930b6e1036329d29e1bcb7b545fd028fafa3ed"
+    },
+    {
+      "name": "popular.png",
+      "bytes": 355801,
+      "width": 720,
+      "height": 1280,
+      "sha256": "ca8731147368319798a4361ddd31ca16b72c6b0c8c5736535cd70c4220e15d6b"
+    },
+    {
+      "name": "promotions.png",
+      "bytes": 445524,
+      "width": 720,
+      "height": 1280,
+      "sha256": "07d9b798b21a0ef10557c1c5181f3114b6398ea82f2028d496c2b2806a97d48f"
+    },
+    {
+      "name": "quote-error.png",
+      "bytes": 557502,
+      "width": 720,
+      "height": 1280,
+      "sha256": "7ac71d77f460f74da4e411b5cdc1847e88bc9eed54755db96a99754df9339fdf"
+    },
+    {
+      "name": "search.png",
+      "bytes": 300475,
+      "width": 720,
+      "height": 1280,
+      "sha256": "33b31687ee8660e5c56dba67f140f0c4d1b141d8058708186fc8d17f932258d3"
+    }
+  ]
+}

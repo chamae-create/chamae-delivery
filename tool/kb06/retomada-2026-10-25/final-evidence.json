@@ -1,0 +1,29 @@
+{
+  "functions": [
+    "tests 414",
+    "pass 414",
+    "fail 0"
+  ],
+  "emulator": [
+    "tests 20",
+    "pass 20",
+    "fail 0"
+  ],
+  "affectedFlutter": [
+    "00:14 +74: All tests passed!"
+  ],
+  "allFlutter": [
+    "00:50 +207 -2: Some tests failed."
+  ],
+  "analyze": true,
+  "implementationPreserved": true,
+  "protectedFilesPreserved": true,
+  "checklist": {
+    "scenarioCount": 196,
+    "sameIds": true,
+    "manualIdsPreserved": true,
+    "compactIdsPreserved": true,
+    "resultsBlank": true,
+    "gatesPreserved": true
+  }
+}

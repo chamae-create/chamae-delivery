@@ -1,3 +1,4 @@
+const {launchAmounts, assertLaunchDeclaration} = require("./launch-financial-policy");
 const {prepareDelivery} = require("./delivery-service");
 const {prepareOrderAcceptance, assertStoreOpen} = require("./order-acceptance");
 const {assertPurchasable, assertPixCanStart, updateActiveOrder,
@@ -7,7 +8,8 @@ const {createOrderCancellation, cancelFromProvider} =
     require("./order-cancellation");
 const {prepareCustomerEligibility, checkProductEligibility} =
     require("./customer-onboarding");
-const {isCommerciallyBlocked} = require("./catalog-commercial-policy");
+const {isCommerciallyBlocked, categoryReviewRequired,
+  integratedCommercialBlockReason} = require("./catalog-commercial-policy");
 
 const {
 
@@ -151,14 +153,27 @@ async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
   } catch (error) {
     throw erroFinanceiro(error.acceptanceCode || error.message);
   }
+  const eligibility = await prepareCustomerEligibility(transaction, db, pedido);
   if (snapshot.exists) {
     const dados = snapshot.data();
     conferirItensFinanceiros(pedido, dados);
+    // A frozen price is not a reusable authorization after revocation or an
+    // expired age proof. This path starts a new reservation/payment attempt.
+    if (eligibility) {
+      for (const item of itens) {
+        const product = await transaction.get(db.collection("products").doc(item.id));
+        if (!product.exists) throw erroFinanceiro("PRODUTO_NAO_ENCONTRADO");
+        checkProductEligibility(eligibility, product.data());
+        if (isCommerciallyBlocked({...product.data(), id: product.id}) ||
+            categoryReviewRequired(product.data() || {})) {
+          throw erroFinanceiro("PRODUTO_BLOQUEADO_COMERCIALMENTE");
+        }
+      }
+    }
     return {ref, dados, novo: false};
   }
 
   let delivery;
-  const eligibility = await prepareCustomerEligibility(transaction, db, pedido);
   try {
     delivery = await prepareDelivery(transaction, db, orderRef, pedido);
   } catch (error) {
@@ -173,11 +188,14 @@ async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
     if (!productSnapshot.exists) {
       throw erroFinanceiro("PRODUTO_NAO_ENCONTRADO");
     }
-    const product = productSnapshot.data() || {};
+    const product = {...productSnapshot.data(), id: item.id};
     checkProductEligibility(eligibility, product);
-    if (isCommerciallyBlocked(product)) {
+    if (isCommerciallyBlocked(product) || categoryReviewRequired(product)) {
       throw erroFinanceiro("PRODUTO_BLOQUEADO_COMERCIALMENTE");
     }
+    // New financial snapshots only. Frozen historical prices are unchanged.
+    const integratedBlock = integratedCommercialBlockReason(product);
+    if (integratedBlock) throw erroFinanceiro(integratedBlock);
     const preco = product.priceBRL == null ? product.price : product.priceBRL;
     const precoCentavos = Math.round((preco + Number.EPSILON) * 100);
     if (
@@ -202,8 +220,14 @@ async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
   if (subtotalCentavos > Math.floor((Number.MAX_SAFE_INTEGER - 50) / 3)) {
     throw erroFinanceiro("VALOR_PEDIDO_INVALIDO");
   }
-  const customerFeeCentavos = Math.floor((subtotalCentavos + 50) / 100);
-  const merchantFeeCentavos = Math.floor((subtotalCentavos * 3 + 50) / 100);
+  let launch;
+  try {
+    launch = launchAmounts(subtotalCentavos, delivery.feeCents);
+    assertLaunchDeclaration(pedido, launch);
+  } catch (error) {
+    throw erroFinanceiro(error.message);
+  }
+  const {customerFeeCentavos, merchantFeeCentavos} = launch;
   const totalCentavos =
       subtotalCentavos + delivery.feeCents + customerFeeCentavos;
   if (!Number.isSafeInteger(totalCentavos) || totalCentavos <= 0) {
@@ -237,6 +261,7 @@ async function prepararFinanceiroPedido(transaction, orderRef, pedido) {
       dateOfBirthVerified: false,
       documentRequiredAtDelivery: eligibility.documentRequiredAtDelivery,
     }} : {}),
+    financialPolicySnapshot: launch.financialPolicySnapshot,
     customerFee: customerFeeCentavos / 100,
     merchantFee: merchantFeeCentavos / 100,
     merchantNet: (subtotalCentavos - merchantFeeCentavos) / 100,
@@ -280,6 +305,8 @@ function camposFinanceirosPedido(pedido, dados) {
         deliveryQuotedAtMs: dados.deliverySnapshot.quotedAtMs} : {}),
     ...(dados.ageEligibilitySnapshot ?
       {ageEligibilitySnapshot: dados.ageEligibilitySnapshot} : {}),
+    ...(dados.financialPolicySnapshot ?
+      {financialPolicySnapshot: dados.financialPolicySnapshot} : {}),
     customerFee: dados.customerFee,
     merchantFee: dados.merchantFee,
     merchantNet: dados.merchantNet,
@@ -2171,7 +2198,7 @@ exports.chamaeMercadoPagoWebhook = onRequest(
 
           xRequestId: xRequestId,
 
-          dataId: dataId.toString(),
+          dataId: dataId.toString().toLowerCase(),
 
           secret:
 
@@ -2297,114 +2324,11 @@ exports.chamaeMercadoPagoWebhook = onRequest(
       }
 
 
-      // ==================================================
-
-      // FALLBACK CONTROLADO EXCLUSIVO DO SANDBOX
-
-      //
-
-      // IMPORTANTE:
-
-      // O webhook NÃO confirma pagamento diretamente.
-
-      //
-
-      // Ele apenas permite a consulta autenticada da Order
-
-      // na API oficial do Mercado Pago.
-
-      //
-
-      // Em produção real este fallback NÃO é aceito.
-
-      // ==================================================
-
-
-      const sandboxConhecido =
-
-          liveMode === false &&
-
-          tipo === "order" &&
-
-          applicationId !== null &&
-
-          String(applicationId) ===
-
-              "1991368945375836" &&
-
-          userId !== null &&
-
-          String(userId) ===
-
-              "3754565992" &&
-
-          dataId
-
-              .toString()
-
-              .startsWith("ORDTST");
-
-
-      if (!sandboxConhecido) {
-        console.warn(
-
-            "Webhook recusado. Fallback sandbox não aplicável.",
-
-            {
-
-              dataId: dataId,
-
-              liveMode: liveMode,
-
-              applicationId:
-
-                  applicationId,
-
-              userId: userId,
-
-              tipo: tipo,
-
-            },
-
-        );
-
-
-        response.status(401).send(
-
-            "Assinatura inválida",
-
-        );
-
-        return;
-      }
-
-
-      console.warn(
-
-          "Fallback seguro de sandbox ativado.",
-
-          {
-
-            dataId: dataId,
-
-            applicationId:
-
-                applicationId,
-
-            userId: userId,
-
-            action: action,
-
-          },
-
-      );
-
-
-      await processarOrder(
-
-          "mercado_pago_sandbox_verified_api",
-
-      );
+      // Caller-supplied sandbox metadata never authenticates a webhook.
+      // The official SDK validation above is mandatory before any PSP lookup.
+      console.warn("Webhook rejected: invalid signature.");
+      response.status(401).send("Assinatura inválida");
+      return;
     },
 
 );
@@ -3905,6 +3829,7 @@ Object.assign(exports, require("./order-operations")
     .createOrderOperations(db, {
       resolveReservation: resolverReservaNaTransacao,
       checkFinancial: conferirItensFinanceiros,
+      checkDeliveryPayment: validarPagamentoEntrega,
     }));
 
 Object.assign(exports, require("./order-chat").createOrderChat(db));
@@ -3917,6 +3842,7 @@ Object.assign(exports, require("./customer-security")
     .createCustomerSecurity(db));
 Object.assign(exports, require("./customer-onboarding")
     .createCustomerOnboarding(db));
+Object.assign(exports, require("./courier-policy").createCourierPolicyFunctions(db));
 
 Object.assign(exports, require("./customer-account")
     .createCustomerAccountFunctions(db));
@@ -3932,7 +3858,9 @@ Object.assign(exports,
     require("./courier-approval").createCourierApprovalFunctions(db));
 
 Object.assign(exports,
-    require("./courier-pickup").createCourierPickupFunctions(db));
+    require("./courier-pickup").createCourierPickupFunctions(db, require("./courier-pickup-runtime").createPickupRuntime(db, {
+      checkFinancial: conferirItensFinanceiros, checkDeliveryPayment: validarPagamentoEntrega,
+    })));
 
 // Local v0.2 contracts; transports/signing remain explicitly unconfigured.
 exports.chamaeIdentificarPedido =
@@ -3948,6 +3876,21 @@ Object.assign(exports, require("./courier-account")
     .createCourierAccountFunctions(db));
 
 Object.assign(exports, require("./courier-events")
-    .createCourierEventFunctions(db));
+    .createCourierEventFunctions(db, {
+      resolveReservation: resolverReservaNaTransacao,
+      checkFinancial: conferirItensFinanceiros,
+      checkDeliveryPayment: validarPagamentoEntrega,
+    }));
 Object.assign(exports, require("./courier-photo")
     .createCourierPhotoFunctions(db));
+
+// Integrated local increment; existing exports remain available. No publication
+// is authorized by this source change.
+Object.assign(exports, require("./customer-identification").createCustomerIdentification(db));
+Object.assign(exports, require("./age-verification-service").createAgeVerificationFunctions(db));
+Object.assign(exports, require("./recipient-age-check").createRecipientAgeCheck(db));
+Object.assign(exports, require("./delivery-journey").createDeliveryJourneyFunctions(db));
+Object.assign(exports, require("./delivery-pin-verification").createDeliveryPinVerification(db));
+
+// H03 local integration: independent courier remuneration; no customer freight changes.
+Object.assign(exports, require("./courier-remuneration").createCourierRemuneration(db));

@@ -3,19 +3,20 @@ const {RoutingProvider, DeliveryError, point} = require("./delivery-pricing");
 // Server-only adapter. No browser/Android key, straight-line or zero-fee fallback.
 // The active configuration must explicitly select DRIVE or TWO_WHEELER.
 class GoogleRoutesProvider extends RoutingProvider {
-  constructor({apiKey, travelMode, fetchImpl = fetch}) {
-    super(); this.apiKey = apiKey; this.travelMode = travelMode; this.fetchImpl = fetchImpl;
+  constructor({apiKey, authHeaders, travelMode, fetchImpl = fetch}) {
+    super(); this.apiKey = apiKey; this.authHeaders = authHeaders; this.travelMode = travelMode; this.fetchImpl = fetchImpl;
   }
   async route({origin, destination}) {
-    if (!this.apiKey || !["DRIVE", "TWO_WHEELER"].includes(this.travelMode)) {
+    if ((!this.apiKey && !this.authHeaders) || !["DRIVE", "TWO_WHEELER"].includes(this.travelMode)) {
       throw new DeliveryError("ROUTING_PROVIDER_NOT_CONFIGURED");
     }
     if (!point(origin) || !point(destination)) throw new DeliveryError("INVALID_COORDINATES");
     const waypoint = ({latitude, longitude}) => ({location: {latLng: {latitude, longitude}}});
     try {
+      const authentication = this.authHeaders ? await this.authHeaders() : {"X-Goog-Api-Key": this.apiKey};
       const response = await this.fetchImpl("https://routes.googleapis.com/directions/v2:computeRoutes", {
         method: "POST", signal: AbortSignal.timeout(10000), headers: {
-          "Content-Type": "application/json", "X-Goog-Api-Key": this.apiKey,
+          "Content-Type": "application/json", ...authentication,
           "X-Goog-FieldMask": "routes.distanceMeters,routes.duration,fallbackInfo",
         }, body: JSON.stringify({origin: waypoint(origin), destination: waypoint(destination),
           travelMode: this.travelMode, computeAlternativeRoutes: false}),

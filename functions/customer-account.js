@@ -177,9 +177,10 @@ async function processClosure(db, auth, uid, services = {}) {
   if (!execute) return;
   await visitOrders(db, uid, (doc) => redactOrder(db, uid, doc, job.data().requestedAt));
   for (const [collection, field] of [["deliveryQuotes", "uid"], ["deliveryPinAudit", "uid"],
-    ["reviews", "customerUid"]]) await eraseQuery(db, collection, field, uid);
+    ["reviews", "customerUid"], ["ageVerificationSessions", "uid"], ["ageVerificationAudit", "uid"],
+    ["deliveryAgeChecks", "customerUid"], ["deliveryAgeAudit", "uid"]]) await eraseQuery(db, collection, field, uid);
   for (const collection of ["customerProfiles", "customerWorkspaces", "customerDeliverySecrets",
-    "customerConsentEvents", "customerOrderCancellations"]) {
+    "customerConsentEvents", "customerOrderCancellations", "customerAgeVerifications"]) {
     await db.recursiveDelete(db.collection(collection).doc(uid));
   }
   // Delete sensitive provider material only AFTER a durable outcome and local erasure.

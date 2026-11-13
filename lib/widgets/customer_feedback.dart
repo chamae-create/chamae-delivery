@@ -1,3 +1,4 @@
+import '../l10n/customer_localizations.dart';
 import 'package:flutter/material.dart';
 import '../core/theme.dart';
 
@@ -31,12 +32,12 @@ class CustomerFeedback extends StatelessWidget {
           const SizedBox(height: 16),
           Semantics(
               liveRegion: true,
-              child: Text(title,
+              child: LocalizedText(title,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontWeight: FontWeight.w800, fontSize: 18))),
           const SizedBox(height: 8),
-          Text(message,
+          LocalizedText(message,
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.textSecondary)),
           if (onRetry != null) ...[
@@ -44,7 +45,7 @@ class CustomerFeedback extends StatelessWidget {
             TextButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Tentar novamente')),
+                label: const LocalizedText('Tentar novamente')),
           ],
         ]),
       );

@@ -1,0 +1,32 @@
+﻿{
+    "indexUnchanged":  false,
+    "stagedUnchanged":  true,
+    "stagedCount":  12,
+    "generatedFilesPreserved":  12,
+    "previousWorkChecked":  284,
+    "previousWorkDrift":  [
+
+                          ],
+    "protectedFiles":  [
+                           {
+                               "path":  "functions/package.json",
+                               "unchanged":  true
+                           },
+                           {
+                               "path":  "lib/data/customer_auth.dart",
+                               "unchanged":  true
+                           }
+                       ],
+    "unexpectedTrackedChanges":  [
+
+                                 ],
+    "emulatorListeners":  0,
+    "indexEntriesMatchHeadExceptTwelve":  true,
+    "indexEntryCounts":  {
+                             "divergentObjects":  0,
+                             "addedObjects":  0,
+                             "head":  392,
+                             "removals":  12,
+                             "index":  380
+                         }
+}

@@ -1,0 +1,304 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null
+        && (!exists(/databases/$(database)/documents/customerAccountClosures/$(request.auth.uid))
+          || get(/databases/$(database)/documents/customerAccountClosures/$(request.auth.uid)).data.get('status', '') == 'blocked');
+    }
+
+    // Only the owner can observe deletion progress, including with an existing
+    // token while the rest of the account is locked. Never accept client writes.
+    match /customerAccountClosures/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, write: if false;
+    }
+
+    // O cliente atual usa Auth anônimo; roles administrativas nunca o aceitam.
+    function namedAccount() {
+      return signedIn()
+        && request.auth.token.get('firebase', {}).get('sign_in_provider', '') != 'anonymous';
+    }
+
+    // Provisionamento futuro: cadastro do motoboy pelo backend em couriers/{uid}.
+    // Não há role nova e o próprio usuário não pode criar/alterar esse cadastro.
+    function isCourierAccount() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/couriers/$(request.auth.uid));
+    }
+
+    function activeCourier() {
+      let profile = get(/databases/$(database)/documents/couriers/$(request.auth.uid)).data;
+      return profile.get('administrativeState', '') == 'active'
+        && profile.get('enabled', true) != false
+        && profile.get('isActive', true) != false
+        && profile.get('active', true) != false;
+    }
+
+    function hasRole(role) {
+      return namedAccount()
+        && request.auth.token.get('roles', []) is list
+        && role in request.auth.token.get('roles', []);
+    }
+
+    function isSuperadmin() { return hasRole('superadmin'); }
+    function isOperations() { return hasRole('operations_admin') || isSuperadmin(); }
+    function isCatalogAdmin() { return hasRole('catalog_admin') || isSuperadmin(); }
+    function isFinance() { return hasRole('finance') || isSuperadmin(); }
+
+    function ownsOrder(data) {
+      return signedIn() && data.get('customerUid', '') == request.auth.uid;
+    }
+
+    function verifiedCustomerIdentity() {
+      let provider = request.auth.token.get('firebase', {}).get('sign_in_provider', '');
+      return provider != '' && provider != 'anonymous'
+        && (request.auth.token.get('customerVerified', false) == true
+          || provider in ['google.com', 'apple.com']);
+    }
+
+    function currentCustomerConsent() {
+      let policy = get(/databases/$(database)/documents/customerPolicies/current).data;
+      let profile = get(/databases/$(database)/documents/customerProfiles/$(request.auth.uid)).data;
+      return policy.get('published', false) == true && policy.get('draft', true) == false
+        && !policy.termsVersion.lower().matches('.*draft.*')
+        && !policy.privacyVersion.lower().matches('.*draft.*')
+        && !policy.alcoholVersion.lower().matches('.*draft.*')
+        && profile.get('acceptedAt', null) is timestamp
+        && profile.get('birthDate', '') is string && profile.birthDate.size() == 10
+        && profile.get('termsVersion', '') == policy.termsVersion
+        && profile.get('privacyVersion', '') == policy.privacyVersion
+        && profile.get('alcoholVersion', '') == policy.alcoholVersion
+        && profile.get('policyRevision', '') == policy.revision
+        && profile.get('policyHash', '') == policy.contentHash;
+    }
+
+    function confirmedDestination(data) {
+      let address = data.get('deliveryAddress', {});
+      return address is map
+        && address.get('confirmed', false) == true
+        && address.get('latitude', null) is number
+        && address.get('longitude', null) is number
+        && address.latitude >= -90 && address.latitude <= 90
+        && address.longitude >= -180 && address.longitude <= 180
+        && address.get('countryCode', '') in ['BR', 'PY']
+        && (!('country' in address) || address.country == address.countryCode)
+        && (!('deliveryLocation' in data) || data.deliveryLocation == null
+          || (data.deliveryLocation is latlng
+            && data.deliveryLocation.latitude() == address.latitude
+            && data.deliveryLocation.longitude() == address.longitude))
+        && address.get('street', '') is string && address.street.size() > 0
+        && address.get('city', '') is string && address.city.size() > 0
+        && (address.get('noNumber', false) == true
+          || (address.get('number', '') is string && address.number.size() > 0));
+    }
+
+    // Rules timestamps are UTC. MS currently has UTC-4, without seasonal DST.
+    // Node acceptance additionally uses the named America/Campo_Grande zone.
+    function storeAcceptsAt(instant) {
+      return instant.hours() >= 12 || instant.hours() < 4;
+    }
+
+    function paymentAllowedForDestination(data) {
+      let country = data.get('deliveryAddress', {}).get('countryCode', '');
+      let method = data.get('paymentMethod', '');
+      return country in ['BR', 'PY']
+        && (method in ['PIX', 'Dinheiro', 'Pagamento dividido']
+          || (country == 'BR' && method in ['Maquininha',
+            'Maquininha - Débito à vista', 'Maquininha - Crédito à vista']));
+    }
+
+    function validOrderCreate(data, documentId) {
+      // Contrato real de _montarDadosPedido. Valores aqui são propostas do cliente;
+      // validação financeira/estoque e confirmação de pagamento são do backend.
+      return ownsOrder(data)
+        && storeAcceptsAt(request.time)
+        && paymentAllowedForDestination(data)
+        && !exists(/databases/$(database)/documents/customerOrderCancellations/$(request.auth.uid)/orders/$(documentId))
+        && confirmedDestination(data)
+        && verifiedCustomerIdentity()
+        && data.get('customerFlowVersion', 0) == 2
+        && currentCustomerConsent()
+        && data.keys().hasAll(['id', 'customerUid', 'customerName', 'itemsList',
+          'totalBRL', 'paymentMethod', 'paymentStatus', 'status', 'courierPaid', 'createdAt'])
+        && data.keys().hasOnly([
+          'id', 'customerUid', 'customerName', 'customerPhone', 'address', 'customerFlowVersion',
+          'deliveryAddress', 'deliveryLocation', 'itemsList', 'itemsTotal',
+          'deliveryQuoteId', 'deliveryFee', 'customerFee', 'merchantFee', 'merchantNet', 'platformFee',
+          'totalBRL', 'displayCurrency', 'displayTotal', 'exchangeRatePYGPerBRL',
+          'exchangeRateBRLPerUSD', 'exchangeRateSource', 'exchangeRateCapturedAt',
+          'paymentMethod', 'paymentStatus', 'cardType', 'cashCurrency',
+          'cashTendered', 'cashTenderedBRL', 'changeBRL', 'cashChangeRateUSDToBRL',
+          'cashChangeRatePYGPerBRL', 'splitPayment', 'paymentParts', 'splitPaidBRL',
+          'splitRemainingBRL', 'splitChangeBRL', 'status', 'pixRequested',
+          'pixRequestVersion', 'courierName', 'courierPaid', 'createdAt'
+        ])
+        && data.id is string && data.id.size() > 0
+        && data.customerName is string
+        && data.itemsList is list && data.itemsList.size() > 0
+        && data.totalBRL is number && data.totalBRL > 0
+        && data.paymentMethod is string
+        && data.paymentStatus in ['Aguardando confirmação', 'Pendente na entrega', 'Pendente']
+        && data.status in ['Novo', 'Aguardando pagamento']
+        && data.courierPaid == false
+        && data.createdAt == request.time
+        && (!('exchangeRateCapturedAt' in data) || data.exchangeRateCapturedAt == request.time)
+        && (!('paymentParts' in data) || data.paymentParts == null
+          || (data.paymentParts is list && data.paymentParts.size() <= 3))
+        && (data.get('pixRequested', false) != true
+          || (data.status == 'Aguardando pagamento'
+            && data.paymentStatus == 'Aguardando confirmação'));
+    }
+
+    match /orders/{orderId} {
+      allow create: if signedIn() && !isCourierAccount() && validOrderCreate(request.resource.data, orderId);
+      allow read: if signedIn() && !isCourierAccount()
+        && (ownsOrder(resource.data) || isOperations() || isFinance());
+      // Every operational/financial mutation uses authenticated backend.
+      allow update, delete: if false;
+    }
+
+    // Integrate inside /databases/{database}/documents in the authoritative rules.
+    // Uses the existing isCatalogAdmin() helper (named superadmin/catalog_admin).
+    // Do not deploy this fragment as a replacement ruleset.
+    match /categories/{categoryId} {
+      function validCategory() {
+        let data = request.resource.data;
+        return data.keys().hasOnly(['name', 'normalizedName', 'createdAt', 'updatedAt'])
+          && data.keys().hasAll(['name', 'normalizedName', 'createdAt'])
+          && data.name is string
+          && data.name.size() > 0 && data.name.size() <= 100
+          && !data.name.matches('.*[\\s]{2,}.*')
+          && !data.name.matches('^[\\s].*|.*[\\s]$')
+          && data.normalizedName == data.name.lower()
+          && data.normalizedName != 'todos'
+          && (!('updatedAt' in data) || data.updatedAt == request.time);
+      }
+      allow read: if isCatalogAdmin();
+      allow create: if isCatalogAdmin()
+        && validCategory()
+        && request.resource.data.createdAt == request.time;
+      // Keep the normalized identity stable: products store the category as text.
+      allow update: if isCatalogAdmin() && validCategory()
+        && request.resource.data.normalizedName == resource.data.normalizedName
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    match /deliveryConfiguration/{id} {
+      allow read: if isSuperadmin() && !isCourierAccount();
+      allow write: if false;
+    }
+    match /deliveryPricingVersions/{version} {
+      allow read: if isSuperadmin() && !isCourierAccount();
+      allow write: if false;
+    }
+    match /customerPolicies/{id} {
+      // Only the onboarding configuration, including an absent current document.
+      allow get: if signedIn() && id == 'current';
+      allow list, write: if false;
+    }
+    match /customerProfiles/{uid} {
+      allow get: if namedAccount() && request.auth.uid == uid && !isCourierAccount();
+      // Consent, birth date and verification are exclusively backend-owned.
+      allow create: if namedAccount() && request.auth.uid == uid && !isCourierAccount()
+        && request.resource.data.keys().hasOnly(['createdAt'])
+        && request.resource.data.keys().hasAll(['createdAt'])
+        && request.resource.data.createdAt == request.time;
+      allow list, update, delete: if false;
+    }
+    match /customerConsentEvents/{uid}/events/{id} { allow read, write: if false; }
+    match /deliveryConfiguration/{id} {
+      allow read: if isSuperadmin() && !isCourierAccount();
+      allow write: if false;
+    }
+    match /customerWorkspaces/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid && !isCourierAccount();
+      allow list: if false;
+      allow create, update: if signedIn() && request.auth.uid == uid && !isCourierAccount()
+        && request.resource.data.keys().hasOnly(['addresses', 'lastAddress', 'defaultAddress', 'cart', 'pending', 'contact'])
+        && request.resource.data.get('addresses', []) is list
+        && request.resource.data.get('addresses', []).size() <= 20
+        && request.resource.data.get('cart', []) is list
+        && request.resource.data.get('cart', []).size() <= 100;
+      allow delete: if false;
+    }
+    match /deliveryQuotes/{id} { allow read, write: if false; }
+    match /customerDeliverySecrets/{uid} { allow read, write: if false; }
+    match /deliveryPinVerifiers/{id} { allow read, write: if false; }
+    match /deliveryPinAudit/{id} { allow read, write: if false; }
+    match /customerOrderCancellations/{uid}/orders/{id} { allow read, write: if false; }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isCatalogAdmin();
+    }
+
+    match /orderFinancials/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /courierSettlements/{receiptId} {
+      allow read: if !isCourierAccount() && (isOperations() || isFinance());
+      allow create, update, delete: if false;
+    }
+
+    match /couriers/{courierId} {
+      allow read: if isOperations() && !isCourierAccount();
+      allow write: if false;
+    }
+
+    function canReadOrderChat(orderId) {
+      let order = get(/databases/$(database)/documents/orders/$(orderId)).data;
+      let roles = request.auth.token.get('roles', []);
+      return signedIn() && !isCourierAccount()
+        && order.get('financialValidationStatus', '') == 'validated'
+        && (isOperations() || (ownsOrder(order)
+          && !(roles is list && roles.hasAny(['finance', 'catalog_admin']))));
+    }
+
+    match /orderChats/{orderId} {
+      allow get: if canReadOrderChat(orderId);
+      allow list: if isOperations() && !isCourierAccount();
+      allow write: if false;
+      match /messages/{messageId} {
+        allow read: if canReadOrderChat(orderId);
+        allow write: if false;
+      }
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if isOperations() && !isCourierAccount();
+      allow write: if false;
+    }
+
+    match /courierDeliveries/{deliveryId} {
+      // Somente projeção sanitizada pelo backend. Nenhuma escrita de cliente.
+      allow get: if namedAccount() && isCourierAccount()
+        && resource.data.courierUid == request.auth.uid
+        && activeCourier()
+        && resource.data.keys().hasAll(['orderId', 'courierUid', 'customerName', 'status'])
+        && resource.data.keys().hasOnly(['orderId', 'courierUid', 'customerName',
+          'deliveryLocation', 'address', 'complement', 'reference', 'status',
+          'createdAt', 'assignedAt', 'pickedUpAt', 'completedAt', 'updatedAt'])
+        && resource.data.orderId is string
+        && resource.data.customerName is string && resource.data.status is string
+        && resource.data.get('createdAt', request.time) is timestamp
+        && resource.data.get('assignedAt', request.time) is timestamp
+        && resource.data.get('pickedUpAt', request.time) is timestamp
+        && resource.data.get('completedAt', request.time) is timestamp
+        && resource.data.get('updatedAt', request.time) is timestamp
+        && (!('address' in resource.data) || resource.data.address is string)
+        && (!('complement' in resource.data) || resource.data.complement is string)
+        && (!('reference' in resource.data) || resource.data.reference is string)
+        && (!('deliveryLocation' in resource.data) || resource.data.deliveryLocation is latlng);
+      allow list, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

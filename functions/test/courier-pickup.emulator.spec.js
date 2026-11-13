@@ -9,9 +9,10 @@ const {getDoc, doc, setDoc} = require("firebase/firestore");
 const {beginPickup, confirmPickup, signTicket, listAssignments, issueTicket} = require("../courier-pickup");
 const {enqueueNotice, deliverNotice} = require("../courier-notifications");
 const {ownProfile, reviewCourier} = require("../courier-approval");
+const {seedCourierPolicy} = require("./courier-policy-fixture");
 let app; let db; let environment; let n = 0;
 const keys = generateKeyPairSync("ed25519");
-const auth = (uid = "rider") => ({uid, token: {firebase: {sign_in_provider: "password"}}});
+const auth = (uid = "rider") => ({uid, token: {email_verified: true, firebase: {sign_in_provider: "password"}}});
 const admin = {uid: "reviewer", token: {roles: ["superadmin"]}};
 const denied = (e) => ["permission-denied", "failed-precondition", "invalid-argument"].includes(e.code);
 before(async () => {
@@ -33,6 +34,7 @@ async function fixture(status = "approved") {
   const profile = {name: "Pessoa Exemplo", role: "courier", approvalStatus: status,
     administrativeState: "active", enabled: true, online: true};
   await db.doc(`couriers/${uid}`).set(profile);
+  await db.doc(`courierPickupAssignments/${assignmentId}`).set({orderId: id, courierUid: uid, status: "active"});
   const order = {courierUid: uid, courierAssignmentId: assignmentId, acceptedAt: Timestamp.now(),
     courierAssignmentExpiresAt: Timestamp.fromMillis(expiry), status: "Em Separação",
     financialValidationStatus: "validated", paymentMethod: "Dinheiro"};
@@ -91,6 +93,10 @@ test("valid physical ticket prepares but grants no read until durable-package ac
   assert.equal((await db.doc(`orders/${f.id}`).get()).data().courierPickupState, undefined);
   const confirmed = await f.confirm(prepared); assert.equal(confirmed.acknowledged, true);
   await assertSucceeds(getDoc(doc(f.client, "courierDeliveries", f.id)));
+  const staleClient = environment.authenticatedContext(f.uid, {
+    email_verified: false, firebase: {sign_in_provider: "password"},
+  }).firestore();
+  await assertFails(getDoc(doc(staleClient, "courierDeliveries", f.id)));
   assert.equal((await db.doc(`orders/${f.id}`).get()).data().courierPickupState, "headingToCustomer");
   const before = (await db.doc(`courierPickupGrants/${f.id}`).get()).updateTime;
   assert.equal((await f.confirm(prepared)).replayed, true);
@@ -150,6 +156,7 @@ test("only approved and available assignment enqueues notification, adapter reva
 });
 test("photo receipt required, plate/license optional, administrator approval succeeds without documents", async () => {
   const uid = `applicant-${++n}`;
+  await seedCourierPolicy(db, uid);
   const fields = {name: "Pessoa Exemplo", phone: "67900000000", profilePhoto: "verified-photo-reference"};
   await assert.rejects(ownProfile(db, {auth: auth(uid), data: fields}, "register"), denied);
   await db.doc(`courierProfilePhotos/${uid}`).set({verified: true, reference: fields.profilePhoto});

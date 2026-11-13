@@ -1,3 +1,4 @@
+import '../l10n/customer_localizations.dart';
 import 'package:flutter/material.dart';
 import '../core/models.dart';
 import '../data/customer_workspace.dart';
@@ -39,7 +40,16 @@ class _AddressDestinationScreenState extends State<AddressDestinationScreen> {
     });
     try {
       final data = await _workspace.read();
-      if (mounted) setState(() => _data = data);
+      if (mounted) {
+        setState(() {
+          _data = Map<String, dynamic>.from(data);
+          for (final key in ['lastAddress', 'defaultAddress']) {
+            if (_data[key] is Map && _data[key]['label'] == 'Não salvar') {
+              _data.remove(key);
+            }
+          }
+        });
+      }
     } catch (_) {
       if (mounted) {
         setState(() => _error =
@@ -123,6 +133,11 @@ class _AddressDestinationScreenState extends State<AddressDestinationScreen> {
           e['label'] == reviewed.label || (edit && e['label'] == saved?.label));
       addresses.add(reviewed.toMap());
     }
+    // An unsaved destination belongs only to this authenticated session.
+    if (reviewed.label == 'Não salvar') {
+      if (mounted) _finish(reviewed);
+      return;
+    }
     try {
       final updates = <String, dynamic>{
         'lastAddress': reviewed.toMap(),
@@ -137,7 +152,7 @@ class _AddressDestinationScreenState extends State<AddressDestinationScreen> {
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
+          content: LocalizedText(
               'Destino confirmado neste uso. A sincronização está pendente; confira a conexão.')));
     }
     if (mounted) _finish(reviewed);
@@ -157,15 +172,15 @@ class _AddressDestinationScreenState extends State<AddressDestinationScreen> {
       final confirmed = await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
-                  title: const Text('Excluir endereço salvo?'),
+                  title: const LocalizedText('Excluir endereço salvo?'),
                   content: Text(address.label),
                   actions: [
                     TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text('Voltar')),
+                        child: const LocalizedText('Voltar')),
                     TextButton(
                         onPressed: () => Navigator.pop(ctx, true),
-                        child: const Text('Excluir')),
+                        child: const LocalizedText('Excluir')),
                   ]));
       if (confirmed != true || !mounted) return;
       updates['addresses'] = (_data['addresses'] as List? ?? [])
@@ -201,7 +216,7 @@ class _AddressDestinationScreenState extends State<AddressDestinationScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text(
+            content: LocalizedText(
                 'Destino selecionado. A sincronização ainda está pendente.')));
       }
     }
@@ -211,61 +226,65 @@ class _AddressDestinationScreenState extends State<AddressDestinationScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-            title: const Text('Onde vamos entregar?'),
+            title: const LocalizedText('Onde vamos entregar?'),
             automaticallyImplyLeading: !widget.onboarding),
         body: ListView(padding: const EdgeInsets.all(24), children: [
-          const Text(
+          const LocalizedText(
               'Escolha o destino. A localização do telefone pode ser diferente do local da entrega.'),
           const SizedBox(height: 24),
           ElevatedButton.icon(
               onPressed: () => _choose(gps: true),
               icon: const Icon(Icons.my_location),
-              label: const Text('Usar minha localização')),
+              label: const LocalizedText('Usar minha localização')),
           const SizedBox(height: 12),
           OutlinedButton.icon(
               onPressed: () => _choose(),
               icon: const Icon(Icons.edit_location_alt_outlined),
-              label: const Text('Digitar endereço')),
+              label: const LocalizedText('Digitar endereço')),
           if (_loading)
             const Padding(
                 padding: EdgeInsets.all(24),
                 child: Center(child: CircularProgressIndicator())),
           if (_error != null) ...[
-            Text(_error!),
-            TextButton(onPressed: _load, child: const Text('Tentar novamente'))
+            LocalizedText(_error!),
+            TextButton(
+                onPressed: _load,
+                child: const LocalizedText('Tentar novamente'))
           ],
           if (_data['lastAddress'] is Map)
             Card(
                 child: ListTile(
-                    title: const Text('Reutilizar último destino'),
-                    subtitle: Text(
+                    title: const LocalizedText('Reutilizar último destino'),
+                    subtitle: LocalizedText(
                         (_data['lastAddress']['addressText'] ?? '').toString()),
                     onTap: () => _useSaved(_data['lastAddress']))),
           for (final saved
               in (_data['addresses'] as List? ?? []).whereType<Map>())
             ListTile(
                 leading: const Icon(Icons.bookmark_outline),
-                title: Text(
+                title: LocalizedText(
                     '${saved['label'] ?? 'Endereço'}${_data['defaultAddress']?['label'] == saved['label'] ? ' • Padrão' : ''}'),
-                subtitle: Text(saved['addressText']?.toString() ?? ''),
+                subtitle: LocalizedText(saved['addressText']?.toString() ?? ''),
                 trailing: PopupMenuButton<String>(
                     tooltip: 'Opções do endereço',
                     onSelected: (value) => _savedAction(value, saved),
                     itemBuilder: (_) => const [
                           PopupMenuItem(
-                              value: 'edit', child: Text('Editar endereço')),
+                              value: 'edit',
+                              child: LocalizedText('Editar endereço')),
                           PopupMenuItem(
                               value: 'default',
-                              child: Text('Definir como padrão')),
+                              child: LocalizedText('Definir como padrão')),
                           PopupMenuItem(
-                              value: 'delete', child: Text('Excluir endereço'))
+                              value: 'delete',
+                              child: LocalizedText('Excluir endereço'))
                         ]),
                 onTap: () => _useSaved(saved)),
           const SizedBox(height: 24),
           TextButton(
               onPressed: () => _finish(null),
-              child: const Text('Explorar catálogo sem endereço')),
-          const Text(
+              child: const LocalizedText('Explorar catálogo sem endereço')),
+          const LocalizedText(
               'Defina seu endereço para calcular entrega. Você pode explorar o catálogo antes disso.',
               textAlign: TextAlign.center),
         ]),
@@ -305,7 +324,7 @@ class _ManualAddressScreenState extends State<ManualAddressScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(title: const Text('Digitar endereço')),
+      appBar: AppBar(title: const LocalizedText('Digitar endereço')),
       body: Form(
           key: _form,
           child: ListView(padding: const EdgeInsets.all(24), children: [
@@ -315,7 +334,7 @@ class _ManualAddressScreenState extends State<ManualAddressScreen> {
             CheckboxListTile(
                 value: _noNumber,
                 onChanged: (v) => setState(() => _noNumber = v!),
-                title: const Text('Sem número')),
+                title: const LocalizedText('Sem número')),
             addressField(_district, 'Bairro'),
             addressField(_city, 'Cidade', required: true),
             ElevatedButton(
@@ -331,22 +350,24 @@ class _ManualAddressScreenState extends State<ManualAddressScreen> {
                             _noNumber));
                   }
                 },
-                child: const Text('Confirmar no mapa')),
+                child: const LocalizedText('Confirmar no mapa')),
           ])));
 }
 
 Widget addressField(TextEditingController controller, String label,
         {bool required = false, bool enabled = true}) =>
-    Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: TextFormField(
-            controller: controller,
-            enabled: enabled,
-            textCapitalization: TextCapitalization.words,
-            decoration: InputDecoration(labelText: label),
-            validator: (v) => required && (v?.trim().isEmpty ?? true)
-                ? 'Informe $label'
-                : null));
+    Builder(
+        builder: (context) => Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: TextFormField(
+                controller: controller,
+                enabled: enabled,
+                textCapitalization: TextCapitalization.words,
+                decoration: localizedDecoration(
+                    context, InputDecoration(labelText: label)),
+                validator: (v) => required && (v?.trim().isEmpty ?? true)
+                    ? context.l10n.fieldRequired(localizedLabel(context, label))
+                    : null)));
 
 class AddressReviewScreen extends StatefulWidget {
   final DeliveryAddress address;
@@ -385,11 +406,11 @@ class _AddressReviewScreenState extends State<AddressReviewScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(title: const Text('Confira o endereço')),
+      appBar: AppBar(title: const LocalizedText('Confira o endereço')),
       body: Form(
           key: _form,
           child: ListView(padding: const EdgeInsets.all(24), children: [
-            const Text(
+            const LocalizedText(
                 'A entrega segue o ponto confirmado no mapa. Confira os dados para ajudar o entregador.'),
             const SizedBox(height: 16),
             addressField(_street, 'Rua', required: true),
@@ -398,21 +419,22 @@ class _AddressReviewScreenState extends State<AddressReviewScreen> {
             CheckboxListTile(
                 value: _noNumber,
                 onChanged: (v) => setState(() => _noNumber = v!),
-                title: const Text('Sem número')),
+                title: const LocalizedText('Sem número')),
             addressField(_district, 'Bairro'),
             addressField(_city, 'Cidade', required: true),
             if (_country == null || _country!.isEmpty) ...[
-              const Text(
+              const LocalizedText(
                   'Não foi possível identificar o país. Esta entrega é no Brasil ou Paraguai?'),
               Wrap(spacing: 12, children: [
                 for (final code in ['BR', 'PY'])
                   ChoiceChip(
-                      label: Text(code == 'BR' ? 'Brasil' : 'Paraguai'),
+                      label:
+                          LocalizedText(code == 'BR' ? 'Brasil' : 'Paraguai'),
                       selected: _country == code,
                       onSelected: (_) => setState(() => _country = code))
               ]),
             ] else
-              Text(_country == 'BR'
+              LocalizedText(_country == 'BR'
                   ? 'Destino: Brasil'
                   : _country == 'PY'
                       ? 'Destino: Paraguai'
@@ -422,10 +444,11 @@ class _AddressReviewScreenState extends State<AddressReviewScreen> {
             addressField(_reference, 'Ponto de referência'),
             DropdownButtonFormField<String>(
                 initialValue: _label,
-                decoration:
-                    const InputDecoration(labelText: 'Salvar endereço como'),
+                decoration: localizedDecoration(context,
+                    const InputDecoration(labelText: 'Salvar endereço como')),
                 items: ['Não salvar', 'Casa', 'Trabalho', 'Outro']
-                    .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                    .map((s) =>
+                        DropdownMenuItem(value: s, child: LocalizedText(s)))
                     .toList(),
                 onChanged: (v) => setState(() => _label = v!)),
             const SizedBox(height: 24),
@@ -456,6 +479,6 @@ class _AddressReviewScreenState extends State<AddressReviewScreen> {
                                   _city.text.trim()
                                 ].where((s) => s.isNotEmpty).join(', ')));
                       },
-                child: const Text('Confirmar destino')),
+                child: const LocalizedText('Confirmar destino')),
           ])));
 }

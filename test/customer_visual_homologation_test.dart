@@ -71,13 +71,13 @@ void main() {
           CartScreen(items: () => items, change: (_, __) {}, checkout: () {}),
           scale));
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(find.text('R\$ 40,40'), 200,
+      await tester.scrollUntilVisible(find.text('R\$ 40,00').last, 200,
           scrollable: find.byType(Scrollable).first);
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('R\$ 40,40'));
+      await tester.ensureVisible(find.text('R\$ 40,00').last);
       await tester.pumpAndSettle();
-      final feeRight = tester.getRect(find.text('R\$ 0,40')).right;
-      final totalRight = tester.getRect(find.text('R\$ 40,40')).right;
+      final feeRight = tester.getRect(find.text('R\$ 0,00')).right;
+      final totalRight = tester.getRect(find.text('R\$ 40,00').last).right;
       expect((feeRight - totalRight).abs(), lessThan(.5));
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());

@@ -1,0 +1,301 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/material.dart';
+
+import 'admin_auth.dart';
+import 'admin_auth_ui.dart';
+import 'courier_assignment.dart';
+import 'order_operation.dart';
+
+abstract class ContingencyGateway {
+  Future<void> execute(String action, Map<String, dynamic> data);
+}
+
+class FirebaseContingencyGateway implements ContingencyGateway {
+  @override
+  Future<void> execute(String action, Map<String, dynamic> data) async {
+    final name = {
+      'assign': 'chamaeAtribuirMotoboy',
+      'dispatch': 'chamaeDespacharPedido',
+      'complete': 'chamaeConcluirEntrega',
+    }[action];
+    if (name == null) throw StateError('Ação inválida.');
+    await FirebaseFunctions.instanceFor(region: 'southamerica-east1')
+        .httpsCallable(name)
+        .call(data);
+  }
+}
+
+class OperationalContingencyScreen extends StatefulWidget {
+  const OperationalContingencyScreen({super.key});
+  @override
+  State<OperationalContingencyScreen> createState() =>
+      _OperationalContingencyScreenState();
+}
+
+class _OperationalContingencyScreenState
+    extends State<OperationalContingencyScreen> {
+  final _id = TextEditingController();
+  String? _selected, _error;
+  bool _loading = false;
+  @override
+  void dispose() {
+    _id.dispose();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+      _selected = null;
+    });
+    try {
+      final input = _id.text.trim();
+      if (input.isEmpty || input.contains('/')) {
+        throw StateError('Pedido inválido.');
+      }
+      final orders = FirebaseFirestore.instance.collection('orders');
+      final direct = await orders.doc(input).get();
+      final matches = direct.exists
+          ? [direct]
+          : (await orders.where('id', isEqualTo: input).limit(2).get()).docs;
+      if (matches.length != 1) {
+        throw StateError('Pedido não encontrado ou ambíguo.');
+      }
+      if (mounted) setState(() => _selected = matches.single.id);
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _error = 'Não foi possível localizar um pedido único. Confira o código exato (incluindo #) ou ID documental.',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!AdminAccessScope.of(context).access.allows(PanelArea.contingency)) {
+      return const Center(
+        child: Text('Contingência exclusiva para superadmin.'),
+      );
+    }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Contingência administrativa',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+          const Text(
+            'Intervenção excepcional. Todas as alterações exigem motivo e ficam auditadas.',
+          ),
+          TextField(
+            controller: _id,
+            decoration: const InputDecoration(
+              labelText: 'ID documental ou código exato do pedido',
+            ),
+          ),
+          FilledButton(
+            onPressed: _loading ? null : _load,
+            child: const Text('Consultar pedido'),
+          ),
+          if (_error != null) Text(_error!),
+          if (_selected != null)
+            StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collection('orders')
+                  .doc(_selected)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                final order = snapshot.data?.data();
+                if (snapshot.hasError) {
+                  return const Text('Não foi possível atualizar o pedido.');
+                }
+                if (order == null) return const Text('Carregando pedido...');
+                return ContingencyForm(
+                  key: ValueKey(_selected),
+                  orderId: _selected!,
+                  order: order,
+                  access: AdminAccessScope.of(context).access,
+                  gateway: FirebaseContingencyGateway(),
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class ContingencyForm extends StatefulWidget {
+  const ContingencyForm({
+    super.key,
+    required this.orderId,
+    required this.order,
+    required this.access,
+    required this.gateway,
+  });
+  final String orderId;
+  final Map<String, dynamic> order;
+  final AdminAccess access;
+  final ContingencyGateway gateway;
+  @override
+  State<ContingencyForm> createState() => _ContingencyFormState();
+}
+
+class _ContingencyFormState extends State<ContingencyForm> {
+  final _reason = TextEditingController(),
+      _confirmation = TextEditingController(),
+      _courier = TextEditingController();
+  String _action = 'assign', _requestId = courierRequestId();
+  String? _error;
+  bool _saving = false;
+  @override
+  void dispose() {
+    _reason.dispose();
+    _confirmation.dispose();
+    _courier.dispose();
+    super.dispose();
+  }
+
+  bool get _valid =>
+      _reason.text.trim().length >= 10 &&
+      _reason.text.trim().length <= 500 &&
+      _confirmation.text == 'CONFIRMAR ${widget.orderId}' &&
+      (_action != 'assign' || _courier.text.trim().isNotEmpty);
+  Future<void> _execute() async {
+    final yes = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        scrollable: true,
+        title: const Text('Confirmar intervenção excepcional'),
+        content: Text(
+          'Pedido ${orderCode(widget.order)} · ${widget.orderId}\n'
+          'Estado atual: ${widget.order['status']}\nAção: $_action\nMotivo: ${_reason.text.trim()}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Confirmar intervenção'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted ||
+        yes != true ||
+        !widget.access.allows(PanelArea.contingency)) {
+      return;
+    }
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await widget.gateway.execute(_action, {
+        'orderId': widget.orderId,
+        'requestId': _requestId,
+        'contingencyReason': _reason.text.trim(),
+        'confirmation': _confirmation.text,
+        if (_action == 'assign') ...{
+          'courierUid': _courier.text.trim(),
+          'expectedCourierUid': widget.order['courierUid'] ?? '',
+        },
+      });
+      if (mounted) {
+        _requestId = courierRequestId();
+        _confirmation.clear();
+        _reason.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Intervenção confirmada e auditada.')),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _error = 'Intervenção não confirmada. Confira a etapa, o cadastro e a permissão.',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.access.allows(PanelArea.contingency)) {
+      return const Text('Acesso restrito a superadmin.');
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Pedido ${orderCode(widget.order)} · ${widget.order['status']}'),
+        DropdownButton<String>(
+          value: _action,
+          items: const [
+            DropdownMenuItem(
+              value: 'assign',
+              child: Text('Atribuição excepcional de motoboy'),
+            ),
+            DropdownMenuItem(
+              value: 'dispatch',
+              child: Text('Saída excepcional para entrega'),
+            ),
+            DropdownMenuItem(
+              value: 'complete',
+              child: Text('Conclusão excepcional da entrega'),
+            ),
+          ],
+          onChanged: _saving
+              ? null
+              : (v) => setState(() {
+                  _action = v!;
+                  _requestId = courierRequestId();
+                }),
+        ),
+        if (_action == 'assign')
+          TextField(
+            key: const ValueKey('contingency-courier'),
+            controller: _courier,
+            enabled: !_saving,
+            onChanged: (_) => setState(() {}),
+            decoration: const InputDecoration(
+              labelText: 'UID do motoboy cadastrado',
+            ),
+          ),
+        TextField(
+          key: const ValueKey('contingency-reason'),
+          controller: _reason,
+          enabled: !_saving,
+          maxLength: 500,
+          onChanged: (_) => setState(() {}),
+          decoration: const InputDecoration(
+            labelText: 'Motivo obrigatório (mínimo 10 caracteres)',
+          ),
+        ),
+        TextField(
+          key: const ValueKey('contingency-confirmation'),
+          controller: _confirmation,
+          enabled: !_saving,
+          onChanged: (_) => setState(() {}),
+          decoration: InputDecoration(
+            labelText: 'Digite CONFIRMAR ${widget.orderId}',
+          ),
+        ),
+        if (_error != null) Text(_error!),
+        FilledButton(
+          onPressed: !_saving && _valid ? _execute : null,
+          child: Text(_saving ? 'Confirmando...' : 'Revisar intervenção'),
+        ),
+      ],
+    );
+  }
+}

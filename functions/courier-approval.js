@@ -4,6 +4,8 @@ const {assertCustomerAccountActive} = require("./customer-account-state");
 const {requireCourierIdentity, requireApprovedCourier,
   requireCourierAdministrator} = require("./courier-authorization");
 
+const {assertCurrentCourierAcceptance, currentCourierAcceptance} = require("./courier-policy");
+
 const profileFields = ["name", "phone", "profilePhoto", "city", "vehicleType",
   "vehicleDescription", "vehiclePlate", "vehicleCountry", "driverLicense"];
 const statuses = ["pendingApproval", "approved", "rejected", "suspended"];
@@ -83,6 +85,7 @@ async function ownProfile(db, request, operation = "get") {
       }
     }
     if (operation === "register") {
+      await assertCurrentCourierAcceptance(db, uid, tx);
       // Retrying registration never resets a rejection or suspension.
       if (!snapshot.exists) {
         tx.create(ref, {...patch, role: "courier",
@@ -95,7 +98,8 @@ async function ownProfile(db, request, operation = "get") {
       if (operation === "update") tx.update(ref, {...patch, updatedAt: FieldValue.serverTimestamp()});
     }
   });
-  return publicProfile(uid, (await ref.get()).data());
+  return {...publicProfile(uid, (await ref.get()).data()),
+    policyAcceptanceCurrent: await currentCourierAcceptance(db, uid)};
 }
 async function reviewCourier(db, request) {
   const actorUid = requireCourierAdministrator(request);
@@ -127,6 +131,7 @@ async function reviewCourier(db, request) {
       throw new HttpsError("failed-precondition", "O cadastro mudou. Atualize a lista.");
     }
     if (data.action === "approve") {
+      await assertCurrentCourierAcceptance(db, uid, tx);
       const profile = snapshot.data();
       profileInput(Object.fromEntries(profileFields.filter((key) =>
         Object.hasOwn(profile, key)).map((key) => [key, profile[key]])));
@@ -158,6 +163,7 @@ async function courierOperation(db, request) {
     const data = dataOnly(request.data, ["operation", "on"]);
     if (data.operation === "availability") {
       if (typeof data.on !== "boolean") throw new HttpsError("invalid-argument", "Disponibilidade inválida.");
+      if (data.on) await assertCurrentCourierAcceptance(db, courier.uid, tx);
       tx.update(courier.ref, {online: data.on, updatedAt: FieldValue.serverTimestamp()});
       return {online: data.on};
     }

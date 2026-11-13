@@ -240,7 +240,7 @@ async function processCourierClosure(db, auth, storage, uid, options = {}) {
     // No token/PII/error bodies in audit logs. No financial writes in this worker.
     await storage.deleteFiles({prefix: `courier-photos/${uid}/`});
     for (const collection of ["courierProfilePhotos", "courierDevices",
-      "courierPushTokens", "courierOfflinePackages"]) {
+      "courierPushTokens", "courierOfflinePackages", "courierPolicyAcceptances", "courierConsentEvents"]) {
       await db.recursiveDelete(db.doc(`${collection}/${uid}`));
     }
     for (const collection of ["courierDeliveries", "courierPickupGrants", "courierPickupSessions",

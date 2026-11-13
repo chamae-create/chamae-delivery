@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../core/models.dart';
+import 'customer_sign_in_configuration.dart';
 
 enum CustomerProvider { google, apple }
 
@@ -54,6 +55,10 @@ class FirebaseCustomerAuth implements CustomerAuth {
   @override
   Future<void> signIn(CustomerProvider kind,
       {bool useExistingAccount = false}) async {
+    if (!CustomerSignInConfiguration.enabled(kind.name)) {
+      throw const CustomerAuthFailure(
+          'Esta forma de entrada aguarda configuração neste ambiente.');
+    }
     final old = auth.currentUser;
     try {
       final link = old != null && !useExistingAccount;
@@ -139,6 +144,10 @@ class FirebaseCustomerAuth implements CustomerAuth {
         await signOut();
         throw const CustomerAuthFailure(
             'Sua sessão não está disponível. Entre novamente.');
+      }
+      if (e.code == 'too-many-requests') {
+        throw const CustomerAuthFailure(
+            'Muitas tentativas. Aguarde um pouco antes de tentar novamente.');
       }
       if (e.code == 'operation-not-allowed' ||
           e.code == 'unauthorized-domain') {
