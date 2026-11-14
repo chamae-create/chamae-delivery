@@ -1,5 +1,4 @@
 import '../core/launch_financial_policy.dart';
-import '../widgets/age_verification_card.dart';
 import '../l10n/customer_localizations.dart';
 import '../widgets/customer_visual.dart';
 import '../widgets/commerce_components.dart';
@@ -75,6 +74,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   OrderAttempt? _orderAttempt;
   bool _splitPayment = false;
   final List<Map<String, dynamic>> _paymentParts = [];
+  bool _ageDeclarationAccepted = false;
+  bool get _hasAlcoholicOrAgeRestrictedItems =>
+      widget.cartItems.any(requiresAgeVerificationCartItem);
   bool _isLoading = false;
   DeliveryQuote? _quote;
   final _quoteCache = DeliveryQuoteCache();
@@ -820,6 +822,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       'pixRequested': aguardandoPix,
       'pixRequestVersion': aguardandoPix ? 1 : null,
       'courierPaid': false,
+      if (_hasAlcoholicOrAgeRestrictedItems)
+        'requiresAgeVerificationOnDelivery': true,
       'createdAt': FieldValue.serverTimestamp(),
     };
   }
@@ -1304,8 +1308,55 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           'Confira seus dados e escolha a forma de pagamento.',
                       onBack: () => Navigator.maybePop(context),
                     ),
-                    if (widget.cartItems.any(restrictedCartItem))
-                      const AgeVerificationCard(),
+                    if (_hasAlcoholicOrAgeRestrictedItems)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Container(
+                          decoration: CustomerVisual.panel(),
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.verified_user_outlined,
+                                    color: AppTheme.primaryYellow,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Venda proibida para menores de 18 anos',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              CheckboxListTile(
+                                contentPadding: EdgeInsets.zero,
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
+                                value: _ageDeclarationAccepted,
+                                onChanged: (value) => setState(
+                                  () => _ageDeclarationAccepted =
+                                      value ?? false,
+                                ),
+                                title: const Text(
+                                  'Declaro ter 18 anos ou mais e apresentarei documento oficial com foto ao entregador',
+                                  style: TextStyle(fontSize: 13.5),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     if (!storeOpen)
                       const Padding(
                         padding: EdgeInsets.only(bottom: 12),
@@ -2037,7 +2088,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       onPressed: _quoting ||
                               !_quoteUsable ||
                               !storeOpen ||
-                              _deliveryCountry == 'PY'
+                              _deliveryCountry == 'PY' ||
+                              (_hasAlcoholicOrAgeRestrictedItems &&
+                                  !_ageDeclarationAccepted)
                           ? null
                           : () {
                               if (!_validarDadosCliente()) return;

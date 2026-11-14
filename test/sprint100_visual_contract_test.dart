@@ -196,12 +196,17 @@ void main() {
   });
 
   test(
-      'catalog uses authoritative flags and categories, not product names, for exposure',
+      'catalog allows alcoholic drinks with age-check flag while keeping Tabacaria restricted',
       () {
     expect(
-        restrictedCatalogProduct(sample('a', 'Água', 'Geral', alcohol: true)),
+        requiresAgeVerificationProduct(
+            sample('a', 'Água', 'Geral', alcohol: true)),
         true);
-    expect(restrictedCatalogProduct(sample('b', 'Item', 'Cervejas')), true);
+    expect(requiresAgeVerificationProduct(sample('b', 'Item', 'Cervejas')),
+        true);
+    expect(restrictedCatalogProduct(sample('b', 'Item', 'Cervejas')), false);
+    expect(
+        restrictedCatalogProduct(sample('t', 'Cigarro', 'Tabacaria')), true);
     expect(
         restrictedCatalogProduct(
             sample('c', 'Cerveja sem álcool', 'Refrigerantes & Sucos')),

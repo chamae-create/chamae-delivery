@@ -157,7 +157,8 @@ service cloud.firestore {
           'cashTendered', 'cashTenderedBRL', 'changeBRL', 'cashChangeRateUSDToBRL',
           'cashChangeRatePYGPerBRL', 'splitPayment', 'paymentParts', 'splitPaidBRL',
           'splitRemainingBRL', 'splitChangeBRL', 'status', 'pixRequested',
-          'pixRequestVersion', 'courierName', 'courierPaid', 'createdAt'
+          'pixRequestVersion', 'courierName', 'courierPaid',
+          'requiresAgeVerificationOnDelivery', 'createdAt'
         ])
         && data.id is string && data.id.size() > 0
         && data.customerName is string
@@ -167,6 +168,7 @@ service cloud.firestore {
         && data.paymentStatus in ['Aguardando confirmação', 'Pendente na entrega', 'Pendente']
         && data.status in ['Novo', 'Aguardando pagamento']
         && data.courierPaid == false
+        && (!('requiresAgeVerificationOnDelivery' in data) || data.requiresAgeVerificationOnDelivery is bool)
         && data.createdAt == request.time
         && (!('exchangeRateCapturedAt' in data) || data.exchangeRateCapturedAt == request.time)
         && (!('paymentParts' in data) || data.paymentParts == null
