@@ -12,11 +12,54 @@ const reject = (reason) => {
     STORE_CLOSED: "A loja está fechada. O delivery funciona das 08:00 às 00:00 (MS).",
     DESTINATION_COUNTRY_UNVERIFIED: "Não foi possível confirmar o país do destino. Confira o endereço.",
     PAYMENT_METHOD_NOT_ALLOWED_FOR_COUNTRY: "Esta forma de pagamento não está disponível para o país da entrega.",
+    ACTIVE_ORDER_EXISTS: "Você já possui um pedido em andamento. Acompanhe o pedido atual antes de finalizar outro.",
   };
   const error = new HttpsError("failed-precondition", messages[reason], {reason});
   error.acceptanceCode = reason;
   throw error;
 };
+
+const TERMINAL_ORDER_STATUSES = new Set([
+  "concluído",
+  "concluido",
+  "entregue",
+  "cancelado",
+  "cancelada",
+]);
+
+function isTerminalOrderStatus(status) {
+  return TERMINAL_ORDER_STATUSES.has(String(status || "").trim().toLowerCase());
+}
+
+async function syncCustomerActiveOrder(db, customerUid) {
+  if (!db || typeof db.collection !== "function" || !customerUid) return null;
+  const snap = await db.collection("orders")
+      .where("customerUid", "==", customerUid)
+      .get();
+  const activeDoc = snap.docs.find((d) => !isTerminalOrderStatus(d.data()?.status));
+  const ref = db.collection("customerActiveOrders").doc(customerUid);
+  if (activeDoc) {
+    const data = activeDoc.data() || {};
+    const payload = {
+      customerUid,
+      orderId: activeDoc.id,
+      friendlyId: data.id || null,
+      status: data.status || "Novo",
+      active: true,
+    };
+    await ref.set(payload, {merge: true});
+    return payload;
+  }
+  const payload = {
+    customerUid,
+    orderId: null,
+    friendlyId: null,
+    status: null,
+    active: false,
+  };
+  await ref.set(payload, {merge: true});
+  return payload;
+}
 
 function storeIsOpen(now) {
   if (!Number.isFinite(now)) return false;
@@ -58,6 +101,17 @@ function verifiedQuoteCountry(quote, destination) {
 
 async function prepareOrderAcceptance(tx, db, orderRef, order) {
   assertStoreOpen();
+  if (order.customerUid && typeof db?.collection === "function") {
+    const activeLockSnap = await tx.get(db.collection("customerActiveOrders").doc(order.customerUid));
+    const activeLock = activeLockSnap?.exists ? activeLockSnap.data() : null;
+    if (activeLock && activeLock.active === true && activeLock.orderId && activeLock.orderId !== orderRef.id) {
+      const otherOrderSnap = await tx.get(db.collection("orders").doc(activeLock.orderId));
+      const otherStatus = otherOrderSnap?.exists ? otherOrderSnap.data()?.status : null;
+      if (otherOrderSnap?.exists && !isTerminalOrderStatus(otherStatus)) {
+        reject("ACTIVE_ORDER_EXISTS");
+      }
+    }
+  }
   if (!/^[a-f0-9]{64}$/.test(order.deliveryQuoteId || "")) reject("DESTINATION_COUNTRY_UNVERIFIED");
   const quote = (await tx.get(db.collection("deliveryQuotes").doc(order.deliveryQuoteId))).data();
   const country = verifiedQuoteCountry(quote, order.deliveryAddress);
@@ -82,4 +136,5 @@ async function prepareOrderAcceptance(tx, db, orderRef, order) {
 }
 
 module.exports = {timeZone, serverClock, storeIsOpen, assertStoreOpen,
-  assertPaymentCountry, verifiedQuoteCountry, prepareOrderAcceptance};
+  assertPaymentCountry, verifiedQuoteCountry, prepareOrderAcceptance,
+  isTerminalOrderStatus, syncCustomerActiveOrder};

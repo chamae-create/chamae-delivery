@@ -75,7 +75,7 @@ void main() {
     expect(find.text('Carrinho'), findsNothing);
     await reveal(tester, find.text('Promoções do dia'));
     await reveal(tester, find.text('Mais pedidos'));
-    await reveal(tester, find.text('Compre por categoria'));
+    expect(find.text('Compre por categoria'), findsNothing);
     await reveal(tester, find.text('Todos os produtos'));
     expect(find.text('POD bloqueado'), findsNothing);
     expect(find.text('Tabacaria'), findsNothing);

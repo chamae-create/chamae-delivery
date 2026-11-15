@@ -2,15 +2,20 @@ import '../core/launch_financial_policy.dart';
 import '../l10n/customer_localizations.dart';
 import '../widgets/customer_visual.dart';
 import '../widgets/commerce_components.dart';
+import '../data/customer_orders.dart';
 import '../data/delivery_quote.dart';
 import '../widgets/delivery_quote_summary.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import '../core/models.dart';
 import '../core/theme.dart';
 import '../widgets/store_hours_builder.dart';
 import '../widgets/customer_feedback.dart';
+import 'tracking_screen.dart';
 
 class CartScreen extends StatefulWidget {
   final List<CartItem> Function() items;
@@ -19,6 +24,7 @@ class CartScreen extends StatefulWidget {
   final String? notice;
   final DeliveryAddress? destination;
   final DeliveryQuoter? quoter;
+  final Stream<List<Map<String, dynamic>>>? activeOrders;
   const CartScreen({
     super.key,
     required this.items,
@@ -27,6 +33,7 @@ class CartScreen extends StatefulWidget {
     this.notice,
     this.destination,
     this.quoter,
+    this.activeOrders,
   });
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -36,11 +43,19 @@ class _CartScreenState extends State<CartScreen> {
   late final DeliveryQuoteController _delivery = DeliveryQuoteController(
     widget.quoter ?? FirebaseDeliveryQuoter(),
   );
+  Stream<List<Map<String, dynamic>>>? _activeOrdersStream;
   @override
   void initState() {
     super.initState();
     _delivery.addListener(_deliveryChanged);
     if (widget.destination != null) _delivery.refresh(widget.destination!);
+    _activeOrdersStream = widget.activeOrders ??
+        (widget.quoter == null && Firebase.apps.isNotEmpty
+            ? CustomerOrders(
+                auth: FirebaseAuth.instance,
+                firestore: FirebaseFirestore.instance,
+              ).watchActiveOrders()
+            : null);
   }
 
   void _deliveryChanged() {
@@ -173,18 +188,15 @@ class _CartScreenState extends State<CartScreen> {
                                           )
                                         else ...[
                                           _line('Produtos', money(subtotal)),
+                                          _line('Frete', 'A calcular'),
                                           _line(
                                             'Taxa de serviço',
                                             money(cartAmounts.customerFee),
                                           ),
-                                          const Divider(height: 16),
+                                          const Divider(height: 14),
                                           _line(
-                                            'Produtos e serviço',
-                                            money(cartAmounts.totalBRL),
-                                          ),
-                                          _line(
-                                            'Entrega',
-                                            'A calcular após confirmar o endereço',
+                                            'Total',
+                                            'A calcular',
                                           ),
                                         ],
                                       ],
@@ -202,62 +214,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       ),
                                     ),
-                                  if (open)
-                                    Container(
-                                      margin: const EdgeInsets.only(bottom: 12),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 10,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFFF8E1),
-                                        borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(
-                                          color: AppColors.borderLight,
-                                        ),
-                                      ),
-                                      child: const Row(
-                                        children: [
-                                          Icon(
-                                            Icons.schedule_rounded,
-                                            color: AppColors.darkGold,
-                                            size: 20,
-                                          ),
-                                          SizedBox(width: 10),
-                                          Expanded(
-                                            child: LocalizedText(
-                                              'Entrega rápida após confirmação',
-                                              style: TextStyle(
-                                                fontSize: 12.5,
-                                                fontWeight: FontWeight.w700,
-                                                color: AppTheme.textDark,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  GoldPrimaryButton(
-                                    onPressed: open &&
-                                            (widget.destination == null ||
-                                                (!_delivery.loading &&
-                                                    _delivery.value
-                                                            ?.isFresh() ==
-                                                        true))
-                                        ? widget.checkout
-                                        : null,
-                                    label: 'Continuar para entrega',
-                                    icon: Icons.lock_outline,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const LocalizedText(
-                                    'O total será conferido ao confirmar o pedido.',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: AppColors.textSecondary,
-                                      fontSize: 11,
-                                    ),
-                                  ),
+                                  _buildCheckoutAction(open),
                                   if (!open)
                                     const Padding(
                                       padding: EdgeInsets.only(top: 10),
@@ -273,6 +230,116 @@ class _CartScreenState extends State<CartScreen> {
           );
         },
       );
+
+  Widget _buildCheckoutAction(bool open) {
+    final canProceedByQuote = open &&
+        (widget.destination == null ||
+            (!_delivery.loading && _delivery.value?.isFresh() == true));
+    if (_activeOrdersStream == null) {
+      return GoldPrimaryButton(
+        onPressed: canProceedByQuote ? widget.checkout : null,
+        label: 'Continuar para entrega',
+        icon: Icons.lock_outline,
+      );
+    }
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: _activeOrdersStream,
+      builder: (context, snapshot) {
+        final active = snapshot.data ?? const [];
+        final activeOrder = active.isEmpty ? null : active.first;
+        if (activeOrder == null) {
+          return GoldPrimaryButton(
+            onPressed: canProceedByQuote ? widget.checkout : null,
+            label: 'Continuar para entrega',
+            icon: Icons.lock_outline,
+          );
+        }
+        final docId = activeOrder['_documentId']?.toString();
+        final friendlyId =
+            activeOrder['id']?.toString().trim().isNotEmpty == true
+                ? activeOrder['id'].toString().trim()
+                : (docId ?? '');
+        final status =
+            activeOrder['status']?.toString().trim().isNotEmpty == true
+                ? activeOrder['status'].toString().trim()
+                : 'Em andamento';
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppTheme.lightBg,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.borderLight, width: 1),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.info_outline_rounded,
+                        color: AppColors.darkGold,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: LocalizedText(
+                          'Você já possui um pedido ativo ($friendlyId • $status).',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13,
+                            color: AppTheme.textDark,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  const LocalizedText(
+                    'Acompanhe o pedido atual antes de finalizar uma nova compra.',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  GoldPrimaryButton(
+                    label: 'Acompanhar pedido ativo',
+                    icon: Icons.delivery_dining_rounded,
+                    onPressed: friendlyId.isEmpty && docId == null
+                        ? null
+                        : () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => TrackingScreen(
+                                  orderId: friendlyId.isNotEmpty
+                                      ? friendlyId
+                                      : docId!,
+                                  documentId: docId,
+                                ),
+                              ),
+                            ),
+                  ),
+                ],
+              ),
+            ),
+            const GoldPrimaryButton(
+              onPressed: null,
+              label: 'Continuar para entrega',
+              icon: Icons.lock_outline,
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Widget _cartItem(CartItem item) => CommerceCartItemCard(
         key: ValueKey('cart-item-${item.id}'),

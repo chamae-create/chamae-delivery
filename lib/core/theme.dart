@@ -9,7 +9,8 @@ class AppTheme {
   static const Color obsidianDark = Color(0xFF111111);
   static const Color obsidianCard = Color(0xFF1C1915);
   static const Color darkBg = Color(0xFF141414);
-  static const Color lightBg = Color(0xFFFFFDF7);
+  static const Color lightBg = Color(0xFFFAF9F6);
+  static const Color metallicGold = Color(0xFFC9A24D);
   static const Color textDark = Color(0xFF141311);
 
   static bool get _isTestEnvironment =>
@@ -61,12 +62,12 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.surfaceWhite,
         surfaceTintColor: Colors.transparent,
-        shadowColor: const Color(0x189A7600),
+        shadowColor: const Color(0x16916A16),
         elevation: 1,
         margin: const EdgeInsets.symmetric(vertical: AppSpace.xs),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
-          side: const BorderSide(color: AppColors.borderLight),
+          side: const BorderSide(color: AppColors.borderLight, width: 1),
         ),
       ),
       chipTheme: ChipThemeData(
@@ -116,7 +117,11 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
-          borderSide: const BorderSide(color: AppColors.borderLight),
+          borderSide: const BorderSide(color: AppColors.borderLight, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderSide: const BorderSide(color: AppTheme.goldDeep, width: 1.5),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -178,8 +183,8 @@ class AppColors {
   static const Color deepBlack = AppTheme.darkBg;
 
   static const Color accentGreen = Color(0xFF2E7D32);
-  static const Color surfaceWhite = Colors.white;
-  static const Color borderLight = Color(0xFFEFE4C8);
+  static const Color surfaceWhite = Color(0xFFFAF9F6);
+  static const Color borderLight = Color(0xFFC9A24D);
   static const Color textMain = AppTheme.textDark;
   static const Color textSecondary = Color(0xFF666057);
   static const Color backgroundLight = AppTheme.lightBg;

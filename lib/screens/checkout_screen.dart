@@ -28,6 +28,7 @@ import 'tracking_screen.dart';
 import 'address_destination_screen.dart';
 import '../data/delivery_quote.dart';
 import '../widgets/delivery_quote_summary.dart' show DeliveryRouteDetails;
+import '../data/customer_orders.dart';
 import '../data/customer_workspace.dart';
 import '../data/customer_verification.dart';
 
@@ -46,6 +47,7 @@ class CheckoutScreen extends StatefulWidget {
   final DeliveryQuoter? quoter;
   final AccountVerification? verification;
   final CustomerWorkspace? workspace;
+  final Stream<List<Map<String, dynamic>>>? activeOrders;
   const CheckoutScreen({
     super.key,
     required this.cartItems,
@@ -55,6 +57,7 @@ class CheckoutScreen extends StatefulWidget {
     this.quoter,
     this.verification,
     this.workspace,
+    this.activeOrders,
     this.onOrderConfirmed,
   });
   @override
@@ -67,6 +70,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _nameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _cashPaidCtrl = TextEditingController();
+  final _cashPaidFocus = FocusNode();
+  StreamSubscription<List<Map<String, dynamic>>>? _activeOrdersSub;
+  Map<String, dynamic>? _activeOrder;
   late DeliveryAddress _deliveryAddress;
   String _paymentMethod = 'PIX';
   String? _deliveryCountry;
@@ -107,6 +113,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _selectedCurrency = 'BRL';
     _nameCtrl.text = UserSession.fullName;
     _phoneCtrl.text = UserSession.whatsapp;
+    _cashPaidFocus.addListener(_onCashFocusChanged);
+    final ordersStream = widget.activeOrders ??
+        (widget.quoter == null && Firebase.apps.isNotEmpty
+            ? CustomerOrders(
+                auth: FirebaseAuth.instance,
+                firestore: FirebaseFirestore.instance,
+              ).watchActiveOrders()
+            : null);
+    if (ordersStream != null) {
+      _activeOrdersSub = ordersStream.listen((orders) {
+        if (!mounted) return;
+        final first = orders.isEmpty ? null : orders.first;
+        if (_activeOrder?['_documentId'] != first?['_documentId'] ||
+            _activeOrder?['status'] != first?['status']) {
+          setState(() => _activeOrder = first);
+        }
+      });
+    }
     _refreshQuote();
     if (widget.verification != null) {
       _verification.isVerified().then((verified) {
@@ -115,8 +139,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
+  void _onCashFocusChanged() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
+    _activeOrdersSub?.cancel();
+    _cashPaidFocus.removeListener(_onCashFocusChanged);
+    _cashPaidFocus.dispose();
     _quoteExpiry?.cancel();
     _nameCtrl.dispose();
     _phoneCtrl.dispose();
@@ -873,6 +904,35 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     }
     if (_pendingOrder == null) {
+      if (_activeOrder != null) {
+        throw StateError(
+          'Você já possui um pedido em andamento. Acompanhe o pedido atual antes de fazer outro.',
+        );
+      }
+      if (Firebase.apps.isNotEmpty) {
+        final existing = await FirebaseFirestore.instance
+            .collection('orders')
+            .where('customerUid', isEqualTo: customerUid)
+            .get()
+            .timeout(const Duration(seconds: 8));
+        for (final doc in existing.docs) {
+          final status = (doc.data()['status'] ?? 'Novo').toString().trim().toLowerCase();
+          if (!const {
+            'concluído',
+            'concluido',
+            'entregue',
+            'cancelado',
+            'cancelada',
+          }.contains(status)) {
+            if (mounted) {
+              setState(() => _activeOrder = {...doc.data(), '_documentId': doc.id});
+            }
+            throw StateError(
+              'Você já possui um pedido em andamento. Acompanhe o pedido atual antes de fazer outro.',
+            );
+          }
+        }
+      }
       if (!await _verification.isVerified()) {
         throw StateError(
           'Verifique sua conta antes da primeira compra. A navegação continua disponível.',
@@ -1216,17 +1276,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  Widget _summaryLine(String label, String value, {bool total = false}) =>
-      CommerceSummaryLine(
-          label: label,
-          value: value,
-          labelStyle: TextStyle(
-              fontSize: total ? 18 : 13,
-              fontWeight: total ? FontWeight.w900 : FontWeight.w500),
-          valueStyle: TextStyle(
-              fontSize: total ? 24 : 13,
-              color: total ? AppColors.darkGold : AppColors.textMain,
-              fontWeight: FontWeight.w800));
+  Widget _summaryLine(String label, String value, {bool total = false}) {
+    final isWaiting = value.startsWith('Aguardando');
+    return CommerceSummaryLine(
+      label: label,
+      value: value,
+      labelStyle: TextStyle(
+        fontSize: total ? 17 : 13,
+        fontWeight: total ? FontWeight.w900 : FontWeight.w500,
+      ),
+      valueStyle: TextStyle(
+        fontSize: isWaiting
+            ? (total ? 15 : 12.5)
+            : (total ? 22 : 13),
+        color: total && !isWaiting ? AppColors.darkGold : AppColors.textMain,
+        fontWeight: FontWeight.w800,
+      ),
+    );
+  }
   Widget _trackingRoute(Widget child) {
     final navigation = CommerceRouteNavigation.maybeOf(context);
     return navigation == null
@@ -1302,11 +1369,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             )
           : SafeArea(
               top: false,
-              child: SingleChildScrollView(
-                padding: CustomerVisual.pagePadding(context),
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: CustomerVisual.pagePadding(context),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
                     CommercePageTitle(
                       title: 'Finalizar Pedido',
                       subtitle:
@@ -1764,10 +1837,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             const SizedBox(height: 10),
                             TextField(
                               controller: _cashPaidCtrl,
+                              focusNode: _cashPaidFocus,
                               keyboardType:
                                   const TextInputType.numberWithOptions(
                                 decimal: true,
                               ),
+                              textInputAction: TextInputAction.done,
+                              onTapOutside: (_) =>
+                                  FocusManager.instance.primaryFocus?.unfocus(),
+                              onSubmitted: (_) =>
+                                  FocusManager.instance.primaryFocus?.unfocus(),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                   RegExp(r'[0-9,.]'),
@@ -2087,10 +2166,79 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           style: const TextStyle(color: AppColors.error),
                         ),
                       ),
+                    if (_activeOrder != null)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(14),
+                        decoration: CustomerVisual.panel(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.info_outline_rounded,
+                                  color: AppColors.darkGold,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: LocalizedText(
+                                    'Você já possui um pedido ativo (${_activeOrder!['id'] ?? _activeOrder!['_documentId'] ?? ''}).',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            const LocalizedText(
+                              'Aguarde a conclusão ou acompanhe seu pedido atual antes de finalizar um novo.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            GoldPrimaryButton(
+                              label: 'Acompanhar pedido ativo',
+                              icon: Icons.delivery_dining_rounded,
+                              onPressed: () {
+                                final docId =
+                                    _activeOrder!['_documentId']?.toString();
+                                final friendlyId = _activeOrder!['id']
+                                            ?.toString()
+                                            .trim()
+                                            .isNotEmpty ==
+                                        true
+                                    ? _activeOrder!['id'].toString().trim()
+                                    : (docId ?? '');
+                                if (friendlyId.isEmpty && docId == null) return;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => TrackingScreen(
+                                      orderId: friendlyId.isNotEmpty
+                                          ? friendlyId
+                                          : docId!,
+                                      documentId: docId,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                     GoldPrimaryButton(
                       label: 'Finalizar pedido',
                       icon: Icons.check_circle_outline,
-                      onPressed: _quoting ||
+                      onPressed: _activeOrder != null ||
+                              _quoting ||
                               !_quoteUsable ||
                               !storeOpen ||
                               _deliveryCountry == 'PY' ||
@@ -2178,6 +2326,44 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             },
                     ),
                     const CommerceTrustStrip(),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (_cashPaidFocus.hasFocus &&
+                        (Theme.of(context).platform == TargetPlatform.iOS ||
+                            MediaQuery.viewInsetsOf(context).bottom > 0))
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: AppTheme.lightBg,
+                          border: Border(
+                            top: BorderSide(
+                              color: AppColors.borderLight,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () =>
+                                FocusManager.instance.primaryFocus?.unfocus(),
+                            child: const Text(
+                              'Concluir',
+                              style: TextStyle(
+                                color: AppColors.darkGold,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),

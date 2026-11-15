@@ -93,3 +93,37 @@ test("unconfigured, network timeout and provider rejection fail closed", async (
         (e) => e.details.reason === "DESTINATION_COUNTRY_UNVERIFIED");
   }
 });
+
+test("single active order rule blocks second non-terminal order", async () => {
+  const {prepareOrderAcceptance, isTerminalOrderStatus, serverClock} =
+      require("../order-acceptance");
+  assert.equal(isTerminalOrderStatus("Concluído"), true);
+  assert.equal(isTerminalOrderStatus("Cancelado"), true);
+  assert.equal(isTerminalOrderStatus("Novo"), false);
+  assert.equal(isTerminalOrderStatus("Em Separação"), false);
+  const savedNow = serverClock.now;
+  serverClock.now = () => Date.parse("2026-10-24T16:00:00Z");
+  try {
+    const docs = new Map([
+      ["customerActiveOrders/cust-1", {active: true, orderId: "order-1"}],
+      ["orders/order-1", {customerUid: "cust-1", status: "Em Separação"}],
+    ]);
+    const db = {
+      collection: (name) => ({
+        doc: (id) => ({path: `${name}/${id}`, id}),
+      }),
+    };
+    const tx = {
+      get: async (ref) => ({
+        exists: docs.has(ref.path),
+        data: () => docs.get(ref.path),
+      }),
+    };
+    await assert.rejects(
+        prepareOrderAcceptance(tx, db, {id: "order-2"}, {customerUid: "cust-1"}),
+        (error) => error.acceptanceCode === "ACTIVE_ORDER_EXISTS",
+    );
+  } finally {
+    serverClock.now = savedNow;
+  }
+});

@@ -31,18 +31,32 @@ async function ownPin(db, request, key, reset = false) {
         throw new HttpsError("failed-precondition", "Redefina após concluir seus pedidos em andamento.");
       }
     }
-    if (old.exists && !reset) return {pin: decryptPin(old.data().encrypted, uid, key)};
+    if (old.exists && !reset) {
+      const revision = Number(old.data().revision || 1);
+      return {
+        pin: decryptPin(old.data().encrypted, uid, key),
+        resetCount: Math.max(0, revision - 1),
+        canReset: revision < 2,
+      };
+    }
+    if (reset && old.exists && Number(old.data().revision || 1) >= 2) {
+      throw new HttpsError(
+          "failed-precondition",
+          "Limite de redefinição direta do PIN atingido. Abra um chamado com o suporte.",
+          {reason: "PIN_RESET_LIMIT_REACHED"},
+      );
+    }
     let pin = generatePin();
     if (old.exists && reset) {
       const previous = decryptPin(old.data().encrypted, uid, key);
       while (pin === previous) pin = generatePin();
     }
-    const revision = old.exists ? old.data().revision + 1 : 1;
+    const revision = old.exists ? Number(old.data().revision || 1) + 1 : 1;
     tx.set(secretRef, {encrypted: encryptPin(pin, uid, key), revision,
       updatedAt: FieldValue.serverTimestamp()});
     tx.set(audit, {uid, operation: reset ? "reset" : "created", revision,
       at: FieldValue.serverTimestamp()});
-    return {pin};
+    return {pin, resetCount: Math.max(0, revision - 1), canReset: revision < 2};
   });
 }
 function createCustomerSecurity(db) {

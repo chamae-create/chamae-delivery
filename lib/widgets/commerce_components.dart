@@ -373,7 +373,8 @@ class GoldStepper extends StatelessWidget {
         decoration: compact
             ? BoxDecoration(
                 color: AppTheme.lightBg,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.borderLight, width: 1),
               )
             : CustomerVisual.panel(),
         child: Row(
@@ -382,27 +383,69 @@ class GoldStepper extends StatelessWidget {
             IconButton(
               tooltip: localizedLabel(context, 'Diminuir quantidade'),
               constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-              iconSize: compact ? 18 : 24,
+              padding: EdgeInsets.zero,
               onPressed: decrease,
-              icon: const Icon(Icons.remove),
+              icon: Container(
+                width: compact ? 28 : 34,
+                height: compact ? 28 : 34,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: decrease == null
+                        ? AppColors.mutedSurface
+                        : AppColors.borderLight,
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  Icons.remove,
+                  size: compact ? 16 : 20,
+                  color: decrease == null
+                      ? AppColors.textSecondary
+                      : AppTheme.textDark,
+                ),
+              ),
             ),
-            Semantics(
-              liveRegion: true,
-              label: semanticLabel ?? '$value',
-              child: Text(
-                '$value',
-                style: TextStyle(
-                    fontSize: compact ? 14 : 20, fontWeight: FontWeight.w800),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: compact ? 2 : 6),
+              child: Semantics(
+                liveRegion: true,
+                label: semanticLabel ?? '$value',
+                child: Text(
+                  '$value',
+                  style: TextStyle(
+                      fontSize: compact ? 14 : 18,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.textDark),
+                ),
               ),
             ),
             IconButton(
               tooltip: localizedLabel(context, 'Aumentar quantidade'),
               constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-              iconSize: compact ? 18 : 24,
+              padding: EdgeInsets.zero,
               onPressed: increase,
-              style:
-                  IconButton.styleFrom(backgroundColor: AppTheme.primaryYellow),
-              icon: const Icon(Icons.add),
+              icon: Container(
+                width: compact ? 28 : 34,
+                height: compact ? 28 : 34,
+                decoration: BoxDecoration(
+                  gradient: increase == null ? null : CustomerVisual.gold,
+                  color: increase == null ? AppColors.mutedSurface : null,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: increase == null
+                        ? AppColors.borderLight
+                        : AppTheme.goldDeep,
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  Icons.add,
+                  size: compact ? 16 : 20,
+                  color: AppTheme.obsidianDark,
+                ),
+              ),
             ),
           ],
         ),
@@ -413,7 +456,7 @@ class CategoryBannerTile extends StatelessWidget {
   const CategoryBannerTile({
     super.key,
     required this.title,
-    required this.count,
+    this.count = 0,
     required this.imageUrl,
     required this.onTap,
     this.icon = Icons.storefront_outlined,
@@ -425,18 +468,11 @@ class CategoryBannerTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppTheme.obsidianDark,
-              AppTheme.obsidianCard,
-              Color(0xFF33230C),
-            ],
-          ),
+          color: AppTheme.obsidianCard,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppTheme.goldMid.withValues(alpha: 0.45),
+            color: AppColors.borderLight,
+            width: 1,
           ),
           boxShadow: const [
             BoxShadow(
@@ -451,71 +487,76 @@ class CategoryBannerTile extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              child: Row(
-                children: [
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (imageUrl.trim().isNotEmpty)
+                  ProductImage(url: imageUrl, darkPlaceholder: true)
+                else
                   Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF261E14),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppTheme.primaryYellow.withValues(alpha: 0.55),
+                    decoration: const BoxDecoration(
+                      gradient: CustomerVisual.charcoal,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        icon,
+                        size: 38,
+                        color: AppTheme.primaryYellow.withValues(alpha: 0.72),
                       ),
                     ),
-                    clipBehavior: Clip.antiAlias,
-                    child: imageUrl.isNotEmpty
-                        ? ProductImage(url: imageUrl)
-                        : Icon(icon, size: 22, color: AppTheme.primaryYellow),
                   ),
-                  const SizedBox(width: 9),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        LocalizedText(
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0x14000000),
+                        Color(0x550D0B08),
+                        Color(0xEB110E09),
+                      ],
+                      stops: [0.0, 0.5, 1.0],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 10,
+                  right: 10,
+                  bottom: 10,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: LocalizedText(
                           title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 13,
+                            fontSize: 13.5,
                             height: 1.15,
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '$count ${Localizations.localeOf(context).languageCode == 'es' ? (count == 1 ? 'producto' : 'productos') : (count == 1 ? 'produto' : 'produtos')}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFFD9CDB5),
-                          ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: const BoxDecoration(
+                          gradient: CustomerVisual.gold,
+                          shape: BoxShape.circle,
                         ),
-                      ],
-                    ),
+                        child: const Icon(
+                          Icons.chevron_right_rounded,
+                          size: 16,
+                          color: AppTheme.obsidianDark,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 4),
-                  Container(
-                    width: 22,
-                    height: 22,
-                    decoration: const BoxDecoration(
-                      gradient: CustomerVisual.gold,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.chevron_right_rounded,
-                      size: 16,
-                      color: AppTheme.obsidianDark,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -544,10 +585,20 @@ class CommerceSummaryLine extends StatelessWidget {
         amount,
       ]);
     }
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Expanded(child: title),
-      const SizedBox(width: 12),
-      Expanded(child: amount),
+    return Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+      Expanded(flex: 2, child: title),
+      const SizedBox(width: 10),
+      Expanded(
+        flex: 3,
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerRight,
+            child: amount,
+          ),
+        ),
+      ),
     ]);
   }
 }
@@ -568,14 +619,14 @@ class CommerceCartItemCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         margin: const EdgeInsets.only(bottom: 10),
         decoration: CustomerVisual.panel(),
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+        padding: const EdgeInsets.fromLTRB(12, 10, 8, 8),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Row(children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
             ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: SizedBox(
-                    width: 56,
-                    height: 56,
+                    width: 54,
+                    height: 54,
                     child: ProductImage(url: item.imageUrl))),
             const SizedBox(width: 10),
             Expanded(
@@ -587,45 +638,45 @@ class CommerceCartItemCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       semanticsLabel: item.name,
                       style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 13.5,
                           height: 1.2,
                           fontWeight: FontWeight.w700)),
                   const SizedBox(height: 3),
-                  Text(money(item.price),
+                  Text('${money(item.price)} / un.',
                       style: const TextStyle(
-                          fontSize: 11, color: AppColors.textSecondary)),
+                          fontSize: 11.5, color: AppColors.textSecondary)),
                 ])),
+            IconButton(
+                tooltip: '${localizedLabel(context, 'Remover')} ${item.name}',
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                onPressed: remove,
+                icon: const Icon(Icons.delete_outline, size: 20),
+                color: AppColors.textSecondary),
           ]),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           LayoutBuilder(builder: (context, constraints) {
             final price = Text(money(item.totalPrice),
-                style:
-                    const TextStyle(fontSize: 17, fontWeight: FontWeight.w900));
-            final controls = Row(mainAxisSize: MainAxisSize.min, children: [
-              GoldStepper(
-                  value: item.quantity,
-                  compact: true,
-                  semanticLabel: '${item.quantity} unidades',
-                  decrease: decrease,
-                  increase: increase),
-              IconButton(
-                  tooltip: '${localizedLabel(context, 'Remover')} ${item.name}',
-                  constraints:
-                      const BoxConstraints(minWidth: 48, minHeight: 48),
-                  onPressed: remove,
-                  icon: const Icon(Icons.delete_outline, size: 19),
-                  color: AppColors.textSecondary),
-            ]);
-            if (constraints.maxWidth < 300 ||
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.darkGold));
+            final stepper = GoldStepper(
+                value: item.quantity,
+                compact: true,
+                semanticLabel: '${item.quantity} unidades',
+                decrease: decrease,
+                increase: increase);
+            if (constraints.maxWidth < 280 ||
                 MediaQuery.textScalerOf(context).scale(1) > 1.3) {
               return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     price,
-                    Align(alignment: Alignment.centerRight, child: controls),
+                    const SizedBox(height: 4),
+                    Align(alignment: Alignment.centerRight, child: stepper),
                   ]);
             }
-            return Row(children: [Expanded(child: price), controls]);
+            return Row(children: [Expanded(child: price), stepper]);
           }),
         ]),
       );
@@ -1076,17 +1127,20 @@ class CommerceProductCard extends StatelessWidget {
     this.onAdd,
     this.onRemove,
     this.quantity = 0,
+    this.isFavorite = false,
+    this.onToggleFavorite,
   });
   final Product product;
   final VoidCallback onOpen;
-  final VoidCallback? onAdd, onRemove;
+  final VoidCallback? onAdd, onRemove, onToggleFavorite;
   final int quantity;
+  final bool isFavorite;
   @override
   Widget build(BuildContext context) => Container(
         decoration: BoxDecoration(
           color: AppColors.surfaceWhite,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.borderLight, width: 1),
           boxShadow: const [
             BoxShadow(
               color: Color(0x14916A16),
@@ -1111,127 +1165,219 @@ class CommerceProductCard extends StatelessWidget {
                         color: ProductImage.fallbackBackground,
                         child: ProductImage(url: product.imageUrl),
                       ),
-                      if (quantity == 0)
+                      if (quantity > 0)
                         Positioned(
-                          right: 7,
-                          top: 7,
+                          left: 6,
+                          top: 6,
                           child: Container(
-                            width: 26,
-                            height: 26,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.88),
+                              color: AppTheme.primaryYellow,
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: AppTheme.goldDeep,
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              '$quantity',
+                              style: const TextStyle(
+                                color: AppTheme.obsidianDark,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                        ),
+                      Positioned(
+                        right: 4,
+                        top: 4,
+                        child: IconButton(
+                          tooltip: isFavorite
+                              ? 'Remover ${product.name} dos favoritos'
+                              : 'Favoritar ${product.name}',
+                          constraints: const BoxConstraints(
+                            minWidth: 34,
+                            minHeight: 34,
+                          ),
+                          padding: EdgeInsets.zero,
+                          onPressed: onToggleFavorite,
+                          icon: Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.92),
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: AppColors.borderLight,
+                                width: 1,
                               ),
                             ),
-                            child: const Icon(
-                              Icons.favorite_border_rounded,
-                              size: 14,
-                              color: Color(0xFF4A4A4A),
+                            child: Icon(
+                              isFavorite
+                                  ? Icons.favorite_rounded
+                                  : Icons.favorite_border_rounded,
+                              size: 15,
+                              color: isFavorite
+                                  ? AppColors.error
+                                  : AppTheme.textDark,
                             ),
                           ),
                         ),
-                      if (quantity > 0)
-                        Positioned(
-                          left: 0,
-                          top: 0,
-                          child: IconButton.filledTonal(
-                            tooltip: 'Diminuir quantidade de ${product.name}',
-                            onPressed: onRemove,
-                            style: IconButton.styleFrom(
-                              backgroundColor: AppColors.lightGold,
-                            ),
-                            icon: const Icon(Icons.remove),
-                          ),
-                        ),
-                      if (quantity > 0)
-                        Positioned(
-                          right: 6,
-                          top: 6,
-                          child: Badge(
-                            label: Text('$quantity'),
-                            backgroundColor: AppTheme.primaryYellow,
-                            textColor: AppTheme.darkBg,
-                          ),
-                        ),
+                      ),
                     ],
                   ),
                 ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(7, 5, 7, 0),
-                child: Text(
-                  product.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    height: 1.2,
-                    fontWeight: FontWeight.w700,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 6, 8, 0),
+                  child: Text(
+                    product.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      height: 1.2,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 7),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final price = Text(
-                      'R\$ ${product.price.toStringAsFixed(2).replaceAll('.', ',')}',
-                      style: const TextStyle(
-                        color: AppColors.darkGold,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    );
-                    final add = IconButton(
-                      tooltip: onAdd == null
-                          ? localizedLabel(context, 'Indisponível')
-                          : 'Adicionar ${product.name}',
-                      onPressed: onAdd,
-                      icon: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: onAdd == null ? null : CustomerVisual.gold,
-                          color: onAdd == null ? AppColors.mutedSurface : null,
-                          shape: BoxShape.circle,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 2, 4, 4),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final price = FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'R\$ ${product.price.toStringAsFixed(2).replaceAll('.', ',')}',
+                          maxLines: 1,
+                          style: const TextStyle(
+                            color: AppColors.darkGold,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(5),
-                          child: Icon(Icons.add_rounded, size: 20),
+                      );
+                      final add = IconButton(
+                        tooltip: onAdd == null
+                            ? localizedLabel(context, 'Indisponível')
+                            : 'Adicionar ${product.name}',
+                        constraints: const BoxConstraints(
+                          minWidth: 30,
+                          minHeight: 30,
                         ),
-                      ),
-                    );
-                    return constraints.maxWidth < 130 ||
-                            MediaQuery.textScalerOf(context).scale(1) > 1.3
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              price,
-                              Align(
-                                  alignment: Alignment.centerRight, child: add),
-                            ],
-                          )
-                        : Row(
-                            children: [
-                              Expanded(child: price),
-                              add,
-                            ],
-                          );
-                  },
-                ),
-              ),
-              if (onAdd == null)
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(7, 0, 7, 5),
-                  child: LocalizedText(
-                    'Indisponível',
-                    style: TextStyle(fontSize: 10),
+                        style: IconButton.styleFrom(
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        padding: EdgeInsets.zero,
+                        onPressed: onAdd,
+                        icon: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: onAdd == null ? null : CustomerVisual.gold,
+                            color:
+                                onAdd == null ? AppColors.mutedSurface : null,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: onAdd == null
+                                  ? AppColors.borderLight
+                                  : AppTheme.goldDeep,
+                              width: 1,
+                            ),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(4),
+                            child: Icon(
+                              Icons.add_rounded,
+                              size: 16,
+                              color: AppTheme.obsidianDark,
+                            ),
+                          ),
+                        ),
+                      );
+                      final removeBtn = IconButton(
+                        tooltip: 'Diminuir quantidade de ${product.name}',
+                        constraints: const BoxConstraints(
+                          minWidth: 30,
+                          minHeight: 30,
+                        ),
+                        style: IconButton.styleFrom(
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        padding: EdgeInsets.zero,
+                        onPressed: onRemove,
+                        icon: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.borderLight,
+                              width: 1,
+                            ),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(4),
+                            child: Icon(
+                              Icons.remove_rounded,
+                              size: 16,
+                              color: AppTheme.textDark,
+                            ),
+                          ),
+                        ),
+                      );
+                      final actionsRow = quantity > 0
+                          ? Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                removeBtn,
+                                Text(
+                                  '$quantity',
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                add,
+                              ],
+                            )
+                          : add;
+                      return (constraints.maxWidth < 130 ||
+                              MediaQuery.textScalerOf(context).scale(1) > 1.3)
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                price,
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: actionsRow,
+                                ),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                Expanded(child: price),
+                                const SizedBox(width: 4),
+                                actionsRow,
+                              ],
+                            );
+                    },
                   ),
                 ),
-            ],
+                if (onAdd == null)
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(8, 0, 8, 5),
+                    child: LocalizedText(
+                      'Indisponível',
+                      style: TextStyle(fontSize: 10),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
 }
 
 class CommerceOrderTimeline extends StatelessWidget {

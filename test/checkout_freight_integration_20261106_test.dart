@@ -99,7 +99,7 @@ void main() {
           find.text('Distância de rota: ${isBr ? '7,964' : '6,549'} km'),
           findsOneWidget);
       expect(find.text('Destino: ${isBr ? 'Brasil (BR)' : 'Paraguai (PY)'}'),
-          findsOneWidget);
+          findsNothing);
       expect(find.text(isBr ? r'R$ 121,00' : r'R$ 119,00'), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
       controller.dispose();

@@ -157,9 +157,9 @@ void main() {
         orderStream: Stream.value({'status': 'unknown'}))));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
-        find.text('Destino: Endereço não informado'), 250,
+        find.text('Endereço não informado'), 250,
         scrollable: find.byType(Scrollable).first);
-    expect(find.text('Total em confirmação'), findsOneWidget);
+    expect(find.text('Em confirmação'), findsOneWidget);
     expect(find.textContaining('Centro - Ponta Porã'), findsNothing);
     expect(find.text('Entregador não informado'), findsOneWidget);
     expect(find.byIcon(Icons.check_circle), findsNothing);

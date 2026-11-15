@@ -50,37 +50,46 @@ class CustomerSectionTitle extends StatelessWidget {
   final String title;
   final String? subtitle;
   final IconData icon;
+  final bool compact;
   const CustomerSectionTitle({
     super.key,
     required this.title,
     required this.icon,
     this.subtitle,
+    this.compact = false,
   });
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 10),
+    padding: EdgeInsets.symmetric(vertical: compact ? 4 : 8),
     child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(icon, color: AppColors.darkGold, size: 28),
-        const SizedBox(width: 12),
+        Icon(icon, color: AppColors.darkGold, size: compact ? 20 : 24),
+        SizedBox(width: compact ? 8 : 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               LocalizedText(
                 title,
-                style: const TextStyle(
-                  fontSize: 20,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: compact ? 16 : 19,
                   height: 1.15,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               if (subtitle != null) ...[
-                const SizedBox(height: 6),
+                SizedBox(height: compact ? 2 : 4),
                 LocalizedText(
                   subtitle!,
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: compact ? 12 : 13,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ],

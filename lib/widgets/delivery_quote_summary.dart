@@ -76,7 +76,7 @@ class DeliveryQuoteSummary extends StatelessWidget {
             ]);
       });
   Widget _line(String label, String value) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 4),
         child: CommerceSummaryLine(label: label, value: value),
       );
 }
@@ -89,22 +89,14 @@ class DeliveryRouteDetails extends StatelessWidget {
       {super.key, required this.quote, required this.countryCode});
   @override
   Widget build(BuildContext context) {
-    final country = countryCode == 'BR'
-        ? 'Brasil (BR)'
-        : countryCode == 'PY'
-            ? (Localizations.localeOf(context).languageCode == 'es'
-                ? 'Paraguay (PY)'
-                : 'Paraguai (PY)')
-            : context.l10n.countryUnknown;
     final locale = LocaleController.resolve(Localizations.localeOf(context))
         .toLanguageTag()
         .replaceAll('-', '_');
     final distance = NumberFormat('0.000', locale)
         .format((quote.distanceMeters ?? 0) / 1000);
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(context.l10n.routeDistance(distance)),
-      Text(context.l10n.destinationLabel(country)),
-      const LocalizedText('Frete cotado em BRL'),
-    ]);
+    return Text(
+      context.l10n.routeDistance(distance),
+      style: const TextStyle(fontSize: 12, color: Colors.black54),
+    );
   }
 }

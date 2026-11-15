@@ -161,17 +161,6 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                   : UserSession.fullName;
               final actions = <Widget>[
                 ProfileActionTile(
-                  title: 'Meus pedidos',
-                  subtitle: 'Histórico da sua conta',
-                  icon: Icons.inventory_2_outlined,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const CustomerHistoryScreen(),
-                    ),
-                  ),
-                ),
-                ProfileActionTile(
                   title: 'Endereço de entrega',
                   subtitle: 'Escolha seu endereço',
                   icon: Icons.location_on_outlined,
@@ -288,83 +277,132 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                         ),
                       ),
                     const CustomerSectionTitle(
-                      title: 'Últimos pedidos',
-                      icon: Icons.history,
-                    ),
-                    Card(
-                      child: ListTile(
-                        leading: const Icon(
-                          Icons.receipt_long_outlined,
-                          color: AppColors.darkGold,
-                        ),
-                        title: const LocalizedText('Histórico da sua conta'),
-                        subtitle: const LocalizedText(
-                          'Consulte seus pedidos e acompanhe os detalhes.',
-                        ),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const CustomerHistoryScreen(),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const CustomerSectionTitle(
                       title: 'Minha conta',
                       icon: Icons.person_outline_rounded,
+                      compact: true,
                     ),
-                    ListTile(
-                      leading: const Icon(Icons.login),
-                      title: const LocalizedText('Método de login'),
-                      subtitle: Text(
-                        identity?.providers
-                                .map(
-                                  (p) => p == 'google.com'
-                                      ? 'Google'
-                                      : p == 'apple.com'
-                                          ? 'Apple'
-                                          : 'Conta vinculada',
-                                )
-                                .join(' • ') ??
-                            'Conta Chamaê',
+                    Container(
+                      decoration: CustomerVisual.panel(),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(
+                              Icons.login,
+                              color: AppColors.darkGold,
+                            ),
+                            title: const LocalizedText(
+                              'Método de login',
+                              style: TextStyle(fontWeight: FontWeight.w700),
+                            ),
+                            subtitle: Text(
+                              identity?.providers
+                                      .map(
+                                        (p) => p == 'google.com'
+                                            ? 'Google'
+                                            : p == 'apple.com'
+                                                ? 'Apple'
+                                                : 'Conta vinculada',
+                                      )
+                                      .join(' • ') ??
+                                  'Conta Chamaê',
+                            ),
+                          ),
+                          if (profile['birthDate'] is String) ...[
+                            const Divider(height: 1),
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: const Icon(
+                                Icons.cake_outlined,
+                                color: AppColors.darkGold,
+                              ),
+                              title: const LocalizedText(
+                                'Data de nascimento',
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                              subtitle: Text(
+                                'Data declarada: ${(profile['birthDate'] as String)
+                                        .split('-')
+                                        .reversed
+                                        .join('/')}',
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                    if (profile['birthDate'] is String)
-                      ListTile(
-                        leading: const Icon(Icons.cake_outlined),
-                        title: const LocalizedText('Data de nascimento'),
-                        subtitle: Text(
-                          'Data declarada: ${(profile['birthDate'] as String)
-                                  .split('-')
-                                  .reversed
-                                  .join('/')}',
-                        ),
-                      ),
+                    const SizedBox(height: 12),
                     const DeliveryPinCard(allowReset: true),
+                    const SizedBox(height: 12),
                     if (identity != null) ...[
                       if (!identity.providers.contains('google.com'))
-                        TextButton(
-                          onPressed: _busy
-                              ? null
-                              : () => _link(CustomerProvider.google),
-                          child: const LocalizedText('Vincular Google à conta'),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: AppColors.surfaceWhite,
+                              foregroundColor: AppTheme.textDark,
+                              side: const BorderSide(
+                                color: AppColors.borderLight,
+                              ),
+                            ),
+                            onPressed: _busy
+                                ? null
+                                : () => _link(CustomerProvider.google),
+                            icon: const Icon(
+                              Icons.link_rounded,
+                              color: AppColors.darkGold,
+                            ),
+                            label: const LocalizedText(
+                              'Vincular Google à conta',
+                              style: TextStyle(fontWeight: FontWeight.w700),
+                            ),
+                          ),
                         ),
                       if (!identity.providers.contains('apple.com'))
-                        TextButton(
-                          onPressed: _busy
-                              ? null
-                              : () => _link(CustomerProvider.apple),
-                          child: const LocalizedText('Vincular Apple à conta'),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: AppColors.surfaceWhite,
+                              foregroundColor: AppTheme.textDark,
+                              side: const BorderSide(
+                                color: AppColors.borderLight,
+                              ),
+                            ),
+                            onPressed: _busy
+                                ? null
+                                : () => _link(CustomerProvider.apple),
+                            icon: const Icon(
+                              Icons.link_rounded,
+                              color: AppColors.darkGold,
+                            ),
+                            label: const LocalizedText(
+                              'Vincular Apple à conta',
+                              style: TextStyle(fontWeight: FontWeight.w700),
+                            ),
+                          ),
                         ),
                     ],
                     if (_error != null)
-                      LocalizedText(
-                        _error!,
-                        style: const TextStyle(color: AppColors.error),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: LocalizedText(
+                          _error!,
+                          style: const TextStyle(color: AppColors.error),
+                        ),
                       ),
                     if (_busy) const LinearProgressIndicator(),
-                    TextButton.icon(
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryYellow,
+                        foregroundColor: AppTheme.obsidianDark,
+                      ),
                       onPressed: _busy || _auth == null ? null : _logout,
                       icon: const Icon(Icons.logout),
                       label: const LocalizedText('Sair da conta'),
@@ -372,8 +410,15 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                     if (widget.account != null ||
                         identity != null &&
                             !identity.anonymous &&
-                            _auth is FirebaseCustomerAuth)
-                      TextButton.icon(
+                            _auth is FirebaseCustomerAuth) ...[
+                      const SizedBox(height: 8),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.error,
+                          side: BorderSide(
+                            color: AppColors.error.withValues(alpha: 0.4),
+                          ),
+                        ),
                         onPressed: _busy
                             ? null
                             : () => Navigator.push(
@@ -394,16 +439,23 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                         ),
                         label: const LocalizedText(
                           'Excluir minha conta',
-                          style: TextStyle(color: AppColors.error),
+                          style: TextStyle(
+                            color: AppColors.error,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
-                    const Divider(),
+                    ],
+                    const SizedBox(height: 12),
                     const Padding(
-                      padding: EdgeInsets.all(16),
+                      padding: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
                       child: LocalizedText(
-                        'Usamos seu nome, WhatsApp e endereço para preparar e entregar seus pedidos. '
-                        'A localização é usada quando você solicita encontrar seu endereço. '
-                        'O histórico fica vinculado à sua conta.',
+                        'Seus dados são usados apenas para preparar e entregar seus pedidos.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ),
                   ],
@@ -460,6 +512,8 @@ class ProfileActionTile extends StatelessWidget {
                     children: [
                       LocalizedText(
                         title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 14,
@@ -471,6 +525,8 @@ class ProfileActionTile extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 4),
                           child: LocalizedText(
                             subtitle!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 12,
@@ -568,15 +624,26 @@ class _CustomerHistoryScreenState extends State<CustomerHistoryScreen> {
                     final doc = docs[index], data = doc.data();
                     final id = customerOrderLabel(data);
                     final date = _date(data).toLocal();
-                    final total =
-                        (data['totalBRL'] as num? ?? 0).toStringAsFixed(
-                      2,
-                    );
+                    final total = (data['totalBRL'] as num? ?? 0)
+                        .toStringAsFixed(2)
+                        .replaceAll('.', ',');
+                    final rawStatus = (data['status'] ?? 'Novo').toString().trim();
+                    final lowerStatus = rawStatus.toLowerCase();
+                    final isActive = !const {
+                      'concluído',
+                      'concluido',
+                      'entregue',
+                      'cancelado',
+                      'cancelada',
+                    }.contains(lowerStatus);
+                    final itemsSummary = _itemsSummary(data['itemsList']);
                     return CustomerOrderHistoryCard(
                       id: id,
                       total: total,
                       date: date,
-                      status: customerStatus(data['status']?.toString()),
+                      status: customerStatus(rawStatus),
+                      itemsSummary: itemsSummary,
+                      isActive: isActive,
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -595,6 +662,17 @@ class _CustomerHistoryScreenState extends State<CustomerHistoryScreen> {
   DateTime _date(Map<String, dynamic> data) => data['createdAt'] is Timestamp
       ? (data['createdAt'] as Timestamp).toDate()
       : DateTime.fromMillisecondsSinceEpoch(0);
+  String? _itemsSummary(dynamic raw) {
+    if (raw is! List || raw.isEmpty) return null;
+    final parts = <String>[];
+    for (final entry in raw.whereType<Map>()) {
+      final qty = (entry['quantity'] as num?)?.toInt() ?? 1;
+      final name = (entry['name'] ?? '').toString().trim();
+      if (name.isEmpty) continue;
+      parts.add('${qty}x $name');
+    }
+    return parts.isEmpty ? null : parts.join(', ');
+  }
   Widget _error() => Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

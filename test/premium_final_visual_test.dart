@@ -36,7 +36,7 @@ void main() {
   });
 
   testWidgets(
-    'category count and action remain real with unavailable photography',
+    'category title and action remain real without product count or photography',
     (tester) async {
       var opened = 0;
       await tester.pumpWidget(
@@ -57,7 +57,7 @@ void main() {
           ),
         ),
       );
-      expect(find.text('7 produtos'), findsOneWidget);
+      expect(find.text('7 produtos'), findsNothing);
       expect(find.byType(Image), findsNothing);
       await tester.tap(find.text('Snacks & Doces'));
       expect(opened, 1);

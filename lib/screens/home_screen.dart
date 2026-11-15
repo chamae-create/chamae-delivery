@@ -62,6 +62,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
   final GlobalKey _catalogAnchor = GlobalKey();
   bool _searchVisible = false;
   final Map<String, CartItem> _cart = {};
+  final Set<String> _favorites = {};
   DeliveryAddress? _deliveryAddress;
   DeliveryQuoteController? _deliveryQuote;
   final String _selectedCurrency = 'BRL';
@@ -229,6 +230,12 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         _cartNotice = restored.notices.isEmpty
             ? null
             : restored.notices.toSet().join('\n');
+        final favs = data['favorites'];
+        if (favs is List) {
+          _favorites
+            ..clear()
+            ..addAll(favs.whereType<String>());
+        }
         final contact = data['contact'];
         if (contact is Map) {
           if (UserSession.fullName.isEmpty) {
@@ -281,6 +288,18 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         );
       }
     });
+  }
+
+  void _toggleFavorite(Product product) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      if (!_favorites.add(product.id)) {
+        _favorites.remove(product.id);
+      }
+    });
+    if (_workspace != null && _workspaceReady) {
+      _workspace!.save({'favorites': _favorites.toList()}).catchError((Object _) {});
+    }
   }
 
   void _addToCart(Product product) {
@@ -354,7 +373,6 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
     );
   }
 
-  Widget _buildProductImage(String url) => ProductImage(url: url);
 
   void _pruneRestrictedCart() {
     final removed = <String>[];
@@ -400,6 +418,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             notice: _cartNotice,
             destination: _deliveryAddress,
             quoter: widget.quoter,
+            activeOrders: _activeOrdersStream,
             items: () => _cart.values.toList(),
             change: (id, delta) {
               if (delta > 0) {
@@ -492,6 +511,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             initialCurrency: _selectedCurrency,
             quoter: widget.quoter ?? FirebaseDeliveryQuoter(),
             workspace: _workspace,
+            activeOrders: _activeOrdersStream,
             verification: ConfiguredAccountVerification(),
             onCartCleared: () {},
             onOrderConfirmed: (consumed) {
@@ -712,47 +732,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
     List<Product> products,
   ) {
     final scale = MediaQuery.textScalerOf(context).scale(1);
-    final columns = width < 360 || scale > 1.3
-        ? 1
-        : width > 850
-            ? 3
-            : 2;
-    final cardWidth = (width - 32 - (columns - 1) * 10) / columns;
-    final textWidth = (cardWidth - 104).clamp(1.0, 1200.0).toDouble();
-    double measure(String text, TextStyle style) {
-      final painter = TextPainter(
-        text: TextSpan(
-          text: text,
-          style: DefaultTextStyle.of(context).style.merge(style),
-        ),
-        textDirection: Directionality.of(context),
-        textScaler: MediaQuery.textScalerOf(context),
-      )..layout(maxWidth: textWidth);
-      final result = painter.height;
-      painter.dispose();
-      return result;
-    }
-
-    var height = 84.0;
-    for (final category in categories) {
-      final count = products.where((p) => p.category == category).length;
-      final es = Localizations.localeOf(context).languageCode == 'es';
-      final label = '$count ${es
-              ? (count == 1 ? 'producto' : 'productos')
-              : (count == 1 ? 'produto' : 'produtos')}';
-      final required = 29 +
-          measure(
-            localizedLabel(context, category),
-            const TextStyle(
-              fontSize: 13,
-              height: 1.15,
-              fontWeight: FontWeight.w900,
-            ),
-          ) +
-          measure(label, const TextStyle(fontSize: 11));
-      if (required > height) height = required;
-    }
-    return height;
+    return 126 + 34 * (scale - 1).clamp(0.0, 1.5);
   }
 
   Widget _sectionTitle(
@@ -819,11 +799,6 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                 ),
                 fit: BoxFit.cover,
               ),
-      );
-
-  Widget _commerceImage(Product product) => DecoratedBox(
-        decoration: _productBackdrop(product),
-        child: _buildProductImage(product.imageUrl),
       );
 
   Widget _buildOfferCard(Product product) {
@@ -964,7 +939,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
               crossAxisSpacing: 10,
               mainAxisSpacing: 12,
               mainAxisExtent:
-                  242 + 190 * (MediaQuery.textScalerOf(context).scale(1) - 1),
+                  252 + 190 * (MediaQuery.textScalerOf(context).scale(1) - 1),
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) => _buildProductCard(products[index]),
@@ -973,82 +948,6 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           ),
         ),
       );
-
-  Widget _categoryPreview(List<Product> products) {
-    final categories = <String>{
-      ..._categories
-          .where((c) => c != 'Todos' && products.any((p) => p.category == c)),
-      ...products
-          .map((p) => p.category)
-          .where((c) => c.trim().isNotEmpty && c != 'Todos'),
-    }.toList();
-    return SizedBox(
-      height: 96 + 60 * (MediaQuery.textScalerOf(context).scale(1) - 1),
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: categories.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 10),
-        itemBuilder: (context, i) {
-          final category = categories[i];
-          final matching =
-              products.where((p) => p.category == category).toList();
-          return SizedBox(
-            width: 170,
-            child: Material(
-              borderRadius: BorderRadius.circular(18),
-              color: AppTheme.darkBg,
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                onTap: () => _selectCategory(category),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    _commerceImage(matching.first),
-                    const DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0x22000000), Color(0xEE141414)],
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 12,
-                      right: 8,
-                      bottom: 12,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: LocalizedText(
-                              category,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                          const Icon(
-                            Icons.arrow_circle_right,
-                            color: AppTheme.primaryYellow,
-                            size: 26,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
 
   List<Widget> _buildCatalogContent(List<Product> source) {
     if (_categoryOverview) {
@@ -1173,15 +1072,6 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           ),
         ),
       ],
-      SliverToBoxAdapter(
-        child: _sectionTitle(
-          'Compre por categoria',
-          Icons.storefront_outlined,
-          action: 'Ver todas',
-          onAction: () => setState(() => _categoryOverview = true),
-        ),
-      ),
-      SliverToBoxAdapter(child: _categoryPreview(products)),
       SliverToBoxAdapter(
         child: _sectionTitle(
           'Todos os produtos',
@@ -1359,6 +1249,8 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
   Widget _buildProductCard(Product product) => CommerceProductCard(
         product: product,
         quantity: _cart[product.id]?.quantity ?? 0,
+        isFavorite: _favorites.contains(product.id),
+        onToggleFavorite: () => _toggleFavorite(product),
         onOpen: () => _showProduct(product),
         onAdd:
             commerciallyAvailable(product) ? () => _addToCart(product) : null,
@@ -1653,12 +1545,12 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                     if (_categoryOverview)
                       const SliverToBoxAdapter(
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(14, 6, 14, 0),
+                          padding: EdgeInsets.fromLTRB(14, 2, 14, 4),
                           child: CustomerSectionTitle(
                             title: 'Categorias',
-                            subtitle:
-                                'Encontre o que precisa no nosso catálogo.',
+                            subtitle: 'Encontre o que precisa.',
                             icon: Icons.grid_view_rounded,
+                            compact: true,
                           ),
                         ),
                       ),

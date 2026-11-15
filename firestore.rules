@@ -135,6 +135,9 @@ service cloud.firestore {
         && storeAcceptsAt(request.time)
         && paymentAllowedForDestination(data)
         && !exists(/databases/$(database)/documents/customerOrderCancellations/$(request.auth.uid)/orders/$(documentId))
+        && (!exists(/databases/$(database)/documents/customerActiveOrders/$(request.auth.uid))
+          || get(/databases/$(database)/documents/customerActiveOrders/$(request.auth.uid)).data.get('active', false) != true
+          || get(/databases/$(database)/documents/customerActiveOrders/$(request.auth.uid)).data.get('orderId', '') == documentId)
         && confirmedDestination(data)
         && verifiedCustomerIdentity()
         && data.get('customerFlowVersion', 0) == 2
@@ -257,12 +260,18 @@ service cloud.firestore {
       allow get: if signedIn() && request.auth.uid == uid && !isCourierAccount();
       allow list: if false;
       allow create, update: if signedIn() && request.auth.uid == uid && !isCourierAccount()
-        && request.resource.data.keys().hasOnly(['addresses', 'lastAddress', 'defaultAddress', 'cart', 'pending', 'contact'])
+        && request.resource.data.keys().hasOnly(['addresses', 'lastAddress', 'defaultAddress', 'cart', 'pending', 'contact', 'favorites'])
         && request.resource.data.get('addresses', []) is list
         && request.resource.data.get('addresses', []).size() <= 20
         && request.resource.data.get('cart', []) is list
-        && request.resource.data.get('cart', []).size() <= 100;
+        && request.resource.data.get('cart', []).size() <= 100
+        && request.resource.data.get('favorites', []) is list
+        && request.resource.data.get('favorites', []).size() <= 200;
       allow delete: if false;
+    }
+    match /customerActiveOrders/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid && !isCourierAccount();
+      allow list, write: if false;
     }
     match /deliveryQuotes/{id} { allow read, write: if false; }
     match /customerDeliverySecrets/{uid} { allow read, write: if false; }

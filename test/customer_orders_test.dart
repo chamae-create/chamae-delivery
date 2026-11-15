@@ -310,8 +310,9 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('STATUS DO PEDIDO'), findsOneWidget);
-    expect(find.text('Destino: Rua própria'), findsOneWidget);
-    expect(find.text('Total: R\$ 20,00'), findsOneWidget);
+    expect(find.text('Rua própria'), findsOneWidget);
+    expect(find.text('Total do pedido'), findsOneWidget);
+    expect(find.text('R\$ 20,00'), findsOneWidget);
     auth.change(null);
     await tester.pumpAndSettle();
     expect(find.text('STATUS DO PEDIDO'), findsNothing);

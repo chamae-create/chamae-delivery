@@ -1,6 +1,6 @@
 const {launchAmounts, assertLaunchDeclaration} = require("./launch-financial-policy");
 const {prepareDelivery} = require("./delivery-service");
-const {prepareOrderAcceptance, assertStoreOpen} = require("./order-acceptance");
+const {prepareOrderAcceptance, assertStoreOpen, syncCustomerActiveOrder} = require("./order-acceptance");
 const {assertPurchasable, assertPixCanStart, updateActiveOrder,
   savePixCreation, isCancelled, recordCancelledPayment} =
     require("./order-cancellation-state");
@@ -3936,3 +3936,15 @@ Object.assign(exports, require("./courier-remuneration").createCourierRemunerati
 
 // Customer push registration and order status notifications.
 Object.assign(exports, require("./customer-push-notifications").createCustomerPushFunctions(db));
+
+// Keeps customerActiveOrders/{uid} synchronized with active vs terminal order states.
+exports.chamaeSincronizarPedidoAtivo = require("firebase-functions/v2/firestore").onDocumentWritten(
+    {document: "orders/{orderId}", region: "southamerica-east1"},
+    async (event) => {
+      const after = event.data?.after?.data() || null;
+      const before = event.data?.before?.data() || null;
+      const uid = after?.customerUid || before?.customerUid;
+      if (!uid) return;
+      await syncCustomerActiveOrder(db, uid);
+    },
+);

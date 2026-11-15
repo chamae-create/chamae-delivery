@@ -160,15 +160,23 @@ test("PIN generation, encryption, per-order verifier, attempt limit and reconcil
   assert.equal(valid.matched, true); assert.equal(valid.record.reconciled, true);
   assert.equal(checkAttempt(valid.record, "0123", "u1", "order1", key).allowed, false);
 });
-test("PIN creation/reset persist encrypted data and audit, never a plaintext courier value", async () => {
+test("PIN creation/reset persist encrypted data and audit, limiting direct reset to once", async () => {
   const {db, docs} = memory(); const request = {auth: auth()};
   const first = await ownPin(db, request, "b".repeat(64));
   assert.match(first.pin, /^\d{4}$/);
+  assert.equal(first.canReset, true);
+  assert.equal(first.resetCount, 0);
   const saved = docs.get("customerDeliverySecrets/customer");
   assert.equal(saved.pin, undefined); assert.ok(saved.encrypted);
   assert.equal(docs.get("deliveryPinAudit/audit").operation, "created");
-  await ownPin(db, request, "b".repeat(64), true);
+  await assert.rejects(ownPin(db, {auth: {...auth(), token: {...auth().token, auth_time: 1}}}, "b".repeat(64), true));
+  const afterReset = await ownPin(db, request, "b".repeat(64), true);
   assert.equal(docs.get("customerDeliverySecrets/customer").revision, 2);
   assert.equal(docs.get("deliveryPinAudit/audit").operation, "reset");
-  await assert.rejects(ownPin(db, {auth: {...auth(), token: {...auth().token, auth_time: 1}}}, "b".repeat(64), true));
+  assert.equal(afterReset.canReset, false);
+  assert.equal(afterReset.resetCount, 1);
+  await assert.rejects(
+      ownPin(db, request, "b".repeat(64), true),
+      (error) => error.details?.reason === "PIN_RESET_LIMIT_REACHED",
+  );
 });
