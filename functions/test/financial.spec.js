@@ -164,7 +164,8 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
         };
         default:
           if (["./courier-pickup-runtime", "./customer-identification", "./age-verification-service",
-            "./recipient-age-check", "./delivery-journey", "./delivery-pin-verification"].includes(name)) return require("../" + name.slice(2));
+            "./recipient-age-check", "./delivery-journey", "./delivery-pin-verification",
+            "./customer-push-notifications"].includes(name)) return require("../" + name.slice(2));
           throw new Error(`Unexpected import: ${name}`);
       }
     },

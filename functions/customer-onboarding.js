@@ -75,6 +75,14 @@ async function prepareCustomerEligibility(tx, db, order) {
   return {policy, profile: profileDoc.data(), ageProof: ageProof.data(), uid: order.customerUid, country: order.deliveryAddress.countryCode,
     documentRequiredAtDelivery: false};
 }
+function stagingAgeBypassAllowed(uid) {
+  const project = process.env.GCLOUD_PROJECT || (() => {
+    try { return JSON.parse(process.env.FIREBASE_CONFIG || "{}").projectId; } catch { return ""; }
+  })();
+  if (project !== "chamae-delivery-staging") return false;
+  const raw = process.env.CHAMAE_STAGING_AGE_BYPASS_UIDS || "";
+  return Boolean(uid && raw.split(",").map((s) => s.trim()).filter(Boolean).includes(uid));
+}
 function checkProductEligibility(context, product, now = new Date()) {
   if (!context) return;
   const category = String(product.category || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -95,8 +103,10 @@ function checkProductEligibility(context, product, now = new Date()) {
     throw new HttpsError("permission-denied", "Este produto não está disponível para sua faixa etária neste destino.",
         {reason: "AGE_RESTRICTED"});
   }
-  const floor = requiredAge(context.country, minimum);
-  assertAgeEvidence(context.ageProof, {uid: context.uid, minimum: floor, identityRevision: context.profile.identityRevision});
+  if (!stagingAgeBypassAllowed(context.uid)) {
+    const floor = requiredAge(context.country, minimum);
+    assertAgeEvidence(context.ageProof, {uid: context.uid, minimum: floor, identityRevision: context.profile.identityRevision});
+  }
   context.documentRequiredAtDelivery = true;
 }
 async function checkPurchase(db, request) {

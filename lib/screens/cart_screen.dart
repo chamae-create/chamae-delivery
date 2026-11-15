@@ -137,11 +137,23 @@ class _CartScreenState extends State<CartScreen> {
                                       children: [
                                         const Row(
                                           children: [
-                                            Icon(
-                                              Icons.receipt_long_outlined,
-                                              color: AppColors.darkGold,
+                                            DecoratedBox(
+                                              decoration: BoxDecoration(
+                                                gradient: CustomerVisual.gold,
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(10),
+                                                ),
+                                              ),
+                                              child: Padding(
+                                                padding: EdgeInsets.all(7),
+                                                child: Icon(
+                                                  Icons.receipt_long_outlined,
+                                                  color: AppTheme.obsidianDark,
+                                                  size: 18,
+                                                ),
+                                              ),
                                             ),
-                                            SizedBox(width: 8),
+                                            SizedBox(width: 10),
                                             Expanded(
                                               child: LocalizedText(
                                                 'Resumo do pedido',
@@ -178,7 +190,7 @@ class _CartScreenState extends State<CartScreen> {
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(height: 14),
+                                  const SizedBox(height: 12),
                                   if (!open)
                                     Padding(
                                       padding:
@@ -188,6 +200,41 @@ class _CartScreenState extends State<CartScreen> {
                                         style: const TextStyle(
                                           fontWeight: FontWeight.w700,
                                         ),
+                                      ),
+                                    ),
+                                  if (open)
+                                    Container(
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 10,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFF8E1),
+                                        borderRadius: BorderRadius.circular(14),
+                                        border: Border.all(
+                                          color: AppColors.borderLight,
+                                        ),
+                                      ),
+                                      child: const Row(
+                                        children: [
+                                          Icon(
+                                            Icons.schedule_rounded,
+                                            color: AppColors.darkGold,
+                                            size: 20,
+                                          ),
+                                          SizedBox(width: 10),
+                                          Expanded(
+                                            child: LocalizedText(
+                                              'Entrega rápida após confirmação',
+                                              style: TextStyle(
+                                                fontSize: 12.5,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppTheme.textDark,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   GoldPrimaryButton(

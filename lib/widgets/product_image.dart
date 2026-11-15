@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../core/theme.dart';
 
 class ProductImage extends StatefulWidget {
+  static const Color fallbackBackground = Color(0xFFF6F1E7);
+
   final String url;
   final bool darkPlaceholder;
   const ProductImage({
@@ -53,7 +55,9 @@ class _ProductImageState extends State<ProductImage> {
             ? 'Carregando imagem do produto'
             : 'Imagem do produto indisponível',
         child: ColoredBox(
-          color: widget.darkPlaceholder ? Colors.transparent : AppTheme.lightBg,
+          color: widget.darkPlaceholder
+              ? Colors.transparent
+              : ProductImage.fallbackBackground,
           child: Center(
             child: Icon(
               Icons.image_outlined,
@@ -68,31 +72,38 @@ class _ProductImageState extends State<ProductImage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_image == null) return _placeholder();
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.hasBoundedWidth
-            ? (constraints.maxWidth * MediaQuery.devicePixelRatioOf(context))
-                .ceil()
-                .clamp(1, 1600)
-            : 720;
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal:
-                constraints.maxWidth.isFinite ? constraints.maxWidth * .08 : 0,
-            vertical: constraints.maxHeight.isFinite
-                ? constraints.maxHeight * .08
-                : 0,
-          ),
-          child: Image(
-            image: ResizeImage.resizeIfNeeded(width, null, _image!),
-            fit: BoxFit.contain,
-            frameBuilder: (_, child, frame, sync) =>
-                frame != null || sync ? child : _placeholder(loading: true),
-            errorBuilder: (_, __, ___) => _placeholder(),
-          ),
-        );
-      },
+    if (_image == null) {
+      return AspectRatio(
+        aspectRatio: 1.0,
+        child: _placeholder(),
+      );
+    }
+    return AspectRatio(
+      aspectRatio: 1.0,
+      child: ColoredBox(
+        color: widget.darkPlaceholder
+            ? Colors.transparent
+            : ProductImage.fallbackBackground,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.hasBoundedWidth
+                ? (constraints.maxWidth *
+                        MediaQuery.devicePixelRatioOf(context))
+                    .ceil()
+                    .clamp(1, 1600)
+                : 720;
+            return Image(
+              image: ResizeImage.resizeIfNeeded(width, null, _image!),
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+              frameBuilder: (_, child, frame, sync) =>
+                  frame != null || sync ? child : _placeholder(loading: true),
+              errorBuilder: (_, __, ___) => _placeholder(),
+            );
+          },
+        ),
+      ),
     );
   }
 }

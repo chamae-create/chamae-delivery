@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 import '../core/models.dart';
@@ -21,6 +22,7 @@ import '../core/cart_validation.dart';
 import '../core/catalog_commercial_policy.dart';
 import '../widgets/pix_payment_dialog.dart';
 import '../data/order_attempt.dart';
+import '../data/order_notifications.dart';
 import '../core/theme.dart';
 import 'tracking_screen.dart';
 import 'address_destination_screen.dart';
@@ -916,6 +918,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _notifyOrderConfirmed() {
+    if (Firebase.apps.isNotEmpty) {
+      unawaited(FirebaseCustomerPushNotifications.ensureRegisteredSilently());
+    }
     final consumed = (_pendingPayload?['itemsList'] as List? ?? [])
         .whereType<Map>()
         .map((item) => Map<String, dynamic>.from(item))

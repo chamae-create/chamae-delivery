@@ -34,7 +34,10 @@ class CustomerSessionGate extends StatefulWidget {
 class _CustomerSessionGateState extends State<CustomerSessionGate>
     with WidgetsBindingObserver {
   late final CustomerAuth _auth = widget.auth ?? FirebaseCustomerAuth();
-  late Stream<CustomerIdentity?> _session = _auth.changes;
+  Stream<CustomerIdentity?> _dedupedSession() => _auth.changes.distinct(
+        (a, b) => a?.uid == b?.uid && a?.anonymous == b?.anonymous,
+      );
+  late Stream<CustomerIdentity?> _session = _dedupedSession();
   CustomerOnboardingRepository? _repository;
   CustomerWorkspace? _workspace;
   String? _sessionKey;
@@ -88,7 +91,8 @@ class _CustomerSessionGateState extends State<CustomerSessionGate>
         _reload();
       }
     } catch (_) {
-      if (mounted && generation == _generation) _reload();
+      // Transient network/token refresh errors on app resume must not wipe
+      // the active cart or checkout form.
     }
   }
 
@@ -106,7 +110,7 @@ class _CustomerSessionGateState extends State<CustomerSessionGate>
         _developmentPolicy = null;
         _future = null;
         _last = null;
-        _session = _auth.changes;
+        _session = _dedupedSession();
       });
 
   Future<_Journey> _load() async {

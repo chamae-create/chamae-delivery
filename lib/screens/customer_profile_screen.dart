@@ -439,13 +439,18 @@ class ProfileActionTile extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 38,
+                  width: 42,
                   height: 44,
                   decoration: BoxDecoration(
-                    gradient: CustomerVisual.gold,
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFFFFF7D6), Color(0xFFFFE58F)],
+                    ),
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.borderLight),
                   ),
-                  child: Icon(icon, color: AppTheme.darkBg, size: 27),
+                  child: Icon(icon, color: AppTheme.obsidianDark, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

@@ -65,7 +65,7 @@ void main() {
     },
   );
 
-  testWidgets('catalog photograph uses contain and eight percent inset', (
+  testWidgets('catalog photograph uses 1:1 aspect ratio, cover and #F6F1E7 fallback', (
     tester,
   ) async {
     // Transparent one-pixel image tests layout only; it is never a product asset.
@@ -93,9 +93,12 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 50));
     });
     await tester.pump();
+    final aspectRatio = tester.widget<AspectRatio>(find.byType(AspectRatio));
+    expect(aspectRatio.aspectRatio, 1.0);
     final image = tester.widget<Image>(find.byType(Image));
-    expect(image.fit, BoxFit.contain);
-    expect(tester.getSize(find.byType(Image)), const Size(168, 168));
+    expect(image.fit, BoxFit.cover);
+    expect(tester.getSize(find.byType(Image)), const Size(200, 200));
+    expect(ProductImage.fallbackBackground, const Color(0xFFF6F1E7));
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());
   });

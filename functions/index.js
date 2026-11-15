@@ -3305,14 +3305,33 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
     },
     async (event) => {
       const snapshot = event.data;
+      const orderId = event.params && event.params.orderId ?
+        String(event.params.orderId) :
+        (snapshot && snapshot.id ? snapshot.id : "");
 
-      if (!snapshot || !snapshot.exists) {
+      if (!orderId) {
+        console.warn("chamaeReservarEstoquePagamentoEntrega sem orderId.");
         return;
       }
 
-      const orderRef = snapshot.ref;
-      const orderId = event.params.orderId;
-      const pedidoInicial = snapshot.data() || {};
+      const orderRef = (snapshot && snapshot.ref) ?
+        snapshot.ref :
+        db.collection("orders").doc(orderId);
+
+      let pedidoInicial = snapshot && snapshot.exists ?
+        (snapshot.data() || {}) :
+        null;
+      if (!pedidoInicial) {
+        const fetched = await orderRef.get();
+        if (!fetched.exists) {
+          console.log("chamaeReservarEstoquePagamentoEntrega pedido ausente.", {
+            orderId,
+          });
+          return;
+        }
+        pedidoInicial = fetched.data() || {};
+      }
+
       const metodo =
           typeof pedidoInicial.paymentMethod === "string" ?
             pedidoInicial.paymentMethod.trim() :
@@ -3330,6 +3349,11 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
         pedidoInicial.pixRequested === true ||
         !metodosComReserva.has(metodo)
       ) {
+        console.log("chamaeReservarEstoquePagamentoEntrega ignorado.", {
+          orderId,
+          pixRequested: pedidoInicial.pixRequested === true,
+          metodo,
+        });
         return;
       }
 
@@ -3366,18 +3390,16 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
               const pedido = atual.data() || {};
               if (isCancelled(pedido)) return;
 
-              if (
+              const jaReservado =
                 pedido.stockReservationStatus === "reserved" ||
                 pedido.stockReservationStatus === "finalized" ||
-                pedido.stockReservationStatus === "released"
-              ) {
-                return;
-              }
+                pedido.stockReservationStatus === "released";
 
               const itens =
                   agruparItensEstoque(pedido.itemsList);
 
               if (!itens || itens.length === 0) {
+                if (jaReservado) return;
                 transaction.update(orderRef, {
                   stockReservationStatus: "requires_review",
                   stockReservationError: itens ?
@@ -3392,6 +3414,23 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
                   transaction, orderRef, pedido,
               );
               validarPagamentoEntrega(pedido, financeiro.dados);
+
+              if (jaReservado) {
+                if (financeiro.novo) {
+                  transaction.set(financeiro.ref, financeiro.dados);
+                  if (financeiro.quoteRef) {
+                    transaction.update(financeiro.quoteRef,
+                        {orderId: financeiro.ref.id});
+                  }
+                }
+                if (pedido.financialValidationStatus !== "validated") {
+                  transaction.update(orderRef, {
+                    ...camposFinanceirosPedido(pedido, financeiro.dados),
+                    updatedAt: FieldValue.serverTimestamp(),
+                  });
+                }
+                return;
+              }
 
               const itensValidados = [];
               let erro = null;
@@ -3894,3 +3933,6 @@ Object.assign(exports, require("./delivery-pin-verification").createDeliveryPinV
 
 // H03 local integration: independent courier remuneration; no customer freight changes.
 Object.assign(exports, require("./courier-remuneration").createCourierRemuneration(db));
+
+// Customer push registration and order status notifications.
+Object.assign(exports, require("./customer-push-notifications").createCustomerPushFunctions(db));

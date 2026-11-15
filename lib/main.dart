@@ -10,6 +10,7 @@ import 'firebase_options.dart';
 import 'core/theme.dart';
 import 'screens/splash_screen.dart';
 import 'data/customer_staging_bootstrap.dart';
+import 'data/order_notifications.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +30,7 @@ Future<void> initializeCustomerSession() async {
             options: DefaultFirebaseOptions.currentPlatform)
         .timeout(const Duration(seconds: 15));
   }
+  await FirebaseCustomerPushNotifications.configureBackgroundHandler();
   FirebaseFirestore.instance.settings =
       const Settings(persistenceEnabled: true);
   final auth = FirebaseAuth.instance;

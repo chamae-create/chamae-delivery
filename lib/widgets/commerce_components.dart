@@ -24,7 +24,12 @@ class CommerceHeader extends StatelessWidget {
   Widget build(BuildContext context) => LayoutBuilder(
         builder: (context, constraints) {
           return Container(
-            decoration: const BoxDecoration(color: AppTheme.lightBg),
+            decoration: const BoxDecoration(
+              color: AppTheme.lightBg,
+              border: Border(
+                bottom: BorderSide(color: AppColors.borderLight, width: 1),
+              ),
+            ),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
             child: Row(
               children: [
@@ -222,13 +227,13 @@ class CommerceBottomBar extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         decoration: const BoxDecoration(
           color: Color(0xFFFFFCF5),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
-          border: Border(top: BorderSide(color: Color(0xFFFFDF72))),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border(top: BorderSide(color: AppColors.borderLight)),
           boxShadow: [
             BoxShadow(
-              color: Color(0x17916A16),
-              blurRadius: 15,
-              offset: Offset(0, -3),
+              color: Color(0x16916A16),
+              blurRadius: 16,
+              offset: Offset(0, -4),
             ),
           ],
         ),
@@ -254,13 +259,13 @@ class CommerceBottomBar extends StatelessWidget {
                                 [
                                   Icons.home_rounded,
                                   Icons.grid_view_rounded,
-                                  Icons.receipt_long_outlined,
-                                  Icons.person_outline_rounded,
+                                  Icons.receipt_long_rounded,
+                                  Icons.person_rounded,
                                 ][i],
                                 size: 24,
                                 color: i == selectedIndex
-                                    ? AppTheme.primaryYellow
-                                    : AppColors.textSecondary,
+                                    ? const Color(0xFFE09600)
+                                    : const Color(0xFF4A4A4A),
                               ),
                               const SizedBox(height: 2),
                               LocalizedText(
@@ -272,13 +277,13 @@ class CommerceBottomBar extends StatelessWidget {
                                 ][i],
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 10.5,
                                   fontWeight: i == selectedIndex
                                       ? FontWeight.w800
                                       : FontWeight.w500,
                                   color: i == selectedIndex
-                                      ? AppColors.darkGold
-                                      : AppColors.textSecondary,
+                                      ? const Color(0xFFE09600)
+                                      : const Color(0xFF4A4A4A),
                                 ),
                               ),
                             ],
@@ -418,51 +423,100 @@ class CategoryBannerTile extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => Material(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: const BorderSide(color: Color(0xFFECE8DF)),
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppTheme.obsidianDark,
+              AppTheme.obsidianCard,
+              Color(0xFF33230C),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppTheme.goldMid.withValues(alpha: 0.45),
+          ),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x1F111111),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(children: [
-              SizedBox(
-                width: 40,
-                height: 40,
-                child: imageUrl.isNotEmpty
-                    ? ProductImage(url: imageUrl)
-                    : DecoratedBox(
-                        decoration: BoxDecoration(
-                            color: AppColors.lightGold,
-                            borderRadius: BorderRadius.circular(12)),
-                        child: Icon(icon, size: 24, color: AppColors.darkGold),
-                      ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                  child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: Row(
                 children: [
-                  LocalizedText(title,
-                      style: const TextStyle(
-                          fontSize: 13,
-                          height: 1.15,
-                          fontWeight: FontWeight.w900)),
-                  const SizedBox(height: 5),
-                  Text(
-                      '$count ${Localizations.localeOf(context).languageCode == 'es'
-                              ? (count == 1 ? 'producto' : 'productos')
-                              : (count == 1 ? 'produto' : 'produtos')}',
-                      style: const TextStyle(
-                          fontSize: 11, color: AppColors.textSecondary)),
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF261E14),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppTheme.primaryYellow.withValues(alpha: 0.55),
+                      ),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: imageUrl.isNotEmpty
+                        ? ProductImage(url: imageUrl)
+                        : Icon(icon, size: 22, color: AppTheme.primaryYellow),
+                  ),
+                  const SizedBox(width: 9),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LocalizedText(
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            height: 1.15,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '$count ${Localizations.localeOf(context).languageCode == 'es' ? (count == 1 ? 'producto' : 'productos') : (count == 1 ? 'produto' : 'produtos')}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFFD9CDB5),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Container(
+                    width: 22,
+                    height: 22,
+                    decoration: const BoxDecoration(
+                      gradient: CustomerVisual.gold,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.chevron_right_rounded,
+                      size: 16,
+                      color: AppTheme.obsidianDark,
+                    ),
+                  ),
                 ],
-              )),
-            ]),
+              ),
+            ),
           ),
         ),
       );
@@ -603,7 +657,9 @@ class _ConvenienceCampaignState extends State<ConvenienceCampaign> {
           margin: EdgeInsets.symmetric(horizontal: widget.compact ? 12 : 0),
           clipBehavior: Clip.antiAlias,
           decoration: CustomerVisual.panel(dark: true).copyWith(
-            borderRadius: BorderRadius.circular(widget.compact ? 20 : 24),
+            borderRadius: widget.compact
+                ? BorderRadius.circular(20)
+                : const BorderRadius.vertical(bottom: Radius.circular(28)),
           ),
           child: Column(
             children: [
@@ -1026,54 +1082,82 @@ class CommerceProductCard extends StatelessWidget {
   final VoidCallback? onAdd, onRemove;
   final int quantity;
   @override
-  Widget build(BuildContext context) => Material(
-        color: AppColors.surfaceWhite,
-        elevation: 1,
-        shadowColor: const Color(0x22916A16),
-        borderRadius: BorderRadius.circular(14),
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.surfaceWhite,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.borderLight),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x14916A16),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
         clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onOpen,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    ColoredBox(
-                      color: const Color(0xFFFFFEFB),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onOpen,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ColoredBox(
+                        color: ProductImage.fallbackBackground,
                         child: ProductImage(url: product.imageUrl),
                       ),
-                    ),
-                    if (quantity > 0)
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        child: IconButton.filledTonal(
-                          tooltip: 'Diminuir quantidade de ${product.name}',
-                          onPressed: onRemove,
-                          style: IconButton.styleFrom(
-                            backgroundColor: AppColors.lightGold,
+                      if (quantity == 0)
+                        Positioned(
+                          right: 7,
+                          top: 7,
+                          child: Container(
+                            width: 26,
+                            height: 26,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.88),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppColors.borderLight,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.favorite_border_rounded,
+                              size: 14,
+                              color: Color(0xFF4A4A4A),
+                            ),
                           ),
-                          icon: const Icon(Icons.remove),
                         ),
-                      ),
-                    if (quantity > 0)
-                      Positioned(
-                        right: 5,
-                        top: 5,
-                        child: Badge(
-                          label: Text('$quantity'),
-                          backgroundColor: AppTheme.primaryYellow,
-                          textColor: AppTheme.darkBg,
+                      if (quantity > 0)
+                        Positioned(
+                          left: 0,
+                          top: 0,
+                          child: IconButton.filledTonal(
+                            tooltip: 'Diminuir quantidade de ${product.name}',
+                            onPressed: onRemove,
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppColors.lightGold,
+                            ),
+                            icon: const Icon(Icons.remove),
+                          ),
                         ),
-                      ),
-                  ],
+                      if (quantity > 0)
+                        Positioned(
+                          right: 6,
+                          top: 6,
+                          child: Badge(
+                            label: Text('$quantity'),
+                            backgroundColor: AppTheme.primaryYellow,
+                            textColor: AppTheme.darkBg,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(7, 5, 7, 0),
                 child: Text(
@@ -1146,7 +1230,8 @@ class CommerceProductCard extends StatelessWidget {
             ],
           ),
         ),
-      );
+      ),
+    );
 }
 
 class CommerceOrderTimeline extends StatelessWidget {
@@ -1281,42 +1366,93 @@ class CommerceProfileBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         clipBehavior: Clip.antiAlias,
-        decoration: CustomerVisual.panel(dark: true),
+        decoration: CustomerVisual.panel(dark: true).copyWith(
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(18),
+            bottom: Radius.circular(28),
+          ),
+        ),
         child: PremiumAtmosphere(
           child: Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  'CHAMAÊ DELIVERY',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    color: AppTheme.primaryYellow,
-                    fontSize: 14,
-                    letterSpacing: 1.5,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 8),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
-                      width: 60,
-                      height: 60,
-                      padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                        gradient: CustomerVisual.gold,
-                        shape: BoxShape.circle,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 3,
                       ),
-                      child: const DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: Color(0xFFE8E5DE),
-                          shape: BoxShape.circle,
+                      decoration: BoxDecoration(
+                        color: const Color(0x55000000),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: AppTheme.goldMid.withValues(alpha: 0.7),
                         ),
-                        child:
-                            Icon(Icons.person, color: Colors.white, size: 50),
                       ),
+                      child: const Text(
+                        'PIT STOP V8',
+                        style: TextStyle(
+                          color: AppTheme.primaryYellow,
+                          fontSize: 11,
+                          letterSpacing: 1.4,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: 64,
+                          height: 64,
+                          padding: const EdgeInsets.all(3),
+                          decoration: const BoxDecoration(
+                            gradient: CustomerVisual.gold,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Color(0xFFE8E5DE),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 48,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: -2,
+                          bottom: -2,
+                          child: Container(
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              gradient: CustomerVisual.gold,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppTheme.obsidianDark,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.edit_rounded,
+                              size: 12,
+                              color: AppTheme.obsidianDark,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -1332,21 +1468,23 @@ class CommerceProfileBanner extends StatelessWidget {
                               fontSize: 12,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 3),
                           Text(
                             name.isEmpty
                                 ? localizedLabel(context, 'Bem-vindo ao Chamaê')
                                 : name,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              height: 1.1,
-                              fontWeight: FontWeight.w900,
+                            style: AppTheme.displayFont(
+                              const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                height: 1.1,
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
                           ),
                           if (phone?.isNotEmpty == true)
                             Padding(
-                              padding: const EdgeInsets.only(top: 6),
+                              padding: const EdgeInsets.only(top: 5),
                               child: Text(
                                 phone!,
                                 style: const TextStyle(
@@ -1357,7 +1495,7 @@ class CommerceProfileBanner extends StatelessWidget {
                             ),
                           if (email?.isNotEmpty == true)
                             Padding(
-                              padding: const EdgeInsets.only(top: 4),
+                              padding: const EdgeInsets.only(top: 3),
                               child: Text(
                                 email!,
                                 style: const TextStyle(
@@ -1371,13 +1509,13 @@ class CommerceProfileBanner extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                   decoration: BoxDecoration(
                     color: const Color(0x66000000),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: const Color(0xFFB98725)),
                   ),
                   child: const Row(
@@ -1385,12 +1523,12 @@ class CommerceProfileBanner extends StatelessWidget {
                       Icon(
                         Icons.workspace_premium,
                         color: AppTheme.primaryYellow,
-                        size: 23,
+                        size: 21,
                       ),
                       SizedBox(width: 8),
                       Expanded(
                         child: LocalizedText(
-                          'Seu perfil Chamaê',
+                          'Cliente Chamaê',
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,

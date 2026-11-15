@@ -8,6 +8,8 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import '../core/models.dart';
@@ -23,16 +25,21 @@ import 'address_destination_screen.dart';
 import '../data/customer_workspace.dart';
 import '../data/delivery_quote.dart';
 import '../data/customer_verification.dart';
+import '../data/customer_orders.dart';
+import '../data/order_notifications.dart';
 import 'checkout_screen.dart';
+import 'tracking_screen.dart';
 
 class DeliveryHomeScreen extends StatefulWidget {
   final Stream<List<Product>>? products;
+  final Stream<List<Map<String, dynamic>>>? activeOrders;
   final DeliveryAddress? initialAddress;
   final CustomerWorkspace? workspace;
   final DeliveryQuoter? quoter;
   const DeliveryHomeScreen({
     super.key,
     this.products,
+    this.activeOrders,
     this.initialAddress,
     this.workspace,
     this.quoter,
@@ -66,6 +73,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
   String? _cartNotice;
   Future<void>? _cartRestore;
   late Stream<List<Product>> _productsStream;
+  Stream<List<Map<String, dynamic>>>? _activeOrdersStream;
   Map<String, Product> _latestProducts = {};
   @override
   void initState() {
@@ -87,6 +95,15 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             .collection('products')
             .snapshots()
             .map((s) => s.docs.map(Product.fromFirestore).toList());
+    if (widget.activeOrders != null) {
+      _activeOrdersStream = widget.activeOrders;
+    } else if (widget.products == null && Firebase.apps.isNotEmpty) {
+      _activeOrdersStream = CustomerOrders(
+        auth: FirebaseAuth.instance,
+        firestore: FirebaseFirestore.instance,
+      ).watchActiveOrders();
+      unawaited(_initPushNotifications());
+    }
     _storeWasOpen = isStoreOpen();
     _hoursTimer = Timer.periodic(const Duration(minutes: 1), (_) {
       final open = isStoreOpen();
@@ -94,6 +111,70 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         setState(() => _storeWasOpen = open);
       }
     });
+  }
+
+  Future<void> _initPushNotifications() async {
+    await FirebaseCustomerPushNotifications.instance.initializeAndSyncToken(
+      onOrderOpened: _openTrackingFromOrderId,
+      onForegroundMessage: (title, body, orderId) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppTheme.obsidianDark,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (title.isNotEmpty)
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: AppTheme.primaryYellow,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                if (body.isNotEmpty)
+                  Text(
+                    body,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+              ],
+            ),
+            action: orderId != null && orderId.isNotEmpty
+                ? SnackBarAction(
+                    label: 'Acompanhar',
+                    textColor: AppTheme.primaryYellow,
+                    onPressed: () => _openTrackingFromOrderId(orderId),
+                  )
+                : null,
+          ),
+        );
+      },
+    );
+    final pending = FirebaseCustomerPushNotifications.pendingOrderId;
+    if (mounted && pending != null && pending.isNotEmpty) {
+      FirebaseCustomerPushNotifications.pendingOrderId = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _openTrackingFromOrderId(pending);
+      });
+    }
+  }
+
+  void _openTrackingFromOrderId(String rawOrderId, {String? documentId}) {
+    if (!mounted) return;
+    final cleanId = rawOrderId.trim();
+    if (cleanId.isEmpty && (documentId == null || documentId.isEmpty)) return;
+    final resolvedDocId = documentId ?? (cleanId.startsWith('#') ? null : cleanId);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TrackingScreen(
+          orderId: cleanId.isNotEmpty ? cleanId : documentId!,
+          documentId: resolvedDocId,
+        ),
+      ),
+    );
   }
 
   // Display BRL until a real commercial FX contract is configured.
@@ -140,9 +221,11 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
       );
       if (!mounted) return;
       setState(() {
-        _cart
-          ..clear()
-          ..addAll(restored.items);
+        if (restored.items.isNotEmpty || _cart.isEmpty) {
+          _cart
+            ..clear()
+            ..addAll(restored.items);
+        }
         _cartNotice = restored.notices.isEmpty
             ? null
             : restored.notices.toSet().join('\n');
@@ -151,7 +234,10 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           if (UserSession.fullName.isEmpty) {
             UserSession.fullName = contact['name']?.toString() ?? '';
           }
-          UserSession.whatsapp = contact['phone']?.toString() ?? '';
+          final savedPhone = contact['phone']?.toString() ?? '';
+          if (UserSession.whatsapp.isEmpty && savedPhone.isNotEmpty) {
+            UserSession.whatsapp = savedPhone;
+          }
         }
         _workspaceReady = true;
         _persistenceError = null;
@@ -632,7 +718,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             ? 3
             : 2;
     final cardWidth = (width - 32 - (columns - 1) * 10) / columns;
-    final textWidth = (cardWidth - 74).clamp(1.0, 1200.0).toDouble();
+    final textWidth = (cardWidth - 104).clamp(1.0, 1200.0).toDouble();
     double measure(String text, TextStyle style) {
       final painter = TextPainter(
         text: TextSpan(
@@ -647,7 +733,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
       return result;
     }
 
-    var height = 80.0;
+    var height = 84.0;
     for (final category in categories) {
       final count = products.where((p) => p.category == category).length;
       final es = Localizations.localeOf(context).languageCode == 'es';
@@ -737,10 +823,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
 
   Widget _commerceImage(Product product) => DecoratedBox(
         decoration: _productBackdrop(product),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: _buildProductImage(product.imageUrl),
-        ),
+        child: _buildProductImage(product.imageUrl),
       );
 
   Widget _buildOfferCard(Product product) {
@@ -1178,13 +1261,13 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
       if (eligible.any((p) => p.isCombo)) 'Combos Festa',
     ];
     return SizedBox(
-      height: 56 + 24 * (scale - 1),
+      height: 86 + 26 * (scale - 1),
       child: ListView.separated(
         controller: _categoryScrollCtrl,
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         itemCount: shortcuts.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 7),
+        separatorBuilder: (_, __) => const SizedBox(width: 9),
         itemBuilder: (context, index) {
           final category = shortcuts[index];
           final offer = category == 'Ofertas do Dia';
@@ -1196,30 +1279,18 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                   : !_filterOnlyOffers &&
                       !_filterOnlyCombos &&
                       category == _selectedCategory;
-          return Center(
-            child: ChoiceChip(
-              avatar: category == 'Todos'
-                  ? null
-                  : Icon(
-                      offer
-                          ? Icons.discount_outlined
-                          : combo
-                              ? Icons.inventory_2_outlined
-                              : _categoryIcon(category),
-                      size: 18,
-                      color: selected ? Colors.white : AppTheme.textDark,
-                    ),
-              label: LocalizedText(category,
-                  style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: selected ? Colors.white : AppTheme.textDark,
-                  )),
-              selected: selected,
-              selectedColor: AppTheme.darkBg,
-              showCheckmark: false,
-              onSelected: (_) {
+          final iconData = category == 'Todos'
+              ? Icons.grid_view_rounded
+              : offer
+                  ? Icons.local_offer_outlined
+                  : combo
+                      ? Icons.inventory_2_outlined
+                      : _categoryIcon(category);
+          return Semantics(
+            button: true,
+            selected: selected,
+            child: InkWell(
+              onTap: () {
                 if (offer) {
                   _showOffers();
                 } else if (combo) {
@@ -1228,6 +1299,56 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                   _selectCategory(category);
                 }
               },
+              borderRadius: BorderRadius.circular(14),
+              child: Container(
+                width: 68,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 7),
+                decoration: BoxDecoration(
+                  gradient: selected ? CustomerVisual.gold : null,
+                  color: selected ? null : Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: selected
+                        ? AppTheme.goldMid
+                        : AppColors.borderLight,
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x10916A16),
+                      blurRadius: 8,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      iconData,
+                      size: 22,
+                      color: selected
+                          ? AppTheme.obsidianDark
+                          : AppTheme.textDark,
+                    ),
+                    const SizedBox(height: 5),
+                    LocalizedText(
+                      category,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight:
+                            selected ? FontWeight.w800 : FontWeight.w600,
+                        color: selected
+                            ? AppTheme.obsidianDark
+                            : AppTheme.textDark,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
         },
@@ -1281,6 +1402,133 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         },
         child: child,
       );
+
+  Widget _buildActiveOrderBanner() {
+    final stream = _activeOrdersStream;
+    if (stream == null) return const SizedBox.shrink();
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: stream,
+      builder: (context, snapshot) {
+        final active = snapshot.data ?? const [];
+        if (active.isEmpty) return const SizedBox.shrink();
+        final order = active.first;
+        final docId = order['_documentId']?.toString();
+        final friendlyId =
+            order['id']?.toString().trim().isNotEmpty == true
+                ? order['id'].toString().trim()
+                : (docId ?? '');
+        final status =
+            order['status']?.toString().trim().isNotEmpty == true
+                ? order['status'].toString().trim()
+                : 'Em andamento';
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(14, 8, 14, 2),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: () => _openTrackingFromOrderId(
+                friendlyId,
+                documentId: docId,
+              ),
+              child: Ink(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF19150E), Color(0xFF0E0E0E)],
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: AppTheme.primaryYellow.withValues(alpha: 0.7),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryYellow.withValues(alpha: 0.16),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFFFFE047),
+                            Color(0xFFF5A623),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.delivery_dining_rounded,
+                        color: Color(0xFF111111),
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            active.length > 1
+                                ? '${active.length} pedidos em andamento • $friendlyId'
+                                : 'Pedido $friendlyId',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppTheme.primaryYellow,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Status: $status • Toque para acompanhar',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryYellow,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: const LocalizedText(
+                        'Acompanhar',
+                        style: TextStyle(
+                          color: Color(0xFF111111),
+                          fontWeight: FontWeight.w800,
+                          fontSize: 11.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   Widget _buildBottomNavigation() => CommerceBottomBar(
         selectedIndex: _categoryOverview ? 1 : 0,
@@ -1398,6 +1646,8 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                         ),
                       ),
                     SliverToBoxAdapter(child: _buildHeader()),
+                    if (_activeOrdersStream != null)
+                      SliverToBoxAdapter(child: _buildActiveOrderBanner()),
                     if (!_categoryOverview)
                       const SliverToBoxAdapter(child: ConvenienceCampaign()),
                     if (_categoryOverview)

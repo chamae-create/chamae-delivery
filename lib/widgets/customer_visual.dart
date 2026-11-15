@@ -10,28 +10,33 @@ abstract final class CustomerVisual {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
-      Color(0xFFFFF1A8),
-      Color(0xFFFFDC27),
+      AppTheme.goldBright,
       AppTheme.primaryYellow,
-      Color(0xFFEFA900),
-      Color(0xFFFFDE48),
+      AppTheme.goldMid,
+      AppTheme.goldDeep,
     ],
-    stops: [0, .18, .5, .88, 1],
+    stops: [0, .28, .68, 1],
   );
   static const charcoal = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF30281A), AppTheme.darkBg, Color(0xFF493413)],
+    colors: [
+      AppTheme.obsidianDark,
+      AppTheme.obsidianCard,
+      Color(0xFF2E210D),
+    ],
   );
   static BoxDecoration panel({bool dark = false}) => BoxDecoration(
     color: dark ? null : AppColors.surfaceWhite,
     gradient: dark ? charcoal : null,
-    borderRadius: BorderRadius.circular(16),
+    borderRadius: BorderRadius.circular(18),
     border: Border.all(
-      color: dark ? AppTheme.primaryYellow : AppColors.borderLight,
+      color: dark
+          ? AppTheme.goldMid.withValues(alpha: 0.72)
+          : AppColors.borderLight,
     ),
     boxShadow: const [
-      BoxShadow(color: Color(0x11916A16), blurRadius: 18, offset: Offset(0, 5)),
+      BoxShadow(color: Color(0x16916A16), blurRadius: 18, offset: Offset(0, 6)),
     ],
   );
   static EdgeInsets pagePadding(BuildContext context, {double maxWidth = 880}) {
@@ -161,7 +166,7 @@ class PremiumAtmosphere extends StatelessWidget {
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Color(0xFF080808), Color(0xFF34230D), Color(0xFF0D0C0A)],
+        colors: [Color(0xFF0B0B0B), Color(0xFF2A1D0B), Color(0xFF12100C)],
       ),
     ),
     child: CustomPaint(painter: const _PremiumRibbonPainter(), child: child),

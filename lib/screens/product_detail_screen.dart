@@ -60,42 +60,61 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           children: [
             Stack(
               children: [
-                Container(
-                  height: (MediaQuery.sizeOf(context).width * .53).clamp(
-                    190.0,
-                    340.0,
-                  ),
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0xFFFFF9E7), Color(0xFFFFFFFF)],
+                  Container(
+                    height: (MediaQuery.sizeOf(context).width * .56).clamp(
+                      200.0,
+                      350.0,
                     ),
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.elliptical(220, 26),
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF1A140B),
+                          Color(0xFF2D210F),
+                          Color(0xFF14110C),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.elliptical(220, 28),
+                      ),
+                    ),
+                    child: restricted
+                        ? const Icon(
+                            Icons.lock_outline,
+                            size: 64,
+                            color: AppTheme.primaryYellow,
+                          )
+                        : Center(
+                            child: AspectRatio(
+                              aspectRatio: 1.0,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(18),
+                                child: ProductImage(url: product.imageUrl),
+                              ),
+                            ),
+                          ),
+                  ),
+                  Positioned(
+                    top: 12,
+                    left: 12,
+                    child: IconButton(
+                      tooltip: localizedLabel(context, 'Voltar'),
+                      onPressed: () => Navigator.maybePop(context),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.black.withValues(alpha: 0.52),
+                        foregroundColor: Colors.white,
+                        side: BorderSide(
+                          color: AppTheme.goldMid.withValues(alpha: 0.65),
+                        ),
+                      ),
+                      icon: const Icon(Icons.chevron_left, size: 28),
                     ),
                   ),
-                  child: restricted
-                      ? const Icon(Icons.lock_outline, size: 64)
-                      : ProductImage(url: product.imageUrl),
-                ),
-                Positioned(
-                  top: 12,
-                  left: 12,
-                  child: IconButton(
-                    tooltip: localizedLabel(context, 'Voltar'),
-                    onPressed: () => Navigator.maybePop(context),
-                    style: IconButton.styleFrom(
-                      backgroundColor: AppTheme.lightBg,
-                      side: const BorderSide(color: AppColors.borderLight),
-                    ),
-                    icon: const Icon(Icons.chevron_left, size: 28),
-                  ),
-                ),
-              ],
-            ),
+                ],
+              ),
             Padding(
               padding: CustomerVisual.pagePadding(context),
               child: Column(

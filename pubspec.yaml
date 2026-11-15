@@ -2,7 +2,7 @@ name: chamae_delivery
 description: "Chamaê Delivery - Bebidas e Conveniência na Fronteira Brasil/Paraguai"
 publish_to: 'none'
 
-version: 1.0.0+4
+version: 1.0.0+6
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -26,6 +26,7 @@ dependencies:
   geocoding: ^5.0.0
   cloud_functions: ^6.5.0
   firebase_auth: ^6.7.0
+  firebase_messaging: ^16.0.0
   google_sign_in: ^7.2.0
 
 dev_dependencies:

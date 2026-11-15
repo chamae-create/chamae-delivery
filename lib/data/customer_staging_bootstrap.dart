@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'customer_staging_configuration.dart';
+import 'order_notifications.dart';
 import '../firebase_options.dart' show DefaultFirebaseOptions;
 
 /// Does not contact Firebase until all staging defines have passed validation.
@@ -55,6 +56,7 @@ Future<void> initializeCustomerStagingSession() async {
   }
   FirebaseFirestore.instance.settings =
       const Settings(persistenceEnabled: true);
+  await FirebaseCustomerPushNotifications.configureBackgroundHandler();
   final auth = FirebaseAuth.instance;
   if (kIsWeb) await auth.setPersistence(Persistence.LOCAL);
   await auth.authStateChanges().first.timeout(const Duration(seconds: 15));

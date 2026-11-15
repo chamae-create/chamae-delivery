@@ -1,13 +1,15 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import '../data/order_notifications.dart';
 
 class OrderNotificationCard extends StatefulWidget {
   final String orderId;
-  final OrderNotifications notifications;
-  const OrderNotificationCard(
-      {super.key,
-      required this.orderId,
-      this.notifications = const UnconfiguredOrderNotifications()});
+  final OrderNotifications? notifications;
+  const OrderNotificationCard({
+    super.key,
+    required this.orderId,
+    this.notifications,
+  });
   @override
   State<OrderNotificationCard> createState() => _OrderNotificationCardState();
 }
@@ -15,11 +17,16 @@ class OrderNotificationCard extends StatefulWidget {
 class _OrderNotificationCardState extends State<OrderNotificationCard> {
   bool _busy = false;
   String? _message;
+  OrderNotifications get _adapter =>
+      widget.notifications ??
+      (Firebase.apps.isNotEmpty
+          ? FirebaseCustomerPushNotifications.instance
+          : const UnconfiguredOrderNotifications());
+
   Future<void> _request() async {
     setState(() => _busy = true);
     try {
-      final permission =
-          await widget.notifications.requestForOrder(widget.orderId);
+      final permission = await _adapter.requestForOrder(widget.orderId);
       if (!mounted) return;
       setState(() => _message = switch (permission) {
             OrderNotificationPermission.granted =>
