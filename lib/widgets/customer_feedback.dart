@@ -6,6 +6,7 @@ import '../core/theme.dart';
 class CustomerFeedback extends StatelessWidget {
   final String title, message;
   final IconData icon;
+  final String? imageAsset;
   final bool loading;
   final VoidCallback? onRetry;
   const CustomerFeedback({
@@ -13,6 +14,7 @@ class CustomerFeedback extends StatelessWidget {
     required this.title,
     required this.message,
     this.icon = Icons.info_outline_rounded,
+    this.imageAsset,
     this.loading = false,
     this.onRetry,
   });
@@ -27,6 +29,23 @@ class CustomerFeedback extends StatelessWidget {
                 height: 32,
                 child: CircularProgressIndicator(
                     color: AppColors.darkGold, strokeWidth: 3))
+          else if (imageAsset != null)
+            Container(
+              width: 112,
+              height: 112,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.borderLight, width: 1),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Image.asset(
+                imageAsset!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Center(
+                  child: Icon(icon, size: 40, color: AppColors.darkGold),
+                ),
+              ),
+            )
           else
             Icon(icon, size: 40, color: AppColors.darkGold),
           const SizedBox(height: 16),

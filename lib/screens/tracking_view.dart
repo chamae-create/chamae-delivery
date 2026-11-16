@@ -350,16 +350,26 @@ class _TrackingViewState extends State<TrackingView> {
                   decoration: CustomerVisual.panel(),
                   child: Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: const BoxDecoration(
-                          gradient: CustomerVisual.gold,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.two_wheeler_rounded,
-                          size: 22,
-                          color: AppTheme.obsidianDark,
+                      ClipOval(
+                        child: SizedBox(
+                          width: 44,
+                          height: 44,
+                          child: Image.asset(
+                            'assets/images/states/tracking_moto.jpg',
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: const BoxDecoration(
+                                gradient: CustomerVisual.gold,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.two_wheeler_rounded,
+                                size: 22,
+                                color: AppTheme.obsidianDark,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),

@@ -52,7 +52,28 @@ class _OrderNotificationCardState extends State<OrderNotificationCard> {
           padding: const EdgeInsets.all(16),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            const Text('Quer receber atualizações deste pedido?'),
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: SizedBox(
+                    width: 44,
+                    height: 44,
+                    child: Image.asset(
+                      'assets/images/states/notification_bell.jpg',
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.notifications_active_outlined,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text('Quer receber atualizações deste pedido?'),
+                ),
+              ],
+            ),
             if (_message != null) Text(_message!),
             TextButton(
                 onPressed: _busy ? null : _request,

@@ -45,6 +45,8 @@ class _ProductImageState extends State<ProductImage> {
       } catch (_) {
         // A malformed image must not take the catalog down.
       }
+    } else if (url.startsWith('assets/')) {
+      _image = AssetImage(url);
     } else if (['http', 'https'].contains(Uri.tryParse(url)?.scheme)) {
       _image = NetworkImage(url);
     }

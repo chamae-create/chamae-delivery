@@ -45,3 +45,7 @@ flutter:
     - assets/images/home/
     - assets/images/splash/
     - assets/images/onboarding/
+    - assets/images/banners/
+    - assets/images/categories/
+    - assets/images/profile/
+    - assets/images/states/

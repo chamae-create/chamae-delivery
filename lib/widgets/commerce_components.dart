@@ -913,9 +913,31 @@ class _ConvenienceCampaignState extends State<ConvenienceCampaign> {
 
   Widget _slide(String overline, String title, String subtitle) =>
       PremiumAtmosphere(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 14, 16, 14),
-          child: LayoutBuilder(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              'assets/images/banners/home_hero_pitstop_v8.jpg',
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+            ),
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Color(0xE80B0B0B),
+                    Color(0xBA14100A),
+                    Color(0x520B0B0B),
+                  ],
+                  stops: [0.0, 0.58, 1.0],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 14, 16, 14),
+              child: LayoutBuilder(
             builder: (context, constraints) {
               final largeText = MediaQuery.textScalerOf(context).scale(1) > 1.3;
               return Column(
@@ -1031,6 +1053,8 @@ class _ConvenienceCampaignState extends State<ConvenienceCampaign> {
               );
             },
           ),
+        ),
+          ],
         ),
       );
   Widget _benefit(IconData icon, String label) => Expanded(
@@ -1519,9 +1543,33 @@ class CommerceProfileBanner extends StatelessWidget {
           ),
         ),
         child: PremiumAtmosphere(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-            child: Column(
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Image.asset(
+                  'assets/images/profile/profile_card_bg.jpg',
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
+              ),
+              const Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xCC0B0B0B),
+                        Color(0xAE1D150A),
+                        Color(0xD4100E0A),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
@@ -1687,6 +1735,8 @@ class CommerceProfileBanner extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+            ],
           ),
         ),
       );

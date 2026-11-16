@@ -209,15 +209,38 @@ class _IdentificationState extends State<CustomerIdentificationScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    es
-                        ? 'Confirma tus datos para agilizar tus pedidos.'
-                        : 'Confirme seus dados para agilizar seus pedidos.',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: SizedBox(
+                          width: 52,
+                          height: 52,
+                          child: Image.asset(
+                            'assets/images/states/id_shield.jpg',
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const Icon(
+                              Icons.verified_user_outlined,
+                              color: AppColors.darkGold,
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          es
+                              ? 'Confirma tus datos para agilizar tus pedidos.'
+                              : 'Confirme seus dados para agilizar seus pedidos.',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<IdentificationType>(

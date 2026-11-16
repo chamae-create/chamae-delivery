@@ -586,6 +586,43 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
     );
   }
 
+  bool _isRestrictedCategory(String category) {
+    final normalized = category.trim().toLowerCase();
+    return normalized.contains('tabacaria') ||
+        normalized.contains('head shop') ||
+        normalized.contains('headshop');
+  }
+
+  String _categoryImageAsset(String category, String fallbackUrl) {
+    final normalized = category.trim().toLowerCase();
+    if (normalized.contains('cervej')) {
+      return 'assets/images/categories/cat_cervejas.jpg';
+    }
+    if (normalized.contains('destilad') || normalized.contains('vinh')) {
+      return 'assets/images/categories/cat_destilados.jpg';
+    }
+    if (normalized.contains('refrigerant') || normalized.contains('suco')) {
+      return 'assets/images/categories/cat_refrigerantes.jpg';
+    }
+    if (normalized.contains('água') ||
+        normalized.contains('agua') ||
+        normalized.contains('gelo')) {
+      return 'assets/images/categories/cat_agua_gelo.jpg';
+    }
+    if (normalized.contains('energ')) {
+      return 'assets/images/categories/cat_energeticos.jpg';
+    }
+    if (normalized.contains('snack') || normalized.contains('doce')) {
+      return 'assets/images/categories/cat_snacks.jpg';
+    }
+    if (normalized.contains('conven') ||
+        normalized.contains('kaipi') ||
+        normalized.contains('promo')) {
+      return 'assets/images/categories/cat_conveniencia.jpg';
+    }
+    return fallbackUrl;
+  }
+
   IconData _categoryIcon(String category) {
     switch (category) {
       case 'Todos':
@@ -602,8 +639,6 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         return Icons.wine_bar_rounded;
       case 'Refrigerantes & Sucos':
         return Icons.local_drink_rounded;
-      case 'Tabacaria':
-        return Icons.smoking_rooms_rounded;
       case 'Snacks & Doces':
         return Icons.cookie_outlined;
       case 'Gelo & Conveniência':
@@ -671,13 +706,14 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
         .toSet()
         .where(
           (c) =>
-              _searchQuery.isEmpty ||
-              c.toLowerCase().contains(_searchQuery) ||
-              products.any(
-                (p) =>
-                    p.category == c &&
-                    p.name.toLowerCase().contains(_searchQuery),
-              ),
+              !_isRestrictedCategory(c) &&
+              (_searchQuery.isEmpty ||
+                  c.toLowerCase().contains(_searchQuery) ||
+                  products.any(
+                    (p) =>
+                        p.category == c &&
+                        p.name.toLowerCase().contains(_searchQuery),
+                  )),
         )
         .toList();
     if (categories.isEmpty) {
@@ -717,7 +753,10 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
             title: category,
             count: matching.length,
             icon: _categoryIcon(category),
-            imageUrl: matching.first.imageUrl,
+            imageUrl: _categoryImageAsset(
+              category,
+              matching.isNotEmpty ? matching.first.imageUrl : '',
+            ),
             onTap: () => _selectCategory(category),
           );
         },
@@ -1141,11 +1180,20 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
     final shortcuts = [
       'Todos',
       ...<String>{
-        ..._categories
-            .where((c) => c != 'Todos' && eligible.any((p) => p.category == c)),
+        ..._categories.where(
+          (c) =>
+              c != 'Todos' &&
+              !_isRestrictedCategory(c) &&
+              eligible.any((p) => p.category == c),
+        ),
         ...eligible
             .map((p) => p.category)
-            .where((c) => c.trim().isNotEmpty && c != 'Todos'),
+            .where(
+              (c) =>
+                  c.trim().isNotEmpty &&
+                  c != 'Todos' &&
+                  !_isRestrictedCategory(c),
+            ),
       },
       if (eligible.any((p) => p.isOffer)) 'Ofertas do Dia',
       if (eligible.any((p) => p.isCombo)) 'Combos Festa',

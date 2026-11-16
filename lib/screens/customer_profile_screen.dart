@@ -603,7 +603,14 @@ class _CustomerHistoryScreenState extends State<CustomerHistoryScreen> {
                   ..sort((a, b) => _date(b.data()).compareTo(_date(a.data())));
                 if (docs.isEmpty) {
                   return const Center(
-                    child: LocalizedText('Seus pedidos aparecerão aqui.'),
+                    child: SingleChildScrollView(
+                      child: CustomerFeedback(
+                        title: 'Nenhum pedido por aqui',
+                        message: 'Seus pedidos aparecerão aqui.',
+                        icon: Icons.receipt_long_outlined,
+                        imageAsset: 'assets/images/states/empty_orders.jpg',
+                      ),
+                    ),
                   );
                 }
                 return ListView.separated(

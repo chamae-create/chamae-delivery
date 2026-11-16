@@ -109,6 +109,7 @@ class _CartScreenState extends State<CartScreen> {
                           title: 'Seu carrinho está vazio.',
                           message: 'Escolha suas bebidas e conveniência.',
                           icon: Icons.shopping_bag_outlined,
+                          imageAsset: 'assets/images/states/empty_cart.jpg',
                         ),
                       ),
                     )
