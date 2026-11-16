@@ -120,9 +120,15 @@ async function moveOrder(db, request, operation, resolveReservation,
       reject("Pedido sem validação financeira oficial. Revisão necessária.");
     }
     checkFinancial(order, financial.data());
-    if (operation === "complete" && !courierCompletion && order.paymentStatus !== "Pago") {
-      await require("./delivery-collection-contract").assertSupervisedCollection(tx, db, order,
-          id, financial.data(), internal.checkDeliveryPayment);
+    if (operation === "complete" && order.paymentStatus !== "Pago" &&
+        (!courierCompletion || data.collectionConfirmed === true)) {
+      if (order.paymentMethod === "PIX" || order.pixRequested === true) {
+        reject("COLLECTION_STATE_REVIEW_REQUIRED");
+      }
+      if (!courierCompletion || typeof internal.checkDeliveryPayment === "function") {
+        await require("./delivery-collection-contract").assertSupervisedCollection(tx, db, order,
+            id, financial.data(), internal.checkDeliveryPayment);
+      }
     }
     const previous = await tx.get(deliveryRef);
     const uid = courierUid(order.courierUid);
@@ -202,6 +208,11 @@ async function moveOrder(db, request, operation, resolveReservation,
           deliveryConfirmedAt: FieldValue.serverTimestamp(),
           ...(data.collectionConfirmed === true ? {
             deliveryCollectionConfirmedAt: FieldValue.serverTimestamp(),
+            ...(order.paymentStatus !== "Pago" ? {
+              paymentStatus: "Pago",
+              paidAt: FieldValue.serverTimestamp(),
+              paymentConfirmedBy: courierCompletion ? "courier_delivery_completion" : "delivery_completion",
+            } : {}),
           } : {}),
         } : {separationStartedAt: FieldValue.serverTimestamp(),
           courierDispatchState: "awaiting_integration"})});

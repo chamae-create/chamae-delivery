@@ -26,7 +26,7 @@ async function ownPin(db, request, key, reset = false) {
     if (reset) {
       const active = await tx.get(db.collection("orders").where("customerUid", "==", uid)
           .where("status", "in", ["Novo", "Aguardando pagamento", "Em Separação",
-            "Aguardando Retirada", "Saiu para Entrega"]).limit(1));
+            "Saiu para Entrega"]).limit(1));
       if (!active.empty) {
         throw new HttpsError("failed-precondition", "Redefina após concluir seus pedidos em andamento.");
       }

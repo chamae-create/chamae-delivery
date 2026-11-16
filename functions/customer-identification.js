@@ -8,7 +8,7 @@ function sanitizeIdentification(data) {
   if (!data || typeof data !== "object" || Array.isArray(data) ||
       Object.keys(data).some(k => !allowed.includes(k)) ||
       typeof data.fullName !== "string" || data.fullName.trim().length < 3 || data.fullName.trim().length > 120 ||
-      /[\u0000-\u001f]/.test(data.fullName) ||
+      Array.from(data.fullName).some((c) => c.codePointAt(0) < 32) ||
       !["pt-BR", "es-PY"].includes(data.preferredLanguage) ||
       typeof data.phone !== "string" || !/^\+[1-9][0-9]{7,14}$/.test(data.phone) ||
       !((data.documentType === "cpf" && data.documentIssuer === "BR") ||

@@ -26,6 +26,7 @@ const {onRequest, HttpsError} = require("firebase-functions/v2/https");
 const {
   onDocumentCreated,
   onDocumentUpdated,
+  onDocumentWritten,
 } = require("firebase-functions/v2/firestore");
 
 const {defineSecret} = require("firebase-functions/params");
@@ -56,6 +57,8 @@ const {
   FieldValue,
 
 } = require("firebase-admin/firestore");
+
+const {getAuth} = require("firebase-admin/auth");
 
 
 if (getApps().length === 0) {
@@ -93,7 +96,6 @@ function agruparItensEstoque(itemsList) {
   return Array.from(quantidades, ([id, quantity]) => ({id, quantity}));
 }
 
-const PYG_POR_BRL = 1500;
 const BRL_POR_USD = 5;
 
 /**
@@ -318,58 +320,134 @@ function camposFinanceirosPedido(pedido, dados) {
   };
 }
 
+const PYG_POR_CENTAVO = 15; // 1500 PYG = 100 centavos BRL
+
 /**
- * Valida valores declarados para entrega contra o total oficial.
+ * Resolve dados legítimos do pagador para chamadas PIX no Mercado Pago.
+ * @param {Object} pedido Documento do pedido.
+ * @return {Promise<Object>} Objeto payer.
+ */
+async function resolvePixPayer(pedido) {
+  const rawName = typeof pedido?.customerName === "string" ?
+    pedido.customerName.trim() : "";
+  const firstName = rawName ?
+    rawName.split(/\s+/)[0].slice(0, 60) : "Cliente";
+  let email = typeof pedido?.customerEmail === "string" ?
+    pedido.customerEmail.trim() : "";
+  if (!email && typeof pedido?.customerUid === "string" &&
+      pedido.customerUid.trim()) {
+    try {
+      const userRecord = await getAuth().getUser(pedido.customerUid.trim());
+      if (typeof userRecord?.email === "string") {
+        email = userRecord.email.trim();
+      }
+    } catch (_) {
+      // Ambientes mockados ou usuário sem email utilizam fallback determinístico.
+    }
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    const uidSlug = String(pedido?.customerUid || "cliente")
+        .replace(/[^a-zA-Z0-9._-]/g, "").slice(0, 32) || "cliente";
+    email = `cliente.${uidSlug}@chamaedelivery.com.br`;
+  }
+  return {email, first_name: firstName};
+}
+
+/**
+ * Atualiza customerActiveOrders/{uid} dentro da mesma transação de criação do pedido.
+ * @param {Object} transaction Transação Firestore.
+ * @param {Object} pedido Documento do pedido.
+ * @param {string} orderId ID do pedido.
+ * @param {string} statusFallback Status inicial.
+ */
+function setCustomerActiveOrderInTx(transaction, pedido, orderId, statusFallback) {
+  const uid = typeof pedido?.customerUid === "string" ?
+    pedido.customerUid.trim() : "";
+  if (!uid) return;
+  transaction.set(
+      db.collection("customerActiveOrders").doc(uid),
+      {
+        customerUid: uid,
+        orderId,
+        friendlyId: typeof pedido.id === "string" ? pedido.id : null,
+        status: pedido.status || statusFallback,
+        active: true,
+      },
+      {merge: true},
+  );
+}
+
+/**
+ * Converte valor monetário para unidades inteiras de PYG (1 centavo BRL = 15 PYG).
+ * Elimina erros de ponto flutuante entre BRL, USD e PYG.
+ * @param {number} amount Valor na moeda original.
+ * @param {string} currency Código da moeda ("BRL", "USD" ou "PYG").
+ * @return {number} Quantidade inteira equivalente em PYG.
+ */
+function valorParaUnidadesPyg(amount, currency) {
+  if (typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0) {
+    throw erroFinanceiro("VALOR_PAGAMENTO_INVALIDO");
+  }
+  switch (currency || "BRL") {
+    case "BRL": {
+      const cents = Math.round(amount * 100);
+      if (!Number.isSafeInteger(cents) || cents <= 0) {
+        throw erroFinanceiro("VALOR_PAGAMENTO_INVALIDO");
+      }
+      return cents * PYG_POR_CENTAVO;
+    }
+    case "USD": {
+      const cents = Math.round(amount * BRL_POR_USD * 100);
+      if (!Number.isSafeInteger(cents) || cents <= 0) {
+        throw erroFinanceiro("VALOR_PAGAMENTO_INVALIDO");
+      }
+      return cents * PYG_POR_CENTAVO;
+    }
+    case "PYG": {
+      const pyg = Math.round(amount);
+      if (!Number.isSafeInteger(pyg) || pyg <= 0) {
+        throw erroFinanceiro("VALOR_PAGAMENTO_INVALIDO");
+      }
+      return pyg;
+    }
+    default:
+      throw erroFinanceiro("MOEDA_PAGAMENTO_INVALIDA");
+  }
+}
+
+/**
+ * Valida valores declarados para entrega contra o total oficial em centavos inteiros.
  * Mantém moedas e cotações; valores convertidos do cliente não são usados.
  * @param {Object} pedido Pedido atual.
  * @param {Object} dados Financeiro oficial.
  */
 function validarPagamentoEntrega(pedido, dados) {
+  const totalPygEquiv = dados.totalCentavos * PYG_POR_CENTAVO;
   if (pedido.splitPayment === true) {
     const partes = pedido.paymentParts;
     if (!Array.isArray(partes) || partes.length < 2 || partes.length > 3) {
       throw erroFinanceiro("SPLIT_PAYMENT_INVALIDO");
     }
-    let totalBRL = 0;
+    let totalPagoEquiv = 0;
     for (const parte of partes) {
       if (!parte || parte.method !== "Dinheiro") {
         throw erroFinanceiro("SPLIT_PAYMENT_INVALIDO");
       }
-      const amount = parte.amountCurrency;
-      if (
-        typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0
-      ) {
-        throw erroFinanceiro("VALOR_PAGAMENTO_INVALIDO");
-      }
-      switch (parte.currency) {
-        case "BRL": totalBRL += amount; break;
-        case "USD": totalBRL += amount * BRL_POR_USD; break;
-        case "PYG": totalBRL += amount / PYG_POR_BRL; break;
-        default: throw erroFinanceiro("MOEDA_PAGAMENTO_INVALIDA");
-      }
+      totalPagoEquiv += valorParaUnidadesPyg(parte.amountCurrency, parte.currency);
     }
-    if (!Number.isSafeInteger(Math.round(totalBRL * 100))) {
+    if (!Number.isSafeInteger(totalPagoEquiv)) {
       throw erroFinanceiro("VALOR_PAGAMENTO_INVALIDO");
     }
-    if (Math.round(totalBRL * 100) < dados.totalCentavos) {
+    if (totalPagoEquiv < totalPygEquiv) {
       throw erroFinanceiro("PAGAMENTO_INSUFICIENTE");
     }
   } else if (pedido.paymentMethod === "Dinheiro") {
     // Pedidos antigos podem não ter declaração de cédulas para troco.
     if (pedido.cashTendered == null) return;
-    const amount = pedido.cashTendered;
-    if (typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0) {
-      throw erroFinanceiro("VALOR_PAGAMENTO_INVALIDO");
-    }
-    let totalMoeda;
-    switch (pedido.cashCurrency || "BRL") {
-      case "BRL": totalMoeda = dados.totalBRL; break;
-      case "USD": totalMoeda = Math.round(dados.totalBRL / BRL_POR_USD * 100) /
-          100; break;
-      case "PYG": totalMoeda = Math.round(dados.totalBRL * PYG_POR_BRL); break;
-      default: throw erroFinanceiro("MOEDA_PAGAMENTO_INVALIDA");
-    }
-    if (amount < totalMoeda) {
+    const tenderedEquiv = valorParaUnidadesPyg(
+        pedido.cashTendered, pedido.cashCurrency || "BRL",
+    );
+    if (tenderedEquiv < totalPygEquiv) {
       throw erroFinanceiro("PAGAMENTO_INSUFICIENTE");
     }
   }
@@ -2443,6 +2521,8 @@ exports.chamaeCriarPix = onRequest(
 
       let idempotencyKey = "";
 
+      let pedidoParaPayer = null;
+
 
       try {
         await db.runTransaction(
@@ -2489,6 +2569,7 @@ exports.chamaeCriarPix = onRequest(
               );
               idempotencyKey = financeiro.dados.pixIdempotencyKey;
               valorBRL = financeiro.dados.totalBRL;
+              pedidoParaPayer = pedido;
 
               if (financeiro.novo) {
                 transaction.set(financeiro.ref, financeiro.dados);
@@ -2649,18 +2730,7 @@ exports.chamaeCriarPix = onRequest(
         },
 
 
-        payer: {
-
-          email:
-
-              "test_user_br@testuser.com",
-
-
-          first_name:
-
-              "APRO",
-
-        },
+        payer: await resolvePixPayer(pedidoParaPayer),
 
       };
 
@@ -2938,6 +3008,7 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
       document: "orders/{orderId}",
       region: "southamerica-east1",
       secrets: [mercadoPagoToken],
+      retry: true,
       maxInstances: 5,
     },
     async (event) => {
@@ -2978,6 +3049,7 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
       let valorBRL = 0;
       let idempotencyKey = "";
       let deveCriarPix = true;
+      let pedidoParaPayer = pedidoInicial;
 
       try {
         await db.runTransaction(
@@ -3015,6 +3087,7 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
               );
               idempotencyKey = financeiro.dados.pixIdempotencyKey;
               valorBRL = financeiro.dados.totalBRL;
+              pedidoParaPayer = pedido;
 
               if (financeiro.novo) {
                 transaction.set(financeiro.ref, financeiro.dados);
@@ -3039,6 +3112,9 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
                     mercadoPagoCreateSource:
                         "firestore_order_trigger",
                   },
+              );
+              setCustomerActiveOrderInTx(
+                  transaction, pedido, orderDocumentId, "Aguardando pagamento",
               );
             },
         );
@@ -3108,10 +3184,7 @@ exports.chamaeCriarPixAutomatico = onDocumentCreated(
             },
           ],
         },
-        payer: {
-          email: "test_user_br@testuser.com",
-          first_name: "APRO",
-        },
+        payer: await resolvePixPayer(pedidoParaPayer),
       };
 
       try {
@@ -3301,6 +3374,7 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
     {
       document: "orders/{orderId}",
       region: "southamerica-east1",
+      retry: true,
       maxInstances: 10,
     },
     async (event) => {
@@ -3511,6 +3585,9 @@ exports.chamaeReservarEstoquePagamentoEntrega = onDocumentCreated(
                 stockReservedBy: "firestore_order_trigger",
                 updatedAt: FieldValue.serverTimestamp(),
               });
+              setCustomerActiveOrderInTx(
+                  transaction, pedido, orderId, "Novo",
+              );
 
               console.log(
                   "Estoque reservado para pagamento na entrega.",
@@ -3810,6 +3887,7 @@ exports.chamaeResolverReservaEstoque = onDocumentUpdated(
     {
       document: "orders/{orderId}",
       region: "southamerica-east1",
+      retry: true,
       maxInstances: 10,
     },
     async (event) => {
@@ -3937,9 +4015,12 @@ Object.assign(exports, require("./courier-remuneration").createCourierRemunerati
 // Customer push registration and order status notifications.
 Object.assign(exports, require("./customer-push-notifications").createCustomerPushFunctions(db));
 
+// Courier push registration and assignment notifications.
+Object.assign(exports, require("./courier-notifications").createCourierNotificationFunctions(db));
+
 // Keeps customerActiveOrders/{uid} synchronized with active vs terminal order states.
-exports.chamaeSincronizarPedidoAtivo = require("firebase-functions/v2/firestore").onDocumentWritten(
-    {document: "orders/{orderId}", region: "southamerica-east1"},
+exports.chamaeSincronizarPedidoAtivo = onDocumentWritten(
+    {document: "orders/{orderId}", region: "southamerica-east1", retry: true},
     async (event) => {
       const after = event.data?.after?.data() || null;
       const before = event.data?.before?.data() || null;

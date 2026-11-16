@@ -133,6 +133,7 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
         case "./courier-approval": return require("../courier-approval");
         case "./courier-account": return require("../courier-account");
         case "./courier-remuneration": return require("../courier-remuneration");
+        case "./courier-notifications": return require("../courier-notifications");
         case "./courier-events": return require("../courier-events");
         case "./courier-policy": return require("../courier-policy");
         case "./courier-photo": return require("../courier-photo");
@@ -141,11 +142,12 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
         case "./order-chat": return require("../order-chat");
         case "./order-printing": return require("../order-printing");
         case "firebase-functions/v2/https":
-          return {onRequest: (_, handler) => handler};
+          return {onRequest: (_, handler) => handler, HttpsError: class extends Error {}};
         case "firebase-functions/v2/firestore":
           return {
             onDocumentCreated: (_, handler) => handler,
             onDocumentUpdated: (_, handler) => handler,
+            onDocumentWritten: (_, handler) => handler,
           };
         case "firebase-functions/params":
           return {defineSecret: () => ({value: () => "test-secret"})};
@@ -155,6 +157,8 @@ const fixture = (overrides = {}, product = {}, options = {}) => {
         };
         case "firebase-admin/app":
           return {getApps: () => [{}], initializeApp: () => {}};
+        case "firebase-admin/auth":
+          return {getAuth: () => ({getUser: async () => null})};
         case "firebase-admin/firestore": return {
           getFirestore: () => db,
           FieldValue: {
@@ -429,11 +433,11 @@ for (const country of ["BR", "PY"]) {
       order.deliveryAddress.countryCode = country; quote.destination.countryCode = country;
       quote.destinationVerification.countryCode = country;
       await f.invoke(pix ? "auto" : "reserve");
-      const allowed = country === "BR" && !split;
+      const allowed = country === "BR" || !method.startsWith("Maquininha");
       assert.equal(f.docs.has("orderFinancials/o1"), allowed);
       if (!allowed) {
         assert.equal(f.docs.get("products/p1").reservedStock, 0);
-        assert.equal(order.financialValidationError, country === "PY" ? "CROSS_BORDER_OPERATION_NOT_AUTHORIZED" : "SINGLE_PAYMENT_REQUIRED");
+        assert.equal(order.financialValidationError, "PAYMENT_METHOD_NOT_ALLOWED_FOR_COUNTRY");
       }
     });
   }
@@ -577,16 +581,16 @@ test("cash: rejects insufficient tender against official total", async () => {
   assert.equal(f.docs.get("products/p1").reservedStock, 0);
 });
 
-for (const [currency, amount] of [["BRL", 70.00], ["USD", 14.12],
-  ["PYG", 105900]]) {
-  test(`cash: ${currency} requires a genuine configured rate`, async () => {
+for (const [currency, amount] of [["BRL", 70.00], ["USD", 14.00],
+  ["PYG", 105000]]) {
+  test(`cash: ${currency} converts cleanly with binational policy`, async () => {
     const f = fixture({
       paymentMethod: "Dinheiro", pixRequested: false,
       cashCurrency: currency, cashTendered: amount,
     });
     await f.invoke("reserve");
-    if (currency === "BRL") { assertFinancial(f.docs.get("orders/o1")); assert.equal(f.docs.get("products/p1").reservedStock, 3); }
-    else { assert.equal(f.docs.get("orders/o1").financialValidationError, "EXCHANGE_RATE_UNAVAILABLE"); assert.equal(f.docs.get("products/p1").reservedStock, 0); }
+    assertFinancial(f.docs.get("orders/o1"));
+    assert.equal(f.docs.get("products/p1").reservedStock, 3);
   });
 }
 
@@ -599,19 +603,19 @@ const split = (amount) => ({
   ],
 });
 
-test("split: rejects new purchase even when declared payments cover the total",
+test("split: accepts valid cash parts covering the total",
     async () => {
-      const f = fixture(split(4.12));
+      const f = fixture(split(4.00));
       await f.invoke("reserve");
-      assert.equal(f.docs.get("orders/o1").financialValidationError,"SINGLE_PAYMENT_REQUIRED");
-      assert.equal(f.docs.get("products/p1").reservedStock,0);
+      assertFinancial(f.docs.get("orders/o1"));
+      assert.equal(f.docs.get("products/p1").reservedStock, 3);
     });
 
 test("split: rejects insufficient sum despite forged paid totals", async () => {
   const f = fixture(split(1));
   await f.invoke("reserve");
   assert.equal(f.docs.get("orders/o1").financialValidationError,
-      "SINGLE_PAYMENT_REQUIRED");
+      "PAGAMENTO_INSUFICIENTE");
   assert.equal(f.docs.get("products/p1").reservedStock, 0);
 });
 
@@ -767,7 +771,7 @@ test("split rejects overflow in declared converted amounts", async () => {
   const f = fixture(split(1e308));
   await f.invoke("reserve");
   assert.equal(f.docs.get("orders/o1").financialValidationError,
-      "SINGLE_PAYMENT_REQUIRED");
+      "VALOR_PAGAMENTO_INVALIDO");
   assert.equal(f.docs.get("products/p1").reservedStock, 0);
 });
 

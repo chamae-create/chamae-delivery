@@ -8,7 +8,7 @@ function normalizeVeriffDecision(raw,{clientId,sharedSecret,authClient,signature
     !/^[a-f0-9]{64}$/i.test(signature||""))fail("AGE_PROVIDER_SIGNATURE_INVALID");
   const expected=createHmac("sha256",sharedSecret).update(raw).digest();
   if(!timingSafeEqual(expected,Buffer.from(signature,"hex")))fail("AGE_PROVIDER_SIGNATURE_INVALID");
-  let data;try{data=JSON.parse(raw.toString("utf8"));}catch{fail("AGE_PROVIDER_PAYLOAD_INVALID");}
+  let data;try{data=JSON.parse(raw.toString("utf8"));}catch(_){fail("AGE_PROVIDER_PAYLOAD_INVALID");}
   const v=data?.verification;
   if(!sessionId||!subjectRef||v?.id!==sessionId||v?.vendorData!==subjectRef||
       assuranceProfile!=="document_face_liveness")fail("AGE_PROVIDER_SESSION_INVALID");

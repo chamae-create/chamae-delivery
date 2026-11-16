@@ -38,12 +38,17 @@ function parseEvent(data, uid) {
     }
     if (data.type === "confirmDelivery") {
       const proof = data.payload.proof;
-      if (Object.keys(data.payload).some((k) => k !== "proof") || !proof || typeof proof !== "object" ||
+      if (Object.keys(data.payload).some((k) => !["proof", "collectionConfirmed"].includes(k)) ||
+          !proof || typeof proof !== "object" ||
           Object.keys(proof).some((k) => !["method", "verificationId"].includes(k)) ||
-          proof.method !== "pin" || !/^[a-f0-9]{64}$/.test(proof.verificationId || "")) {
+          proof.method !== "pin" || !/^[a-f0-9]{64}$/.test(proof.verificationId || "") ||
+          (data.payload.collectionConfirmed !== undefined && typeof data.payload.collectionConfirmed !== "boolean")) {
         throw new HttpsError("invalid-argument", "PROOF_INVALID");
       }
-      payload = {proof: {method: "pin", verificationId: proof.verificationId}};
+      payload = {
+        proof: {method: "pin", verificationId: proof.verificationId},
+        ...(data.payload.collectionConfirmed === true ? {collectionConfirmed: true} : {}),
+      };
     } else {
       if (Object.keys(data.payload).length) throw new HttpsError("invalid-argument", "TRANSITION_INVALID");
       payload = {};

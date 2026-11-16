@@ -219,12 +219,22 @@ async function notifyOrderStatusChange(db, event, messaging = null) {
   }
 
   if (invalidTokens.length > 0) {
-    const removal = {
-      fcmTokens: FieldValue.arrayRemove(...invalidTokens),
+    const invalidSet = new Set(invalidTokens);
+    const userData = userSnap.exists ? userSnap.data() : null;
+    const profileData = profileSnap.exists ? profileSnap.data() : null;
+    const buildCleanup = (docData) => {
+      const cleanup = {fcmTokens: FieldValue.arrayRemove(...invalidTokens)};
+      if (docData && typeof docData.fcmToken === "string" && invalidSet.has(docData.fcmToken.trim())) {
+        cleanup.fcmToken = FieldValue.delete();
+      }
+      if (docData && typeof docData.pushToken === "string" && invalidSet.has(docData.pushToken.trim())) {
+        cleanup.pushToken = FieldValue.delete();
+      }
+      return cleanup;
     };
     const cleanupOps = [
-      db.collection("users").doc(customerUid).set(removal, {merge: true}),
-      db.collection("customerProfiles").doc(customerUid).set(removal, {merge: true}),
+      db.collection("users").doc(customerUid).set(buildCleanup(userData), {merge: true}),
+      db.collection("customerProfiles").doc(customerUid).set(buildCleanup(profileData), {merge: true}),
     ];
     await Promise.all(cleanupOps);
   }
@@ -248,6 +258,7 @@ function createCustomerPushFunctions(db) {
         {
           document: "orders/{orderId}",
           region: "southamerica-east1",
+          retry: true,
           maxInstances: 10,
         },
         (event) => notifyOrderStatusChange(db, event)),

@@ -35,6 +35,7 @@ async function syncCustomerActiveOrder(db, customerUid) {
   if (!db || typeof db.collection !== "function" || !customerUid) return null;
   const snap = await db.collection("orders")
       .where("customerUid", "==", customerUid)
+      .limit(25)
       .get();
   const activeDoc = snap.docs.find((d) => !isTerminalOrderStatus(d.data()?.status));
   const ref = db.collection("customerActiveOrders").doc(customerUid);
@@ -108,6 +109,16 @@ async function prepareOrderAcceptance(tx, db, orderRef, order) {
       const otherOrderSnap = await tx.get(db.collection("orders").doc(activeLock.orderId));
       const otherStatus = otherOrderSnap?.exists ? otherOrderSnap.data()?.status : null;
       if (otherOrderSnap?.exists && !isTerminalOrderStatus(otherStatus)) {
+        reject("ACTIVE_ORDER_EXISTS");
+      }
+    }
+    const ordersCol = db.collection("orders");
+    if (ordersCol && typeof ordersCol.where === "function") {
+      const activeOrdersSnap = await tx.get(
+          ordersCol.where("customerUid", "==", order.customerUid).limit(25));
+      const conflict = activeOrdersSnap?.docs?.find((d) =>
+        d.id !== orderRef.id && !isTerminalOrderStatus(d.data()?.status));
+      if (conflict) {
         reject("ACTIVE_ORDER_EXISTS");
       }
     }

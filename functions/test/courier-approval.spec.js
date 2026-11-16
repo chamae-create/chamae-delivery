@@ -49,7 +49,7 @@ test("guard requires named authenticated identity before any database read", asy
 });
 test("guard reads stored approval instead of a client boolean", async () => {
   for (const exists of [false, true]) {
-    const db = {collection: (name) => ({doc: (uid) => ({get: async () => ({
+    const db = {collection: (name) => ({doc: () => ({get: async () => ({
       exists: name === "couriers" && exists,
       data: () => ({approvalStatus: "pendingApproval", administrativeState: "active", enabled: true}),
     })})})};

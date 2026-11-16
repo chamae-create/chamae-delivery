@@ -1,0 +1,33 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
+    function isOperationsAdmin() {
+      return isSignedIn()
+        && request.auth.token.roles is list
+        && (request.auth.token.roles.hasAny(['superadmin', 'operations_admin']));
+    }
+
+    // Courier profile selfies/photos used in courier-photo flow.
+    // Bounded to 512 KB JPEG/PNG uploaded solely by the owning authenticated user.
+    match /courier-photos/{uid}/{fileName} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || isOperationsAdmin());
+      allow write: if isSignedIn()
+        && request.auth.uid == uid
+        && fileName.matches('^profile-[a-f0-9-]{8,64}\\.(jpg|jpeg|png)$')
+        && request.resource != null
+        && request.resource.size > 0
+        && request.resource.size <= 512 * 1024
+        && request.resource.contentType in ['image/jpeg', 'image/png'];
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

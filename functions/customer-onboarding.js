@@ -75,6 +75,10 @@ async function prepareCustomerEligibility(tx, db, order) {
   return {policy, profile: profileDoc.data(), ageProof: ageProof.data(), uid: order.customerUid, country: order.deliveryAddress.countryCode,
     documentRequiredAtDelivery: false};
 }
+function externalAgeKycRequired() {
+  const raw = String(process.env.CHAMAE_REQUIRE_EXTERNAL_AGE_KYC || "").trim().toLowerCase();
+  return raw === "true" || raw === "1";
+}
 function stagingAgeBypassAllowed(uid) {
   const project = process.env.GCLOUD_PROJECT || (() => {
     try { return JSON.parse(process.env.FIREBASE_CONFIG || "{}").projectId; } catch { return ""; }
@@ -94,17 +98,17 @@ function checkProductEligibility(context, product, now = new Date()) {
     throw new HttpsError("failed-precondition",
         "A elegibilidade deste produto para o destino ainda não está disponível.");
   }
+  const floor = requiredAge(context.country, minimum);
   const dob = birthDate(context.profile.birthDate, now);
   if (!dob) throw new HttpsError("failed-precondition", "AGE_VERIFICATION_REQUIRED", {reason: "AGE_PROOF_REQUIRED"});
   let age = now.getUTCFullYear() - dob.getUTCFullYear();
   if (now.getUTCMonth() < dob.getUTCMonth() ||
       (now.getUTCMonth() === dob.getUTCMonth() && now.getUTCDate() < dob.getUTCDate())) age--;
-  if (age < minimum) {
+  if (age < floor) {
     throw new HttpsError("permission-denied", "Este produto não está disponível para sua faixa etária neste destino.",
         {reason: "AGE_RESTRICTED"});
   }
-  if (!stagingAgeBypassAllowed(context.uid)) {
-    const floor = requiredAge(context.country, minimum);
+  if (externalAgeKycRequired() && !stagingAgeBypassAllowed(context.uid)) {
     assertAgeEvidence(context.ageProof, {uid: context.uid, minimum: floor, identityRevision: context.profile.identityRevision});
   }
   context.documentRequiredAtDelivery = true;

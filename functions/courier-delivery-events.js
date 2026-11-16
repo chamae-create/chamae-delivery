@@ -88,9 +88,20 @@ async function submitDeliveryEvent(db, request, event, helpers) {
         await require("./delivery-collection-contract").assertSupervisedCollection(tx, db, c.order,
             event.orderId, financial.data(), helpers.checkDeliveryPayment);
       }
-      // A PIN is delivery evidence, never proof that an unpaid cash/card/mixed
-      // amount was collected. Existing authoritative payment state is required.
-      if (c.order.paymentStatus !== "Pago") reject("COLLECTION_CONFIRMATION_REQUIRED");
+      const collectionConfirmed = event.payload.collectionConfirmed === true;
+      const payableOnDelivery = [
+        "Dinheiro",
+        "Maquininha",
+        "Maquininha - Débito à vista",
+        "Maquininha - Crédito à vista",
+        "Pagamento dividido",
+      ].includes(c.order.paymentMethod);
+      // A PIN alone is delivery evidence. Unpaid on-delivery orders require explicit
+      // audited collection confirmation (PIX must always arrive paid via webhook).
+      if (c.order.paymentStatus !== "Pago" &&
+          (!collectionConfirmed || !payableOnDelivery || c.order.pixRequested === true)) {
+        reject("COLLECTION_CONFIRMATION_REQUIRED");
+      }
       const verifierRef = db.doc("deliveryPinVerifiers/" + event.orderId);
       const verifier = (await tx.get(verifierRef)).data();
       const secret = (await tx.get(db.doc("customerDeliverySecrets/" + c.order.customerUid))).data();
@@ -100,9 +111,11 @@ async function submitDeliveryEvent(db, request, event, helpers) {
           verifier.verificationId !== event.payload.proof.verificationId ||
           !(verifier.verifiedAt instanceof Timestamp) || verifier.completionEventId) reject("PIN_CONFIRMATION_REQUIRED");
       await moveOrder(db, {auth: request.auth, data: {orderId: event.orderId, requestId: event.eventId,
-        deliveryConfirmed: true, collectionConfirmed: false, expectedDeliveryRevision: revision(c.order)}},
+        deliveryConfirmed: true, collectionConfirmed: collectionConfirmed && c.order.paymentStatus !== "Pago",
+        expectedDeliveryRevision: revision(c.order)}},
       "complete", helpers.resolveReservation, helpers.checkFinancial,
-      {transaction: tx, courierUid: event.courierUid, fingerprint: event.fingerprint});
+      {transaction: tx, courierUid: event.courierUid, fingerprint: event.fingerprint,
+        checkDeliveryPayment: helpers.checkDeliveryPayment});
       phase = "delivered";
       tx.update(verifierRef, {completionEventId: event.eventId, completedAt: FieldValue.serverTimestamp()});
       tx.update(c.orderRef, {courierDeliveryPhase: phase});

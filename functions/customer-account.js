@@ -61,7 +61,7 @@ async function requestClosure(db, request, now = Date.now()) {
     // Existing index; a full, paginated preflight follows after the write lock.
     const active = await tx.get(db.collection("orders").where("customerUid", "==", uid)
         .where("status", "in", ["Novo", "Aguardando pagamento", "Em Separação",
-          "Aguardando Retirada", "Saiu para Entrega", "Revisão financeira", "Revisão de estoque"]).limit(1));
+          "Saiu para Entrega", "Revisão financeira", "Revisão de estoque"]).limit(1));
     if (!active.empty) throw pending();
     tx.set(ref, {status: "requested", schemaVersion: 1,
       requiresAppleRevocation: tokenHasApple(request.auth.token),
@@ -179,8 +179,9 @@ async function processClosure(db, auth, uid, services = {}) {
   for (const [collection, field] of [["deliveryQuotes", "uid"], ["deliveryPinAudit", "uid"],
     ["reviews", "customerUid"], ["ageVerificationSessions", "uid"], ["ageVerificationAudit", "uid"],
     ["deliveryAgeChecks", "customerUid"], ["deliveryAgeAudit", "uid"]]) await eraseQuery(db, collection, field, uid);
-  for (const collection of ["customerProfiles", "customerWorkspaces", "customerDeliverySecrets",
-    "customerConsentEvents", "customerOrderCancellations", "customerAgeVerifications"]) {
+  for (const collection of ["users", "customerActiveOrders", "customerProfiles", "customerWorkspaces",
+    "customerDeliverySecrets", "customerConsentEvents", "customerOrderCancellations",
+    "customerAgeVerifications"]) {
     await db.recursiveDelete(db.collection(collection).doc(uid));
   }
   // Delete sensitive provider material only AFTER a durable outcome and local erasure.

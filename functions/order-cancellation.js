@@ -104,7 +104,7 @@ async function compensate(db, command, operation, helpers) {
     if (order.paymentStatus === "Pago" && !command.privileged) {
       throw new HttpsError("permission-denied", "Requer superadmin.");
     }
-    if (!["Novo", "Aguardando pagamento", "Em Separação", "Aguardando Retirada", "Saiu para Entrega", "Concluído",
+    if (!["Novo", "Aguardando pagamento", "Em Separação", "Saiu para Entrega", "Concluído",
       "Revisão financeira", "Revisão de estoque"]
         .includes(order.status) && !(operation === "restock" && isCancelled(order))) {
       fail("ORDER_STATE_REVIEW_REQUIRED");

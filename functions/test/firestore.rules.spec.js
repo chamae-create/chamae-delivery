@@ -182,8 +182,8 @@ const checkoutOrder = (overrides = {}) => {
       number: "1", confirmed: true, countryCode: "BR"},
     deliveryLocation: new GeoPoint(-22.5, -55.7),
     itemsList: [{id: "p1", name: "Produto", quantity: 1, price: 20}],
-    itemsTotal: 20, deliveryFee: 5, customerFee: 1, merchantFee: 0.6,
-    merchantNet: 19.4, platformFee: 1.6, totalBRL: 26,
+    itemsTotal: 20, deliveryFee: 5, customerFee: 0, merchantFee: 0,
+    merchantNet: 20, platformFee: 0, totalBRL: 25,
     displayCurrency: "BRL", displayTotal: 26, exchangeRatePYGPerBRL: 1400,
     exchangeRateBRLPerUSD: 5, exchangeRateSource: "fixed_initial",
     exchangeRateCapturedAt: serverTimestamp(), paymentMethod: "Dinheiro",
@@ -279,13 +279,26 @@ for (const address of [{confirmed: false}, {countryCode: "US"},
       });
 }
 
-test("verified owner cannot create PY commerce before territorial authorization",
+test("verified owner can create lawful PY PIX/Dinheiro/split orders and cannot create PY Maquininha or non-zero v1.0 fees",
     async () => {
       const order = checkoutOrder();
-      await assertFails(setDoc(doc(clients.authenticated(),
-          "orders/confirmed-py"), {...order, deliveryAddress: {
+      await assertSucceeds(setDoc(doc(clients.authenticated(),
+          "orders/confirmed-py-cash"), {...order, deliveryAddress: {
         ...order.deliveryAddress, countryCode: "PY", noNumber: true, number: "",
       }}));
+      await assertFails(setDoc(doc(clients.authenticated(),
+          "orders/confirmed-py-card"), {...order,
+        paymentMethod: "Maquininha",
+        deliveryAddress: {
+          ...order.deliveryAddress, countryCode: "PY", noNumber: true, number: "",
+        }}));
+      await assertFails(setDoc(doc(clients.authenticated(),
+          "orders/nonzero-customer-fee"), {...order, customerFee: 1, totalBRL: 26}));
+      await assertFails(setDoc(doc(clients.authenticated(),
+          "orders/nonzero-merchant-fee"), {...order, merchantFee: 0.6}));
+      await assertFails(setDoc(doc(clients.authenticated(),
+          "orders/missing-address-text"), {...order,
+        address: "", deliveryAddress: {...order.deliveryAddress, addressText: ""}}));
     });
 
 test(
@@ -471,12 +484,12 @@ for (const [name, overrides] of Object.entries({
   pix: {paymentMethod: "PIX", pixRequested: true, pixRequestVersion: 1,
     paymentStatus: "Aguardando confirmação", status: "Aguardando pagamento"},
   dividido: {paymentMethod: "Pagamento dividido", splitPayment: true,
-    paymentParts: [{method: "Dinheiro", amountBRL: 10},
-      {method: "Maquininha", amountBRL: 16}],
-    splitPaidBRL: 26, splitRemainingBRL: 0, splitChangeBRL: 0},
+    paymentParts: [{method: "Dinheiro", currency: "BRL", amountCurrency: 10},
+      {method: "Dinheiro", currency: "BRL", amountCurrency: 15}],
+    splitPaidBRL: 25, splitRemainingBRL: 0, splitChangeBRL: 0},
 })) {
   test(`checkout ${name}: owner can create the actual payload`, async () => {
-    await (name === "dividido" ? assertFails : assertSucceeds)(setDoc(doc(clients.authenticated(),
+    await assertSucceeds(setDoc(doc(clients.authenticated(),
         `orders/create-${name}`),
     checkoutOrder(overrides)));
   });
@@ -1007,6 +1020,10 @@ test("public legal documents: only published current get, never drafts/list/priv
   await assertFails(getDoc(doc(signed, "courierPolicies/current")));
   await assertFails(getDoc(doc(anon, "customerPolicies/current")));
   await assertSucceeds(getDoc(doc(signed, "customerPolicies/current")), "legacy signed-in client read preserved");
+  await environment.withSecurityRulesDisabled(async (context) => {
+    await updateDoc(doc(context.firestore(), "courierPolicies/current"), {draft: false});
+    await updateDoc(doc(context.firestore(), "customerPolicies/current"), {draft: false});
+  });
 });
 
 
@@ -1040,9 +1057,50 @@ test("sprint100: client cannot forge private age evidence or a delivery acknowle
     await assertFails(getDocs(collection(db, collectionName)));
   }
 });
-test("sprint100: BRL-only and single-payment gates cannot be bypassed by direct writes", async () => {
-  for(const [id, patch] of Object.entries({foreignUsd:{cashCurrency:"USD"},foreignPyg:{cashCurrency:"PYG"},
-    splitFlag:{splitPayment:true},hiddenParts:{paymentParts:[{method:"Dinheiro",amountBRL:26}]}})){
-    await assertFails(setDoc(doc(clients.authenticated(), "orders", "sprint100-"+id), checkoutOrder(patch)));
+test("sprint100: binational BRL/PYG/USD cash and cash split orders pass rules while invalid splits and Tabacaria/Head Shop reads fail", async () => {
+  for (const [id, patch] of Object.entries({
+    foreignUsd: {cashCurrency: "USD"},
+    foreignPyg: {cashCurrency: "PYG"},
+    splitCash: {
+      paymentMethod: "Pagamento dividido",
+      splitPayment: true,
+      paymentParts: [
+        {method: "Dinheiro", currency: "BRL", amountCurrency: 15},
+        {method: "Dinheiro", currency: "PYG", amountCurrency: 15000},
+      ],
+    },
+  })) {
+    await assertSucceeds(setDoc(doc(clients.authenticated(), "orders", "sprint100-"+id), checkoutOrder(patch)));
   }
+  for (const [id, patch] of Object.entries({
+    invalidCurrency: {cashCurrency: "EUR"},
+    splitFlagWrongMethod: {splitPayment: true},
+    hiddenParts: {paymentParts: [{method: "Dinheiro", amountBRL: 25}]},
+    splitTooMany: {
+      paymentMethod: "Pagamento dividido",
+      splitPayment: true,
+      paymentParts: [
+        {method: "Dinheiro"}, {method: "Dinheiro"},
+        {method: "Dinheiro"}, {method: "Dinheiro"},
+      ],
+    },
+  })) {
+    await assertFails(setDoc(doc(clients.authenticated(), "orders", "sprint100-bad-"+id), checkoutOrder(patch)));
+  }
+  await environment.withSecurityRulesDisabled(async (context) => {
+    const db = context.firestore();
+    await setDoc(doc(db, "products/tabacaria-doc"), {...product, category: "Tabacaria"});
+    await setDoc(doc(db, "products/headshop-doc"), {...product, category: "Head Shop", commercialBlocked: true});
+  });
+  await assertFails(getDoc(doc(clients.authenticated(), "products/tabacaria-doc")));
+  await assertFails(getDoc(doc(clients.unauthenticated(), "products/headshop-doc")));
+  const catalogAdmin = environment.authenticatedContext("cat-admin", {
+    roles: ["catalog_admin"], firebase: {sign_in_provider: "password"},
+  }).firestore();
+  await assertSucceeds(getDoc(doc(catalogAdmin, "products/tabacaria-doc")));
+  await environment.withSecurityRulesDisabled(async (context) => {
+    const db = context.firestore();
+    await deleteDoc(doc(db, "products/tabacaria-doc"));
+    await deleteDoc(doc(db, "products/headshop-doc"));
+  });
 });

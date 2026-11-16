@@ -3,27 +3,46 @@ const {test} = require("node:test");
 const assert = require("node:assert/strict");
 const {assertDestinationOperation, assertSinglePayment, checkoutPolicy} = require("../checkout-policy");
 const {requiredAge, assertAgeEvidence, runtimeTrust} = require("../age-eligibility");
-test("new checkout accepts a single BRL method without an FX dependency", () => {
+test("new checkout accepts BR/PY, BRL/PYG/USD cash and split cash parts", () => {
   for (const paymentMethod of ["PIX", "Dinheiro", "Maquininha"]) {
     assert.doesNotThrow(() => assertSinglePayment({paymentMethod, cashCurrency:"BRL"}));
   }
+  for (const cashCurrency of ["BRL", "PYG", "USD"]) {
+    assert.doesNotThrow(() => assertSinglePayment({paymentMethod:"Dinheiro", cashCurrency}));
+  }
+  assert.doesNotThrow(() => assertSinglePayment({
+    paymentMethod:"Pagamento dividido",
+    splitPayment:true,
+    paymentParts:[
+      {method:"Dinheiro", currency:"PYG", amountCurrency:75000},
+      {method:"Dinheiro", currency:"USD", amountCurrency:4},
+    ],
+  }));
   assert.doesNotThrow(() => assertDestinationOperation("BR"));
+  assert.doesNotThrow(() => assertDestinationOperation("PY"));
 });
-test("old clients cannot opt into split payments with flags, method or hidden parts", () => {
-  for (const patch of [{splitPayment:true},{paymentMethod:"Pagamento dividido"},
-    {paymentParts:[{method:"Dinheiro"},{method:"PIX"}]},{paymentParts:{0:{method:"Dinheiro"}}}]) {
-    assert.throws(() => assertSinglePayment({paymentMethod:"Dinheiro",...patch}), e=>e.details.reason==="SINGLE_PAYMENT_REQUIRED");
+test("split payments reject non-cash parts, PIX or missing/malformed parts", () => {
+  for (const patch of [
+    {splitPayment:true, paymentMethod:"Dinheiro"},
+    {splitPayment:true, paymentMethod:"Pagamento dividido", pixRequested:true,
+      paymentParts:[{method:"Dinheiro", currency:"BRL", amountCurrency:10},
+        {method:"Dinheiro", currency:"BRL", amountCurrency:10}]},
+    {paymentMethod:"Pagamento dividido"},
+    {paymentParts:[{method:"Dinheiro"},{method:"PIX"}]},
+    {paymentParts:{0:{method:"Dinheiro"}}},
+  ]) {
+    assert.throws(() => assertSinglePayment({paymentMethod:"Dinheiro",...patch}),
+      e=>e.details.reason==="SINGLE_PAYMENT_REQUIRED");
   }
   assert.doesNotThrow(() => assertSinglePayment({paymentMethod:"Dinheiro",paymentParts:[]}));
 });
-test("foreign cash cannot consume fictitious exchange or change rates", () => {
-  for(const cashCurrency of ["USD","PYG","unknown",""]) {
-    assert.throws(() => assertSinglePayment({paymentMethod:"Dinheiro",cashCurrency,
-      exchangeRateBRLPerUSD:5,exchangeRatePYGPerBRL:1500}),e=>e.details.reason==="EXCHANGE_RATE_UNAVAILABLE");
+test("unsupported cash currencies remain blocked while BRL/PYG/USD succeed", () => {
+  for(const cashCurrency of ["EUR","ARS","unknown",""]) {
+    assert.throws(() => assertSinglePayment({paymentMethod:"Dinheiro",cashCurrency}),
+      e=>e.details.reason==="EXCHANGE_RATE_UNAVAILABLE");
   }
 });
-test("PY commerce stays closed independently from identity, language and a successful route", () => {
-  assert.throws(() => assertDestinationOperation("PY"),e=>e.details.reason==="CROSS_BORDER_OPERATION_NOT_AUTHORIZED");
+test("unsupported destination countries fail closed independently from identity", () => {
   for(const value of [undefined,null,"US","br"])assert.throws(()=>assertDestinationOperation(value));
   assert.equal(Object.isFrozen(checkoutPolicy),true);
 });

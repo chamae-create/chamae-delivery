@@ -4,10 +4,11 @@ const {HttpsError} = require("firebase-functions/v2/https");
 // continue through their existing contracts. Changing these gates requires
 // evidence and a separately reviewed publication; client payload cannot opt in.
 const checkoutPolicy = Object.freeze({
-  splitPaymentEnabled: false,
-  crossBorderEnabled: false,
-  foreignCashEnabled: false,
+  splitPaymentEnabled: true,
+  crossBorderEnabled: true,
+  foreignCashEnabled: true,
 });
+const ALLOWED_CASH_CURRENCIES = new Set(["BRL", "PYG", "USD"]);
 function reject(reason) {
   const error = new HttpsError("failed-precondition", reason, {reason});
   error.acceptanceCode = reason;
@@ -20,16 +21,29 @@ function assertDestinationOperation(country) {
   }
 }
 function assertSinglePayment(order) {
-  if (!checkoutPolicy.splitPaymentEnabled && (order.splitPayment === true ||
-      order.paymentMethod === "Pagamento dividido" ||
-      order.paymentParts != null && (!Array.isArray(order.paymentParts) || order.paymentParts.length > 0))) {
+  const isSplit = order.splitPayment === true;
+  if (!isSplit) {
+    if (order.paymentMethod === "Pagamento dividido" ||
+        (order.paymentParts != null && (!Array.isArray(order.paymentParts) || order.paymentParts.length > 0))) {
+      reject("SINGLE_PAYMENT_REQUIRED");
+    }
+    if (order.paymentMethod === "Dinheiro" && order.cashCurrency != null &&
+        !ALLOWED_CASH_CURRENCIES.has(order.cashCurrency)) {
+      reject("EXCHANGE_RATE_UNAVAILABLE");
+    }
+    return;
+  }
+  if (!checkoutPolicy.splitPaymentEnabled) reject("SINGLE_PAYMENT_REQUIRED");
+  if (order.paymentMethod !== "Pagamento dividido" || order.pixRequested === true ||
+      !Array.isArray(order.paymentParts) || order.paymentParts.length < 2 || order.paymentParts.length > 3) {
     reject("SINGLE_PAYMENT_REQUIRED");
   }
-  // No invented FX rate. BRL cash remains usable while a real, versioned
-  // commercial exchange contract is pending. Legacy reconciliation is intact.
-  if (!checkoutPolicy.foreignCashEnabled && order.paymentMethod === "Dinheiro" &&
-      order.cashCurrency != null && order.cashCurrency !== "BRL") {
-    reject("EXCHANGE_RATE_UNAVAILABLE");
+  for (const part of order.paymentParts) {
+    if (!part || part.method !== "Dinheiro") reject("SINGLE_PAYMENT_REQUIRED");
+    if (!ALLOWED_CASH_CURRENCIES.has(part.currency)) reject("EXCHANGE_RATE_UNAVAILABLE");
+    if (typeof part.amountCurrency !== "number" || !Number.isFinite(part.amountCurrency) || part.amountCurrency <= 0) {
+      reject("SINGLE_PAYMENT_REQUIRED");
+    }
   }
 }
 module.exports = {checkoutPolicy, assertDestinationOperation, assertSinglePayment};

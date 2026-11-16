@@ -3,7 +3,7 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {defineString} = require("firebase-functions/params");
 const {GoogleRoutesProvider} = require("./google-routes-provider");
 const {createRuntimeMapsAuth} = require("./maps-runtime-auth");
-const {admitDeliveryQuote, assertStagingQuoteCaller} = require("./delivery-quote-limit");
+const {admitDeliveryQuote, assertQuoteCaller} = require("./delivery-quote-limit");
 const runtimeMapsAuth = createRuntimeMapsAuth();
 const quoteTestUids = defineString("CHAMAE_DELIVERY_QUOTE_UIDS", {default: ""});
 const pricingRouteMode = defineString("CHAMAE_DELIVERY_ROUTE_MODE", {default: ""});
@@ -241,8 +241,8 @@ function createDeliveryFunctions(db) {
   return {
     chamaeDescartarPropostaPedido: onCall(options, (r) => discardProposal(db, r)),
     chamaeSalvarConfiguracaoEntrega: onCall(options, (r) => saveVersion(db, r)),
-    chamaeCotarEntrega: onCall({...options, maxInstances: 2, concurrency: 10}, (r) => {
-      assertStagingQuoteCaller(r, quoteTestUids.value());
+    chamaeCotarEntrega: onCall({...options, maxInstances: 10, concurrency: 20}, (r) => {
+      assertQuoteCaller(r, quoteTestUids.value());
       return quoteDelivery(db, r, null);
     }),
     chamaeAtivarConfiguracaoEntrega: onCall(options, (r) => {

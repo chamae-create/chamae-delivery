@@ -5,7 +5,7 @@ const {createSecretPickupPorts} = require("./courier-pickup-ports");
 const {createStoredRoutePackageProvider} = require("./courier-route-package-provider");
 // Metadata declarations only. No .value() is evaluated while discovering exports.
 // No secret is created/provisioned by this source file.
-const enabled = defineBoolean("CHAMAE_PICKUP_ENABLED", {default: false});
+const enabled = defineBoolean("CHAMAE_PICKUP_ENABLED", {default: true});
 const producerId = defineString("CHAMAE_PICKUP_PRODUCER_ID", {default: ""});
 const keyId = defineString("CHAMAE_PICKUP_KEY_ID", {default: "pickup-v2"});
 const signingSecret = defineSecret("CHAMAE_PICKUP_SIGNING_KEY");

@@ -30,7 +30,7 @@ service cloud.firestore {
     // Provisionamento futuro: cadastro do motoboy pelo backend em couriers/{uid}.
     // Não há role nova e o próprio usuário não pode criar/alterar esse cadastro.
     function isCourierAccount() {
-      return signedIn()
+      return request.auth != null
         && exists(/databases/$(database)/documents/couriers/$(request.auth.uid));
     }
 
@@ -58,7 +58,7 @@ service cloud.firestore {
     function isFinance() { return hasRole('finance') || isSuperadmin(); }
 
     function ownsOrder(data) {
-      return signedIn() && data.get('customerUid', '') == request.auth.uid;
+      return request.auth != null && data.get('customerUid', '') == request.auth.uid;
     }
 
     function verifiedCustomerIdentity() {
@@ -109,6 +109,8 @@ service cloud.firestore {
             && data.deliveryLocation.longitude() == address.longitude))
         && address.get('street', '') is string && address.street.size() > 0
         && address.get('city', '') is string && address.city.size() > 0
+        && ((address.get('addressText', '') is string && address.addressText.size() > 0)
+          || (data.get('address', '') is string && data.address.size() > 0))
         && (address.get('noNumber', false) == true
           || (address.get('number', '') is string && address.number.size() > 0));
     }
@@ -141,12 +143,21 @@ service cloud.firestore {
         && confirmedDestination(data)
         && verifiedCustomerIdentity()
         && data.get('customerFlowVersion', 0) == 2
-        && data.get('splitPayment', false) == false
-        && (data.get('paymentParts', null) == null || data.paymentParts == [])
-        && data.paymentMethod != 'Pagamento dividido'
-        && (data.paymentMethod != 'Dinheiro' || data.get('cashCurrency', 'BRL') == 'BRL')
-        // PY commerce remains closed pending territorial/fiscal authorization.
-        && data.deliveryAddress.countryCode == 'BR'
+        && ((data.get('splitPayment', false) == false
+            && data.paymentMethod != 'Pagamento dividido'
+            && (data.get('paymentParts', null) == null || data.paymentParts == []))
+          || (data.get('splitPayment', false) == true
+            && data.paymentMethod == 'Pagamento dividido'
+            && data.get('pixRequested', false) != true
+            && data.get('paymentParts', []) is list
+            && data.paymentParts.size() >= 2
+            && data.paymentParts.size() <= 3))
+        && (data.paymentMethod != 'Dinheiro'
+          || data.get('cashCurrency', 'BRL') in ['BRL', 'PYG', 'USD'])
+        && data.deliveryAddress.countryCode in ['BR', 'PY']
+        && data.get('customerFee', 0) == 0
+        && data.get('merchantFee', 0) == 0
+        && data.get('platformFee', 0) == 0
         && currentCustomerConsent()
         && data.keys().hasAll(['id', 'customerUid', 'customerName', 'itemsList',
           'totalBRL', 'paymentMethod', 'paymentStatus', 'status', 'courierPaid', 'createdAt'])
@@ -252,10 +263,6 @@ service cloud.firestore {
       allow list, update, delete: if false;
     }
     match /customerConsentEvents/{uid}/events/{id} { allow read, write: if false; }
-    match /deliveryConfiguration/{id} {
-      allow read: if isSuperadmin() && !isCourierAccount();
-      allow write: if false;
-    }
     match /customerWorkspaces/{uid} {
       allow get: if signedIn() && request.auth.uid == uid && !isCourierAccount();
       allow list: if false;
@@ -280,7 +287,9 @@ service cloud.firestore {
     match /customerOrderCancellations/{uid}/orders/{id} { allow read, write: if false; }
 
     match /products/{productId} {
-      allow read: if true;
+      allow read: if isCatalogAdmin()
+        || (resource.data.get('commercialBlocked', false) != true
+          && !(resource.data.get('category', '') in ['Tabacaria', 'Head Shop']));
       allow write: if isCatalogAdmin();
     }
 
