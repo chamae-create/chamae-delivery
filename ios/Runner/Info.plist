@@ -4,6 +4,8 @@
 <dict>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Usamos sua localização para encontrar o endereço de entrega quando você solicita.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Usamos sua localização para calcular o frete e manter o endereço de entrega atualizado.</string>
     <key>GMSApiKey</key>
     <string>$(CHAMAE_MAPS_API_KEY)</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>

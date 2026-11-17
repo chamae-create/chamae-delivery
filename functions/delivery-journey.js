@@ -98,10 +98,47 @@ async function customerEstimate(db,request){
    illustrativeOnly:true,liveGps:false};
  });
 }
+async function updateCourierLocation(db,request){
+ const data=request.data;
+ const allowed=["orderId","latitude","longitude","accuracyMeters","atMs","headingDegrees"];
+ if(!data||typeof data!=="object"||Object.keys(data).some(k=>!allowed.includes(k))||
+  !id(data.orderId)||!point({latitude:data.latitude,longitude:data.longitude})||
+  typeof data.accuracyMeters!=="number"||!Number.isFinite(data.accuracyMeters)||data.accuracyMeters<0||data.accuracyMeters>5000||
+  typeof data.atMs!=="number"||!Number.isFinite(data.atMs)||data.atMs<=0||
+  (data.headingDegrees!==undefined&&data.headingDegrees!==null&&
+   (typeof data.headingDegrees!=="number"||!Number.isFinite(data.headingDegrees)||data.headingDegrees<0||data.headingDegrees>360)))
+  reject("invalid-argument","TELEMETRY_REQUEST_INVALID");
+ return db.runTransaction(async tx=>{
+  const courier=await requireApprovedCourier(db,request,tx);
+  await assertCurrentCourierAcceptance(db,courier.uid,tx);
+  const orderRef=db.doc("orders/"+data.orderId);
+  const order=(await tx.get(orderRef)).data();
+  if(courier.profile.online!==true||!order||order.status!=="Saiu para Entrega"||order.courierUid!==courier.uid)
+   reject("permission-denied","TELEMETRY_NOT_ASSIGNED");
+  const telemetryRef=db.doc("couriers/"+courier.uid+"/privateRuntime/locationTelemetry");
+  const old=(await tx.get(telemetryRef)).data();
+  const nowMs=Date.now();
+  if(old?.nextAllowedAt instanceof Timestamp&&old.nextAllowedAt.toMillis()>nowMs&&old.orderId===data.orderId)
+   return {accepted:true,throttled:true,orderId:data.orderId};
+  const nowTs=Timestamp.fromMillis(nowMs);
+  const loc={
+   latitude:data.latitude,
+   longitude:data.longitude,
+   accuracyMeters:data.accuracyMeters,
+   atMs:Math.trunc(data.atMs),
+   updatedAt:nowTs,
+   ...(typeof data.headingDegrees==="number"?{headingDegrees:data.headingDegrees}:{}),
+  };
+  tx.set(telemetryRef,{orderId:data.orderId,...loc,nextAllowedAt:Timestamp.fromMillis(nowMs+8000)});
+  tx.update(orderRef,{courierLocation:loc});
+  return {accepted:true,throttled:false,orderId:data.orderId};
+ });
+}
 function createDeliveryJourneyFunctions(db,config={}){
  const options={region:"southamerica-east1",maxInstances:1};
  return {chamaeRotaOnlineMotoboy:onCall({...options,secrets:[key]},r=>onlineRoute(db,r,config.provider||
    (args=>googleRoute({...args,apiKey:key.value(),travelMode:mode.value()})))),
- chamaePrevisaoEntrega:onCall(options,r=>customerEstimate(db,r))};
+ chamaePrevisaoEntrega:onCall(options,r=>customerEstimate(db,r)),
+ chamaeAtualizarLocalizacaoMotoboy:onCall(options,r=>updateCourierLocation(db,r))};
 }
-module.exports={createDeliveryJourneyFunctions,onlineRoute,customerEstimate,googleRoute,decodePolyline};
+module.exports={createDeliveryJourneyFunctions,onlineRoute,customerEstimate,updateCourierLocation,googleRoute,decodePolyline};

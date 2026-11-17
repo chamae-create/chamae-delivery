@@ -114,14 +114,21 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -350));
+    await tester.pumpAndSettle();
     final favButton = find.byTooltip('Favoritar Produto A').last;
     await tester.ensureVisible(favButton);
+    await tester.pumpAndSettle();
     await tester.tap(favButton);
     await tester.pump();
     expect(workspace.data['favorites'], ['A']);
     expect(find.byTooltip('Remover Produto A dos favoritos'), findsWidgets);
 
-    await tester.tap(find.byTooltip('Remover Produto A dos favoritos').last);
+    final unfavButton =
+        find.byTooltip('Remover Produto A dos favoritos').last;
+    await tester.ensureVisible(unfavButton);
+    await tester.pumpAndSettle();
+    await tester.tap(unfavButton);
     await tester.pump();
     expect(workspace.data['favorites'], isEmpty);
     await tester.pumpWidget(const SizedBox());

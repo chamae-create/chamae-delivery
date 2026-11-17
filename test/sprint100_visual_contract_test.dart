@@ -317,7 +317,7 @@ void main() {
         quoter: LocalQuote(),
         verification: LocalVerifiedAccount())));
     await tester.pumpAndSettle();
-    expect(find.text('Dividir pagamento'), findsNothing);
+    expect(find.text('Dividir pagamento'), findsOneWidget);
     expect(find.byType(AgeVerificationCard), findsNothing);
     await capture(tester, '05_CHECKOUT');
     await tester.pumpWidget(const SizedBox());

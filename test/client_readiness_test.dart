@@ -185,11 +185,11 @@ void main() {
       expect(tester.takeException(), isNull);
     }
   });
-  testWidgets('pagamento dividido fica indisponível na v1', (tester) async {
+  testWidgets('pagamento dividido em dinheiro fica disponível na v1', (tester) async {
     await tester.pumpWidget(checkout('BR'));
     await tester.pumpAndSettle();
-    expect(find.byType(Switch), findsNothing);
-    expect(find.text('Dividir pagamento'), findsNothing);
+    expect(find.byType(Switch), findsOneWidget);
+    expect(find.text('Dividir pagamento'), findsOneWidget);
   });
   testWidgets('carrinho altera quantidade, total e remove item',
       (tester) async {

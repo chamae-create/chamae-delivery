@@ -396,6 +396,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           _cart.remove(id);
         }
       });
+      _persistCart();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: LocalizedText(
@@ -1239,9 +1240,9 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
               },
               borderRadius: BorderRadius.circular(14),
               child: Container(
-                width: 68,
+                constraints: const BoxConstraints(minWidth: 84),
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 7),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                 decoration: BoxDecoration(
                   gradient: selected ? CustomerVisual.gold : null,
                   color: selected ? null : Colors.white,
@@ -1421,7 +1422,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                             active.length > 1
                                 ? '${active.length} pedidos em andamento • $friendlyId'
                                 : 'Pedido $friendlyId',
-                            maxLines: 1,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: AppTheme.primaryYellow,
@@ -1432,7 +1433,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                           const SizedBox(height: 2),
                           Text(
                             'Status: $status • Toque para acompanhar',
-                            maxLines: 1,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.white,

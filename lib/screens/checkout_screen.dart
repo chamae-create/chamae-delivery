@@ -65,8 +65,7 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  // Preserve split-payment code for history/future work, never offer it in v1.
-  static const splitPaymentEnabled = false;
+  static const splitPaymentEnabled = true;
   final _nameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _cashPaidCtrl = TextEditingController();
@@ -722,6 +721,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       );
       return false;
     }
+    if (_deliveryAddress.addressText.trim().isEmpty ||
+        _deliveryAddress.street.trim().isEmpty ||
+        _deliveryAddress.district.trim().isEmpty ||
+        (!_deliveryAddress.noNumber &&
+            _deliveryAddress.number.trim().isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: LocalizedText(
+            'Informe rua, número e bairro completos no endereço de entrega.',
+          ),
+        ),
+      );
+      return false;
+    }
     if (_quoting || !_quoteUsable) return false;
     if (!isStoreOpen()) {
       ScaffoldMessenger.of(context)
@@ -812,6 +825,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       'address': _deliveryAddress.addressText,
       'deliveryAddress': {
         ..._deliveryAddress.toMap(),
+        'neighborhood': _deliveryAddress.district,
         'country': _deliveryCountry,
       },
       'deliveryLocation': _deliveryAddress.geoPoint,

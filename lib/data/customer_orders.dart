@@ -77,13 +77,13 @@ class CustomerOrders {
               },
               onError: (Object error, StackTrace stack) {
                 if (!controller.isClosed && version == generation) {
-                  controller.add(const []);
+                  controller.addError(error, stack);
                 }
               },
             );
           },
-          onError: (_, __) {
-            if (!controller.isClosed) controller.add(const []);
+          onError: (Object error, StackTrace stack) {
+            if (!controller.isClosed) controller.addError(error, stack);
           },
         );
       },

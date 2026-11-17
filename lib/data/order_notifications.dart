@@ -98,8 +98,12 @@ class FirebaseCustomerPushNotifications implements OrderNotifications {
         FirebaseMessaging.onMessageOpenedApp.listen((message) {
           final orderId = message.data['orderId']?.toString();
           if (orderId != null && orderId.isNotEmpty) {
-            pendingOrderId = orderId;
-            _onOrderOpened?.call(orderId);
+            if (_onOrderOpened != null) {
+              pendingOrderId = null;
+              _onOrderOpened!(orderId);
+            } else {
+              pendingOrderId = orderId;
+            }
           }
         });
       }
@@ -107,8 +111,12 @@ class FirebaseCustomerPushNotifications implements OrderNotifications {
       final initial = await messaging.getInitialMessage();
       final initialOrderId = initial?.data['orderId']?.toString();
       if (initialOrderId != null && initialOrderId.isNotEmpty) {
-        pendingOrderId = initialOrderId;
-        _onOrderOpened?.call(initialOrderId);
+        if (_onOrderOpened != null) {
+          pendingOrderId = null;
+          _onOrderOpened!(initialOrderId);
+        } else {
+          pendingOrderId = initialOrderId;
+        }
       }
 
       await ensureRegisteredSilently();

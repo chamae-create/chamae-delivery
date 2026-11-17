@@ -511,11 +511,11 @@ class CategoryBannerTile extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color(0x14000000),
-                        Color(0x550D0B08),
-                        Color(0xEB110E09),
+                        Colors.transparent,
+                        Colors.transparent,
+                        Color(0x9E0B0907),
                       ],
-                      stops: [0.0, 0.5, 1.0],
+                      stops: [0.0, 0.58, 1.0],
                     ),
                   ),
                 ),
@@ -714,27 +714,15 @@ class _ConvenienceCampaignState extends State<ConvenienceCampaign> {
           ),
           child: Column(
             children: [
-              SizedBox(
-                height: _campaignHeight(context),
+              AspectRatio(
+                aspectRatio: 16 / 9,
                 child: PageView(
                   key: const ValueKey('premium-campaign-carousel'),
                   controller: pages,
                   onPageChanged: (value) => setState(() => selected = value),
                   children: [
-                    _slide(
-                      es ? 'TU DÍA PIDE' : 'SEU DIA PEDE',
-                      es ? 'CONVENIENCIA' : 'CONVENIÊNCIA',
-                      es
-                          ? 'Encuentra lo que necesitas en nuestro catálogo.'
-                          : 'Encontre o que precisa no nosso catálogo.',
-                    ),
-                    _slide(
-                      es ? 'ELIGE A TU MANERA' : 'ESCOLHA DO SEU JEITO',
-                      es ? 'PIT STOP V8' : 'PIT STOP V8',
-                      es
-                          ? 'Explora las categorías y las ofertas disponibles.'
-                          : 'Explore as categorias e as ofertas disponíveis.',
-                    ),
+                    _slide('assets/images/banners/home_hero_pitstop_v8.jpg'),
+                    _slide('assets/images/banners/home_hero_kaipi_fruit.jpg'),
                   ],
                 ),
               ),
@@ -827,235 +815,12 @@ class _ConvenienceCampaignState extends State<ConvenienceCampaign> {
     );
   }
 
-  double _campaignHeight(BuildContext context) {
-    final es = Localizations.localeOf(context).languageCode == 'es';
-    final width = (MediaQuery.sizeOf(context).width.clamp(0, 1200) -
-            (widget.compact ? 24 : 0) -
-            36)
-        .clamp(1.0, 1200.0);
-    final monogram = !widget.compact &&
-        MediaQuery.textScalerOf(context).scale(1) <= 1.3 &&
-        width >= 380;
-    final textWidth = (width * (monogram ? .7 : 1.0)).toDouble();
-    double height(String text, TextStyle style, double available) {
-      final painter = TextPainter(
-        text: TextSpan(
-          text: text,
-          style: DefaultTextStyle.of(context).style.merge(style),
-        ),
-        textDirection: Directionality.of(context),
-        textScaler: MediaQuery.textScalerOf(context),
-      )..layout(maxWidth: available);
-      final result = painter.height;
-      painter.dispose();
-      return result;
-    }
-
-    final overlines = [
-      es ? 'TU DÍA PIDE' : 'SEU DIA PEDE',
-      es ? 'ELIGE A TU MANERA' : 'ESCOLHA DO SEU JEITO',
-    ];
-    final titles = [es ? 'CONVENIENCIA' : 'CONVENIÊNCIA', 'PIT STOP V8'];
-    final subtitles = [
-      es
-          ? 'Encuentra lo que necesitas en nuestro catálogo.'
-          : 'Encontre o que precisa no nosso catálogo.',
-      es
-          ? 'Explora las categorías y las ofertas disponibles.'
-          : 'Explore as categorias e as ofertas disponíveis.',
-    ];
-    final header = height(
-      'PIT STOP V8',
-      const TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w900,
-        letterSpacing: 1.5,
-      ),
-      width - 26,
-    );
-    var result = widget.compact ? 140.0 : 194.0;
-    for (var i = 0; i < 2; i++) {
-      final content = (header > 19 ? header : 19) +
-          28 +
-          10 +
-          3 +
-          9 +
-          4 +
-          height(
-            overlines[i],
-            TextStyle(
-              fontSize: widget.compact ? 15 : 21,
-              height: 1.05,
-              fontWeight: FontWeight.w900,
-              fontStyle: FontStyle.italic,
-            ),
-            textWidth,
-          ) +
-          height(
-            titles[i],
-            TextStyle(
-              fontSize: widget.compact ? 21 : 29,
-              height: 1,
-              fontWeight: FontWeight.w900,
-              fontStyle: FontStyle.italic,
-            ),
-            textWidth,
-          ) +
-          height(
-            subtitles[i],
-            const TextStyle(fontSize: 11, height: 1.3),
-            textWidth,
-          );
-      if (content > result) result = content;
-    }
-    return result;
-  }
-
-  Widget _slide(String overline, String title, String subtitle) =>
-      PremiumAtmosphere(
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(
-              'assets/images/banners/home_hero_pitstop_v8.jpg',
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-            ),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    Color(0xE80B0B0B),
-                    Color(0xBA14100A),
-                    Color(0x520B0B0B),
-                  ],
-                  stops: [0.0, 0.58, 1.0],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 16, 14),
-              child: LayoutBuilder(
-            builder: (context, constraints) {
-              final largeText = MediaQuery.textScalerOf(context).scale(1) > 1.3;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Row(
-                    children: [
-                      Icon(
-                        Icons.storefront_outlined,
-                        color: AppTheme.primaryYellow,
-                        size: 19,
-                      ),
-                      SizedBox(width: 7),
-                      Flexible(
-                        child: Text(
-                          'PIT STOP V8',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 13,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 7,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                overline,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: widget.compact ? 15 : 21,
-                                  height: 1.05,
-                                  fontWeight: FontWeight.w900,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                title,
-                                style: TextStyle(
-                                  color: AppTheme.primaryYellow,
-                                  fontSize: widget.compact ? 21 : 29,
-                                  height: 1,
-                                  fontWeight: FontWeight.w900,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                              const SizedBox(height: 9),
-                              Text(
-                                subtitle,
-                                style: const TextStyle(
-                                  color: Color(0xFFECE4D3),
-                                  fontSize: 11,
-                                  height: 1.3,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (!largeText &&
-                            !widget.compact &&
-                            constraints.maxWidth >= 380)
-                          const Expanded(
-                            flex: 3,
-                            child: ExcludeSemantics(
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      'V8',
-                                      style: TextStyle(
-                                        color: Color(0xFFFFD96B),
-                                        fontSize: 70,
-                                        fontWeight: FontWeight.w900,
-                                        fontStyle: FontStyle.italic,
-                                        shadows: [
-                                          Shadow(
-                                            color: Color(0xAA000000),
-                                            blurRadius: 10,
-                                            offset: Offset(0, 4),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Text(
-                                      'PIT STOP',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 11,
-                                        letterSpacing: 3,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-          ],
-        ),
+  Widget _slide(String assetPath) => Image.asset(
+        assetPath,
+        fit: BoxFit.contain,
+        width: double.infinity,
+        height: double.infinity,
+        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
       );
   Widget _benefit(IconData icon, String label) => Expanded(
         child: Row(
@@ -1559,9 +1324,9 @@ class CommerceProfileBanner extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color(0xCC0B0B0B),
-                        Color(0xAE1D150A),
-                        Color(0xD4100E0A),
+                        Color(0x450B0B0B),
+                        Color(0x381D150A),
+                        Color(0x66100E0A),
                       ],
                     ),
                   ),

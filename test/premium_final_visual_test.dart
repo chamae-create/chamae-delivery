@@ -25,11 +25,12 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('SEU DIA PEDE'), findsOneWidget);
+    expect(find.byType(AspectRatio), findsOneWidget);
+    expect(find.text('SEU DIA PEDE'), findsNothing);
     final pager = find.byKey(const ValueKey('premium-campaign-carousel'));
     await tester.drag(pager, const Offset(-420, 0));
     await tester.pumpAndSettle();
-    expect(find.text('ESCOLHA DO SEU JEITO'), findsOneWidget);
+    expect(find.text('ESCOLHA DO SEU JEITO'), findsNothing);
     expect(find.textContaining('cerveja'), findsNothing);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());

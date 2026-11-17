@@ -18,6 +18,8 @@ const {
 } = require("../courier-notifications");
 const {notifyOrderStatusChange} = require("../customer-push-notifications");
 const {ownProfile, reviewCourier} = require("../courier-approval");
+const {useOpenClock} = require("./operational-fixture");
+const {updateCourierLocation, createDeliveryJourneyFunctions} = require("../delivery-journey");
 const {prepareOrderAcceptance} = require("../order-acceptance");
 const {courierPolicyFixture, courierAcceptanceFixture} = require("./courier-policy-fixture");
 const {deliveryFixture} = require("./delivery-fixture");
@@ -291,12 +293,86 @@ test("[P0-05 & P0-06 & P0-07] pickup defaults enabled and atomic active-order qu
       return {exists: docs.has(ref.path), data: () => docs.get(ref.path)};
     },
   };
+  await useOpenClock(async () => {
+    await assert.rejects(
+        prepareOrderAcceptance(tx, db, {id: "new-order"}, {
+          customerUid: "buyer",
+          deliveryQuoteId: df.quoteId,
+          deliveryAddress: df.destination,
+        }),
+        (e) => e.details?.reason === "ACTIVE_ORDER_EXISTS",
+    );
+  });
+});
+
+test("[Wave 3] chamaeAtualizarLocalizacaoMotoboy validates courier assignment and persists throttled telemetry", async () => {
+  const fns = createDeliveryJourneyFunctions({});
+  assert.equal(typeof fns.chamaeAtualizarLocalizacaoMotoboy, "function");
+
+  const policy = courierPolicyFixture();
+  const docs = new Map([
+    ["couriers/c1", {
+      role: "courier",
+      approvalStatus: "approved",
+      administrativeState: "active",
+      enabled: true,
+      online: true,
+    }],
+    ["courierPolicies/current", policy],
+    ["courierPolicyAcceptances/c1", {
+      acceptedAt: new Date(),
+      acceptTerms: true,
+      acknowledgePrivacy: true,
+      policyRevision: policy.revision,
+      policyHash: policy.contentHash,
+      termsVersion: policy.termsVersion,
+      privacyVersion: policy.privacyVersion,
+    }],
+    ["orders/ord1", {
+      status: "Saiu para Entrega",
+      courierUid: "c1",
+    }],
+  ]);
+  const db = {
+    doc: (p) => ({path: p}),
+    collection: (c) => ({doc: (id) => ({path: `${c}/${id}`, id})}),
+    runTransaction: async (fn) => {
+      const tx = {
+        get: async (ref) => ({exists: docs.has(ref.path), data: () => docs.get(ref.path)}),
+        set: (ref, val) => docs.set(ref.path, val),
+        update: (ref, val) => docs.set(ref.path, {...(docs.get(ref.path) || {}), ...val}),
+      };
+      return fn(tx);
+    },
+  };
+  const req = {
+    auth: {
+      uid: "c1",
+      token: {roles: ["courier"], email_verified: true, firebase: {sign_in_provider: "password"}},
+    },
+    data: {
+      orderId: "ord1",
+      latitude: -22.5361,
+      longitude: -55.7256,
+      accuracyMeters: 12.5,
+      atMs: Date.now(),
+      headingDegrees: 90,
+    },
+  };
+  const first = await updateCourierLocation(db, req);
+  assert.equal(first.accepted, true);
+  assert.equal(first.throttled, false);
+  assert.equal(docs.get("orders/ord1").courierLocation.latitude, -22.5361);
+
+  const second = await updateCourierLocation(db, req);
+  assert.equal(second.accepted, true);
+  assert.equal(second.throttled, true);
+
   await assert.rejects(
-      prepareOrderAcceptance(tx, db, {id: "new-order"}, {
-        customerUid: "buyer",
-        deliveryQuoteId: df.quoteId,
-        deliveryAddress: df.destination,
+      updateCourierLocation(db, {
+        ...req,
+        data: {...req.data, latitude: 999},
       }),
-      (e) => e.details?.reason === "ACTIVE_ORDER_EXISTS",
+      (e) => e.details?.reason === "TELEMETRY_REQUEST_INVALID",
   );
 });
